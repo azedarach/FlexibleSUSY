@@ -33,6 +33,26 @@ namespace flexiblesusy {
 #define sum_user_t(type, idx, ini, fin, expr)	\
     sum<type, (ini), (fin)>([&](type (idx)) { return (expr); })
 
+template<class Idx, Idx ini, Idx fin, class Function>
+auto sum(Function f) -> decltype(f(ini))
+{
+    decltype(f(ini)) s = 0;
+    for (Idx i = ini; i <= fin; i++) s += f(i);
+    return s;
+}
+
+#define USUM(...) (get_usum(__VA_ARGS__)(__VA_ARGS__))
+
+#define get_usum(...) get_usum_macro(__VA_ARGS__, usum_user_t, usum_size_t,)
+
+#define get_usum_macro(_1, _2, _3, _4, _5, name, ...) name
+
+#define usum_size_t(idx, ini, fin, expr)	\
+    usum<size_t, (ini), (fin)>([&](size_t (idx)) { return (expr); })
+
+#define usum_user_t(type, idx, ini, fin, expr)	\
+    usum<type, (ini), (fin)>([&](type (idx)) { return (expr); })
+
 template<bool valid, class Function, class Idx, Idx ini, Idx fin>
 struct unroll_sum;
 
@@ -61,7 +81,7 @@ struct unroll_sum<true, Function, Idx, ini, fin> {
 };
 
 template<class Idx, Idx ini, Idx fin, class Function>
-auto sum(Function f) -> decltype(f(ini))
+auto usum(Function f) -> decltype(f(ini))
 {
     return unroll_sum<(fin >= ini), Function, Idx, ini, fin>::eval(f);
 }
