@@ -1,13 +1,10 @@
 
 FSModelName = "@CLASSNAME@";
+FSEigenstates = SARAH`EWSB;
 
 (* MRSSM input parameters *)
 
 MINPAR = { {3, TanBeta} };
-
-DefaultParameterPoint = {
-    {TanBeta, 10}
-};
 
 EWSBOutputParameters = { mHd2, mHu2, mS2, mT2 };
 
@@ -42,3 +39,24 @@ InitialGuessAtLowScale = {
 OnlyLowEnergyFlexibleSUSY = True;
 
 PotentialLSPParticles = { Chi, Su, Sd, Se, Cha1, Cha2 };
+
+DefaultPoleMassPrecision = MediumPrecision;
+HighPoleMassPrecision    = {hh, Ah, Hpm};
+MediumPoleMassPrecision  = {};
+LowPoleMassPrecision     = {};
+
+(* Workaround:  SARAH 4.2.2 defines Weinberg angle as
+
+     {ThetaW, { Description -> "Weinberg-Angle",
+                DependenceNum -> None,
+                Value -> 0.511621}},
+
+   However, we currently need its analytic expression in terms
+   of MW and MZ.
+ *)
+SARAH`ParameterDefinitions = Append[
+    Cases[SARAH`ParameterDefinitions, {p_ /; p =!= SARAH`ThetaW, ___}],
+    {SARAH`ThetaW,
+     { Description -> "Weinberg-Angle",
+       DependenceNum -> ArcSin[Sqrt[1 - (Mass[VWm]^2 - g2^2*vT^2)/Mass[VZ]^2]]}}
+];

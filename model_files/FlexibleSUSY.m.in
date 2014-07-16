@@ -1,5 +1,6 @@
 
 FSModelName = "@CLASSNAME@";
+FSEigenstates = SARAH`EWSB;
 
 (* input parameters *)
 
@@ -8,14 +9,6 @@ MINPAR = { {1, m0},
            {3, TanBeta},
            {4, Sign[\[Mu]]},
            {5, Azero} };
-
-DefaultParameterPoint = {
-    {m0, 125},
-    {m12, 500},
-    {TanBeta, 10},
-    {Sign[\[Mu]], 1},
-    {Azero, 0}
-};
 
 EWSBOutputParameters = { B[\[Mu]], \[Mu] };
 
@@ -72,3 +65,8 @@ InitialGuessAtHighScale = {};
 UseHiggs2LoopMSSM = False;
 
 PotentialLSPParticles = { Chi, Sv, Su, Sd, Se, Cha, Glu };
+
+DefaultPoleMassPrecision = MediumPrecision;
+HighPoleMassPrecision    = {hh, Ah, Hpm};
+MediumPoleMassPrecision  = {};
+LowPoleMassPrecision     = {};

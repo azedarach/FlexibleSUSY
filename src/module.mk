@@ -32,10 +32,11 @@ LIBFLEXI_HDR := \
 		$(DIR)/build_info.hpp \
 		$(DIR)/cextensions.hpp \
 		$(DIR)/command_line_options.hpp \
+		$(DIR)/composite_convergence_tester.hpp \
 		$(DIR)/compound_constraint.hpp \
 		$(DIR)/constraint.hpp \
-		$(DIR)/consts.hpp \
 		$(DIR)/convergence_tester.hpp \
+		$(DIR)/convergence_tester_drbar.hpp \
 		$(DIR)/coupling_monitor.hpp \
 		$(DIR)/def.h \
 		$(DIR)/dilog.h \
@@ -83,7 +84,7 @@ LIBFLEXI_HDR += \
 		$(DIR)/two_scale_composite_convergence_tester.hpp \
 		$(DIR)/two_scale_constraint.hpp \
 		$(DIR)/two_scale_convergence_tester.hpp \
-		$(DIR)/two_scale_convergence_tester_skeleton.hpp \
+		$(DIR)/two_scale_convergence_tester_drbar.hpp \
 		$(DIR)/two_scale_initial_guesser.hpp \
 		$(DIR)/two_scale_matching.hpp \
 		$(DIR)/two_scale_model.hpp \
