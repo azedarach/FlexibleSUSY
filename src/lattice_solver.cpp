@@ -31,7 +31,7 @@ ostream& operator<<(ostream &out, const RGFlow<Lattice>& f)
     return out;
 }
 
-int Lattice_model::run_to(double, double /* eps */)
+void Lattice_model::run_to(double, double /* eps */)
 {
     // TODO: slide scale pointer
 }

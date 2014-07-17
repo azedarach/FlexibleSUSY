@@ -101,7 +101,7 @@ ifeq ($(findstring clean-,$(MAKECMDGOALS)),)
 ifeq ($(findstring distclean-,$(MAKECMDGOALS)),)
 ifeq ($(findstring doc-,$(MAKECMDGOALS)),)
 $(DIR)/lattice.mk: run-metacode-$(MODNAME)
-		@true
+		@$(CONVERT_DOS_PATHS) $@
 endif
 endif
 endif

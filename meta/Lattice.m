@@ -162,7 +162,7 @@ Module[{
 	Global`$flexiblesusyCSrcChunkSize];
     {dependenceNumDecls, dependenceNumDefs} = CFxnsToCCode[
 	DepNumRuleToC /@ ParametrizeDependenceNums[
-	    FindDependenceNums[], parameterRules]];
+	    FindDependenceNums[massMatrices], parameterRules]];
     {matrixDefs, matrixStmts} = CMatricesToCCode[
 	MatrixToC /@ Cases[parameterRules, HoldPattern[_ -> _?MatrixQ]]];
     {eigenVarDefs, eigenVarStmts} = CMatricesToCCode[
@@ -897,18 +897,22 @@ ParametrizeBetaFunctions[betaFunctions_List, sarahAbbrs_, parameterRules_] :=
 Module[{
 	convertedBetaFunctions = betaFunctions /.
 	    sarahOperatorReplacementRules,
-	convertedSarahAbbrs = Flatten[sarahAbbrs /.
-	    sarahOperatorReplacementRules, 1],
+	convertedSarahAbbrs = Traces`ConvertSARAHTraces[sarahAbbrs] /.
+	    sarahOperatorReplacementRules,
 	nestedTraceRules, traceRules,
-	sarahAbbrRules,
+	symbolizeSarahAbbrs, sarahAbbrRules,
 	nBetaFunctions
     },
+    symbolizeSarahAbbrRules =
+       (# -> ToValidCSymbol[#])& /@ convertedSarahAbbrs[[All,1]];
     nestedTraceRules = AbbreviateTraces[
 	{convertedBetaFunctions, convertedSarahAbbrs}];
     traceRules = Flatten[nestedTraceRules];
-    convertedBetaFunctions = convertedBetaFunctions /. traceRules;
+    convertedBetaFunctions = convertedBetaFunctions /.
+       traceRules /. symbolizeSarahAbbrRules;
     sarahAbbrRules = ParametrizeSarahAbbrs[
-	convertedSarahAbbrs, Join[parameterRules, traceRules]];
+	convertedSarahAbbrs,
+	Join[parameterRules, traceRules, symbolizeSarahAbbrRules]];
     nBetaFunctions = Length[convertedBetaFunctions];
     {MapIndexed[
 	(WriteString["stdout",
@@ -1036,14 +1040,14 @@ Betaize[level_, parametrization_] :=
 	Im[z_] :> BETA[level, Im[z]]
     };
 
-ParametrizeSarahAbbrs[sarahAbbrRules:{{_,_}...}, partRules_] :=
+ParametrizeSarahAbbrs[sarahAbbrs:{Traces`SARAHTrace[_,_]...}, partRules_] :=
     SarahAbbrToRule /@
-    ReleaseHold[Hold[sarahAbbrRules] /. partRules //. matrixOpRules]
+    ReleaseHold[Hold[sarahAbbrs] /. partRules //. matrixOpRules]
 
-SarahAbbrToRule[{abbr_, rhs_}] :=
+SarahAbbrToRule[Traces`SARAHTrace[abbr_, rhs_]] :=
     {abbr -> Re[abbr], {Re[abbr] -> rhs}} /; PossibleZeroQ@Simplify@Im[rhs];
 
-SarahAbbrToRule[{ab_, rhs_}] :=
+SarahAbbrToRule[Traces`SARAHTrace[ab_, rhs_]] :=
     {ab -> Re[ab] + I Im[ab], {Re[ab] -> Re[rhs], Im[ab] -> Im[rhs]}};
 
 ParametrizeTraces[nestedTraceRules_List, parameterRules_] :=

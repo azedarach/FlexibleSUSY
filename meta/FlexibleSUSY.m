@@ -1404,7 +1404,7 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
 	   Lat$allParameterRules = Parametrization`KillSmallYukawas @ Parametrization`KillFlavorMixing @ Lat$allParameterRules;
 
 	   Lattice`WriteLatticeCode[
-	       SARAH`TraceAbbr /. traceRules,
+	       SARAH`TraceAbbr,
 	       Join[susyBetaFunctions, susyBreakingBetaFunctions], anomDim,
 	       Lat$massMatrices, nPointFunctions,
 	       vertexRules,
