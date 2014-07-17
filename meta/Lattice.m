@@ -741,16 +741,26 @@ Reap[
 	MapIndexed[(
 	name = "dd" <> CExpToCFormString@ToCExp@Last@First[#1] <> "_" <>
 	ToString@First@First[#1] <> "loop";
-	DoneLn[Sow[CFxn[
-	    ReturnType -> "void",
-	    Name -> name,
-	    Args -> {{"double", "a"}, {"const Eigen::VectorXd&", "x"},
-		     {"Eigen::MatrixXd&", "ddx"}},
-	    Qualifier -> "const",
-	    Body -> StringJoin["{\n",
-	    BetaFunctionRuleToDerivCStmt[#1, enumRules, abbrRules],
-	    "}\n"]]],
-	    "[",First[#2],"/",nRules,"] ", "D[BETA"@@First[#1], "]... "];
+	WriteString["stdout",
+		    "[",First[#2],"/",nRules,"] ", "D[BETA"@@First[#1], "]:"];
+	Sow[Module[{
+		reaped = Reap[
+		    BetaFunctionRuleToDerivCStmt[#1, enumRules, abbrRules]]
+	    },
+	    WriteString[
+		"stdout", " diff... ", FormatShortTime[
+		Plus@@Cases[Flatten@Last[reaped], tagDiff[t_] :> t]],
+		" to CExp... ", FormatShortTime[
+		Plus@@Cases[Flatten@Last[reaped], tagCExp[t_] :> t]],
+		" to C... ", FormatShortTime[
+		Plus@@Cases[Flatten@Last[reaped], tagC   [t_] :> t]], "\n"];
+	    CFxn[
+		ReturnType -> "void",
+		Name -> name,
+		Args -> {{"double", "a"}, {"const Eigen::VectorXd&", "x"},
+			 {"Eigen::MatrixXd&", "ddx"}},
+		Qualifier -> "const",
+		Body -> StringJoin["{\n", First[reaped], "}\n"]]]];
 	{"  ", name, "(a, x, ddx);\n"})&,
 	flattened]]}&, betanLRules],
 	"}\n"]
@@ -772,7 +782,7 @@ BetaFunctionRuleToAssignment[level_Integer, p_, rhs_, op_] :=
 			ToCExp[rhs, x]] <> ";\n";
 
 BetaFunctionRuleToAssignment[level_Integer, p_, rhs_, op_] := Module[{
-	rhsCExp = Done[ToCExp[rhs, x], " translating to CExp... "]
+	rhsCExp = Done[ToCExp[rhs, x], " to CExp... "]
     },
     DoneLn[CExpToCFormString[ToCExp[p, dx]] <> " " <> op <> " " <>
 	   CExpToCFormString[CConversion`oneOver16PiSqr^level rhsCExp] <>
@@ -797,15 +807,17 @@ Module[{
     },
     Module[{
 	    q, qidx,
-	    deriv
+	    deriv, derivCExp, derivC
 	},
 	{q, qidx} = List @@ #;
-	deriv = Differentiate[rhs, q, abbrRules];
+	Sow[tagDiff@First@Timing[deriv = Differentiate[rhs, q, abbrRules]]];
 	If[Expand[deriv] === 0, {},
-	   {"  ddx(", qidx, ",", pidx, ") ", op, " ",
-	    CExpToCFormString[CConversion`oneOver16PiSqr^level
-			      ToCExp[deriv, x]],
-	    ";\n"}]
+	   Sow[tagCExp@First@Timing[derivCExp = ToCExp[deriv, x]]];
+	   Sow[tagC@First@Timing[derivC =
+	       {"  ddx(", qidx, ",", pidx, ") ", op, " ",
+		CExpToCFormString[CConversion`oneOver16PiSqr^level derivCExp],
+		";\n"}]];
+	   derivC]
     ]& /@ enumRules
 ];
 

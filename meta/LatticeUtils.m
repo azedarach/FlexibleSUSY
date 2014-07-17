@@ -28,6 +28,7 @@ FixDiagonalization::usage;
 SingleCase::usage;
 Done::usage;
 DoneLn::usage;
+FormatShortTime::usage;
 MajoranaQ::usage;
 MajoranaMassMatrixQ::usage;
 
@@ -87,15 +88,11 @@ SingleCase[args__] := Module[{
 SetAttributes[Done, HoldFirst];
 
 Done[exp_, msg__] := Module[{
-	result,
-	time
+	result
     },
     WriteString["stdout", msg];
     result = Timing[exp];
-    If[(time = Round[First[result] 1*^3]) === 0,
-       time = ToString[Round[First[result] 1*^6]] <> " us",
-       time = ToString[time] <> " ms"];
-    WriteString["stdout", time];
+    WriteString["stdout", FormatShortTime @ First[result]];
     Last[result]
 ];
 
@@ -106,6 +103,14 @@ DoneLn[exp_, msg__] := Module[{
     },
     WriteString["stdout", "\n"];
     result
+];
+
+FormatShortTime[seconds_] := Module[{
+	time = Round[seconds 1*^3]
+    },
+    If[time === 0,
+       ToString[Round[seconds 1*^6]] <> " us",
+       ToString[time] <> " ms"]
 ];
 
 End[] (* `Private` *)
