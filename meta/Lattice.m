@@ -852,7 +852,8 @@ DecInt[index_Integer] := index - 1;
 
 DecInt[index_] := index;
 
-ToCExp[parametrization_] := Expand[parametrization] //. toCExpDispatch /.
+ToCExp[parametrization_] := SimplifyParametrization[parametrization] //.
+    toCExpDispatch /.
     replaceIndicesDispatch // PrivatizeParameterReIm;
 
 ToCExp[parametrization_, array_Symbol] := ToCExp[parametrization] /.
@@ -862,6 +863,13 @@ ToCExp[parametrization_, array_Symbol] := ToCExp[parametrization] /.
     p:(Lattice`Private`Re|Lattice`Private`Im)[_] /; ValueQ@ToEnumSymbol[p] :>
 	array@ToEnumSymbol[p] /.
     ap:(Lattice`Private`Re|Lattice`Private`Im)[abbr_Symbol] :> ap[array];
+
+SimplifyParametrization[parametrization_] := Simplify[
+    parametrization,
+    TimeConstraint -> FlexibleSUSY`FSSimplifyBetaFunctionsTimeConstraint
+];
+
+SimplifyParametrization[parametrization_] := Expand[parametrization];
 
 ReCExp[cexp_?CRealTypeQ] := cexp;
 
