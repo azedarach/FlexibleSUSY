@@ -1057,7 +1057,7 @@ ParametrizeSarahAbbrs[sarahAbbrs:{Traces`SARAHTrace[_,_]...}, partRules_] :=
     ReleaseHold[Hold[sarahAbbrs] /. partRules //. matrixOpRules]
 
 SarahAbbrToRule[Traces`SARAHTrace[abbr_, rhs_]] :=
-    {abbr -> Re[abbr], {Re[abbr] -> rhs}} /; PossibleZeroQ@Simplify@Im[rhs];
+    {abbr -> Re[abbr], {Re[abbr] -> rhs}} /; RealQ[rhs];
 
 SarahAbbrToRule[Traces`SARAHTrace[ab_, rhs_]] :=
     {ab -> Re[ab] + I Im[ab], {Re[ab] -> Re[rhs], Im[ab] -> Im[rhs]}};
@@ -1078,13 +1078,11 @@ ParametrizeTrace[{trace_SARAH`trace -> Re[ab_] + I Im[ab_], Repeated[_,{0,1}]},
 ParametrizeTrace[{trace_SARAH`trace -> Re[ab_], Repeated[_,{0,1}]},
 		 parameterRules_] :=
 Module[{
-	re, im
+	re, im,
+	z = ReleaseHold[Hold[trace] /. parameterRules //. matrixOpRules]
     },
-    {re, im} =
-	SeparateParts[
-	    ReleaseHold[Hold[trace] /. parameterRules //. matrixOpRules],
-	    parameterRules];
-    Assert[PossibleZeroQ[im]];
+    {re, im} = SeparateParts[z, parameterRules];
+    Assert[RealQ[z]];
     {Re[ab] -> re}
 ];
 
