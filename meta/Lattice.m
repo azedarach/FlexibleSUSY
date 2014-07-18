@@ -371,7 +371,7 @@ HermitianToC[m_, f_, IdentityMatrix, scalarType_] := Module[{
     {d, d} = Dimensions[m];
     ev = ToCMassName[f];
     CMatrix[
-	EigenDef -> CEigenArrayType[ds] <> " " <> ev <> ";",
+	EigenDef -> CEigenArrayType[d] <> " " <> ev <> ";",
 	SetStmt  -> "  " <> ev <> " = " <> ToString@Diagonal[m] <> ";"
     ]
 ];
