@@ -93,6 +93,8 @@ Format[Lattice`Private`M2[f_], CForm] :=
 
 Format[Lattice`Private`SUM, CForm] := Format["SUM", OutputForm];
 
+Format[Lattice`Private`USUM, CForm] := Format["USUM", OutputForm];
+
 Format[Lattice`Private`LispAnd, CForm] := Format["LispAnd", OutputForm];
 
 Format[Lattice`Private`Complex, CForm] :=
@@ -1147,6 +1149,12 @@ matrixOpRules = Dispatch[{
     SARAH`trace[m__] :> Tr[Dot[m]]
 }];
 
+unrollInnermostSumDispatch = Dispatch[{
+    Lattice`Private`SUM[i_, a_, b_, x_] /;
+	FreeQ[x, _Lattice`Private`SUM | _Lattice`Private`USUM] :>
+	Lattice`Private`USUM[i, a, b, x]
+}];
+
 cExpToCFormStringDispatch = Dispatch[{
 (*
     p:Power[_?NumericQ, _?NumericQ] :> N[p],
@@ -1158,7 +1166,8 @@ cExpToCFormStringDispatch = Dispatch[{
 }];
 
 CExpToCFormString[expr_] :=
-    StringReplace[ToString[expr //. cExpToCFormStringDispatch, CForm,
+    StringReplace[ToString[expr //. unrollInnermostSumDispatch //.
+			   cExpToCFormStringDispatch, CForm,
 			   CharacterEncoding -> "ASCII"],
 		  RegularExpression["\\\\\\[(.*?)\\]"] :> "$1"];
 
