@@ -1150,7 +1150,9 @@ cExpToCFormStringDispatch = Dispatch[{
 }];
 
 CExpToCFormString[expr_] :=
-    ToString[expr //. cExpToCFormStringDispatch, CForm];
+    StringReplace[ToString[expr //. cExpToCFormStringDispatch, CForm,
+			   CharacterEncoding -> "ASCII"],
+		  RegularExpression["\\\\\\[(.*?)\\]"] :> "$1"];
 
 End[] (* `Private` *)
 
