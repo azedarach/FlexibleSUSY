@@ -158,6 +158,8 @@ public:
 	    {}
 	Lattice_model *w;
 	RVec units;		// x normalizations
+	std::vector<std::vector<double>> xbufs;
+	std::vector<size_t> used_xbufs;
 	// std::vector<ptrdiff_t> r_offset;
 	RGFlow *f;
 	size_t height;
@@ -171,6 +173,7 @@ public:
 	    size_t T, m;	// first site
 	    size_t n;		// number of occupied sites
 	    size_t realRow;	// row within A_
+	    bool buffer_x;	// whether to allocate xbufs
 	} rowSpec;
     };
 
@@ -256,6 +259,8 @@ public:
     { return y_[site_offset(T,m) + i]; }
     Real  u(size_t T, size_t i) const { return efts[T].units[i]; }
     Real  x(size_t T, size_t m, size_t i) const { return y(T,m,i) * u(T,i); }
+    const std::vector<double>& xbuf(size_t T, size_t m) const
+    { return efts[T].xbufs[m]; }
     std::vector<Lattice_constraint*> constraints;
     std::vector<size_t> teqidx;
     std::vector<size_t> rgeidx;
@@ -282,10 +287,12 @@ public:
     void enable_Runge_Kutta();
     void disable_Runge_Kutta();
     void resample(const std::vector<std::vector<size_t>>& site_maps);
-    EqRow *ralloc(size_t T, size_t m, size_t span);
+    EqRow *ralloc(size_t T, size_t m, size_t span, bool buffer_x);
     void rfree(EqRow *r);
     void init_free_row_list();
     void sort_rows();
+    void realloc_xbufs();
+    void fill_xbufs();
 };
 
 }

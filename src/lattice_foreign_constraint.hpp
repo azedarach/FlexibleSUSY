@@ -12,20 +12,16 @@ public:
 	SingleSiteConstraint(), nr(nrows) {}
     void init(RGFlow<Lattice> *flow, size_t theory, size_t site) {
 	SingleSiteConstraint::init(flow, theory, site);
-	x.resize(f->efts[T].w->width);
-	row.resize(x.size());
+	row.resize(f->efts[T].w->width);
     }
-    void alloc_rows() { ralloc(nr); }
+    void alloc_rows() { ralloc(nr, true); }
     using SingleSiteConstraint::init;
 protected:
-    void set_x() {
-	for (size_t j = 0; j < x.size(); j++) x[j] = u(j)*y(j);
-    }
+    const std::vector<double>& x() { return f->xbuf(T, mbegin); }
     void copy_row(size_t r) {
 	for (size_t j = 0; j < row.size(); j++) A(r,j) = row[j]*u(j);
 	z(r) = rhs;
     }
-    RVec x;
     RVec row;
     Real rhs;
 private:
@@ -38,25 +34,21 @@ public:
 	InterTheoryConstraint(), nr(nrows) {}
     void init(RGFlow<Lattice> *flow, size_t lower_theory) {
 	InterTheoryConstraint::init(flow, lower_theory);
-	w.resize(f->efts[TL  ].w->width);
-	x.resize(f->efts[TL+1].w->width);
-	row.resize(w.size() + x.size());
+	row.resize(f->efts[TL].w->width + f->efts[TL+1].w->width);
     }
-    void alloc_rows() { ralloc(nr); }
+    void alloc_rows() { ralloc(nr, true); }
     using InterTheoryConstraint::init;
 protected:
-    void set_w_x() {
-	for (size_t j = 0; j < w.size(); j++) w[j] = u(0,j)*y(0,j);
-	for (size_t j = 0; j < x.size(); j++) x[j] = u(1,j)*y(1,j);
-    }
+    const std::vector<double>& w() { return f->xbuf(TL  , m(0)); }
+    const std::vector<double>& x() { return f->xbuf(TL+1, m(1)); }
     void copy_row(size_t r) {
 	RVec::const_iterator p = row.begin();
-	for (size_t j = 0; j < w.size(); j++) A(r,0,j) = u(0,j) * *p++;
-	for (size_t j = 0; j < x.size(); j++) A(r,1,j) = u(1,j) * *p++;
+	for (size_t j = 0; j < f->efts[TL  ].w->width; j++)
+	    A(r,0,j) = u(0,j) * *p++;
+	for (size_t j = 0; j < f->efts[TL+1].w->width; j++)
+	    A(r,1,j) = u(1,j) * *p++;
 	z(r) = rhs;
     }
-    RVec w;
-    RVec x;
     RVec row;
     Real rhs;
 private:

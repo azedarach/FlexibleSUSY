@@ -57,7 +57,6 @@ class Fmssmn_constraint_on_ms : public ForeignConstraint {
 public:
     Fmssmn_constraint_on_ms() : ForeignConstraint(1) {}
     void operator()() {
-	set_x();
 	fmssmn_ms_(0,0,0,
 		   nullptr,nullptr,nullptr,nullptr,
 		   0,0,
@@ -66,7 +65,7 @@ public:
 		   nullptr,nullptr,nullptr,nullptr,
 		   0,0,0,
 		   vu,vd,
-		   f->scl0, &x[0], 0,
+		   f->scl0, &x()[0], 0,
 		   &row[0], &rhs);
 	copy_row(0);
     }
@@ -120,7 +119,6 @@ class Fmssmn_constraint_on_ewsb : public ForeignConstraint {
 public:
     Fmssmn_constraint_on_ewsb() : ForeignConstraint(4) {}
     void operator()() {
-	set_x();
 	for (size_t i = 0; i < 4; i++) {
 	    fmssmn_ewsb_(0,0,0,
 			 nullptr,nullptr,nullptr,nullptr,
@@ -130,7 +128,7 @@ public:
 			 nullptr,nullptr,nullptr,nullptr,
 			 0,0,0,
 			 vu,vd,
-			 f->scl0, &x[0], i,
+			 f->scl0, &x()[0], i,
 			 &row[0], &rhs);
 	    copy_row(i);
 	}

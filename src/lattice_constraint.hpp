@@ -50,7 +50,7 @@ protected:
     Real& z(size_t r) { return f->z[rows[r]->rowSpec.realRow]; }
     Real u(size_t T, size_t i) const { return f->u(T, i); }
     Real x(size_t T, size_t m, size_t i) const { return f->x(T, m, i); }
-    void ralloc(size_t nrows, size_t T, size_t m, size_t span);
+    void ralloc(size_t nrows, size_t T, size_t m, size_t span, bool buffer_x);
     void rfree();
 private:
     std::vector<RGFlow<Lattice>::EqRow *> rows;
@@ -78,8 +78,8 @@ protected:
     Real x(size_t To, size_t i) const
     { return Lattice_constraint::x(TL+To, m(To), i); }
     size_t m(size_t To) const { return To ? 0 : f->efts[TL].height - 1; }
-    void ralloc(size_t nrows)
-    { Lattice_constraint::ralloc(nrows, TL, m(0), 2); }
+    void ralloc(size_t nrows, bool buffer_x)
+    { Lattice_constraint::ralloc(nrows, TL, m(0), 2, buffer_x); }
     size_t TL;
 private:
 };
@@ -109,8 +109,8 @@ protected:
     Real& z(size_t r) { return Lattice_constraint::z(r); }
     Real u(size_t i) const { return Lattice_constraint::u(T, i); }
     Real x(size_t m, size_t i) const { return Lattice_constraint::x(T, m, i); }
-    void ralloc(size_t nrows, size_t m, size_t span)
-    { Lattice_constraint::ralloc(nrows, T, m, span); }
+    void ralloc(size_t nrows, size_t m, size_t span, bool buffer_x)
+    { Lattice_constraint::ralloc(nrows, T, m, span, buffer_x); }
     size_t T;
     size_t span;
 private:
@@ -132,8 +132,8 @@ protected:
     Real y(size_t i) const { return IntraTheoryConstraint::y(mbegin, i); }
     Real& z(size_t r) { return IntraTheoryConstraint::z(r); }
     Real x(size_t i) const { return IntraTheoryConstraint::x(mbegin, i); }
-    void ralloc(size_t nrows)
-    { IntraTheoryConstraint::ralloc(nrows, mbegin, 1); }
+    void ralloc(size_t nrows, bool buffer_x)
+    { IntraTheoryConstraint::ralloc(nrows, mbegin, 1, buffer_x); }
 private:
 };
 
@@ -161,7 +161,7 @@ public:
     (size_t nrows, std::function<void(AnySingleSiteConstraint *)> fxn) :
 	nr(nrows), fxn_(fxn)
 	{}
-    void alloc_rows() { ralloc(nr); }
+    void alloc_rows() { ralloc(nr, false); }
     void operator()() { fxn_(this); }
 private:
     size_t nr;
@@ -185,7 +185,7 @@ public:
     }
     void alloc_rows() {
 	for (size_t n = 0; n < span - 1; n++)
-	    ralloc(f->efts[T].w->width - 1, mbegin + n, 2);
+	    ralloc(f->efts[T].w->width - 1, mbegin + n, 2, false);
     }
     void operator()();
     using IntraTheoryConstraint::init;
@@ -237,7 +237,7 @@ public:
 	dx1.resize(f->efts[T].w->width);
     }
     void alloc_rows() {
-	ralloc(f->efts[T].w->width - 1, mbegin, 2);
+	ralloc(f->efts[T].w->width - 1, mbegin, 2, false);
     }
     void operator()();
     using IntraTheoryConstraint::init;
@@ -255,7 +255,7 @@ public:
     // Uniform_dt() {}
     void alloc_rows() {
 	for (size_t n = 1; n < span - 1; n++)
-	    ralloc(1, mbegin + n - 1, 3);
+	    ralloc(1, mbegin + n - 1, 3, false);
     }
     void operator()() {
 	for (size_t n = 1; n < span - 1; n++) {
@@ -274,7 +274,7 @@ class Match_t : public InterTheoryConstraint {
 public:
     // Match_t() {}
     void alloc_rows() {
-	ralloc(1);
+	ralloc(1, false);
     }
     void operator()() {
 	A(0,0,0) =  u(0,0);

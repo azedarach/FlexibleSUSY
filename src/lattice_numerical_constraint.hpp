@@ -28,6 +28,7 @@ public:
 protected:
     virtual Real c(const Real *x) const = 0;
 private:
+    std::vector<double> x_local;
     std::vector<size_t> nonzeros;
     std::vector<bool> depends_on;
     gsl_function F_gsl;
@@ -67,12 +68,15 @@ public:
 protected:
     virtual Real c(const Real *w, const Real *x) const = 0;
 private:
+    std::vector<double> w_local;
+    std::vector<double> x_local;
     std::vector<size_t> nonzerosL, nonzerosH;
     std::vector<bool> depends_on;
     gsl_function F_gsl;
     static double c_wrap(double wxj, void *params);
     size_t j;
-    Real &wx(size_t j) { return j < w.size() ? w[j] : x[j - w.size()]; }
+    Real &wx_local(size_t j)
+    { return j < w_local.size() ? w_local[j] : x_local[j - w_local.size()]; }
     Real deriv_epsilon;
 };
 

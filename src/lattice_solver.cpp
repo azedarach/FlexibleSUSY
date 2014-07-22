@@ -212,6 +212,7 @@ void RGFlow<Lattice>::init_lattice()
 
     for (auto c: constraints) c->alloc_rows();
     sort_rows();
+    realloc_xbufs();
 
     N = y_.size();
     KL = KU = 2*max_width;
@@ -405,6 +406,7 @@ void RGFlow<Lattice>::enable_Runge_Kutta()
 	}
     for (auto i: rgeidx) constraints[i]->alloc_rows();
     sort_rows();
+    realloc_xbufs();
 
     create_threads();
 }
@@ -425,6 +427,7 @@ void RGFlow<Lattice>::disable_Runge_Kutta()
 	}
     for (auto i: rgeidx) constraints[i]->alloc_rows();
     sort_rows();
+    realloc_xbufs();
 
     create_threads();
 }
@@ -493,6 +496,7 @@ void RGFlow<Lattice>::resample(const vector<vector<size_t>>& site_maps)
     }
     for (auto c: constraints) c->alloc_rows();
     sort_rows();
+    realloc_xbufs();
 
     N = y_.size();
     IPIV.resize(N);
@@ -590,14 +594,16 @@ Real RGFlow<Lattice>::maxdiff(const RVec& y0, const RVec& y1)
 }
 
 RGFlow<Lattice>::EqRow *RGFlow<Lattice>::ralloc
-(size_t T, size_t m, size_t span)
+(size_t T, size_t m, size_t span, bool buffer_x)
 {
     EqRow *r = free_row_list_head;
     assert(r != nullptr);
     if (r != nullptr) {
 	free_row_list_head = r->next;
-	r->rowSpec = { T, m, span, 0/* to be determined by sort_rows() */ };
+	r->rowSpec =
+	    { T, m, span, 0/* to be determined by sort_rows() */, buffer_x };
     }
+
     return r;
 }
 
@@ -627,6 +633,38 @@ void RGFlow<Lattice>::sort_rows()
 	layout[r]->rowSpec.realRow = r;
 }
 
+void RGFlow<Lattice>::realloc_xbufs()
+{
+    for (size_t T = 0; T < efts.size(); T++)
+	efts[T].xbufs.assign(efts[T].height, vector<double>());
+
+    for (auto& r: row_pool)
+	if (r.rowSpec.buffer_x)
+	    for (size_t T = r.rowSpec.T, m = r.rowSpec.m, n = r.rowSpec.n;
+		 n; n--)
+	    {
+		efts[T].xbufs[m].resize(efts[T].w->width);
+		if (++m >= efts[T].height) {
+		    m = 0;
+		    T++;
+		}
+	    }
+
+    for (size_t T = 0; T < efts.size(); T++) {
+	efts[T].used_xbufs.clear();
+	for (size_t m = 0; m < efts[T].height; m++)
+	    if (!efts[T].xbufs[m].empty()) efts[T].used_xbufs.push_back(m);
+    }
+}
+
+void RGFlow<Lattice>::fill_xbufs()
+{
+    for (size_t T = 0; T < efts.size(); T++)
+	for (size_t m: efts[T].used_xbufs)
+	    for (size_t i = 0; i < efts[T].xbufs[m].size(); i++)
+		efts[T].xbufs[m][i] = x(T, m, i);
+}
+
 void RGFlow<Lattice>::init_free_row_list()
 {
     for (size_t r = 0; r < row_pool.size() - 1; r++)
@@ -654,6 +692,7 @@ RGFlow<Lattice>::Inner_status RGFlow<Lattice>::iterate()
 
     while (iter < max_iter && state != END) {
 	iter++;
+	fill_xbufs();
 	apply_constraints();
 #ifdef DUMP_MATRIX
 	cout << setprecision(15) << scientific;

@@ -23,12 +23,13 @@ void Lattice_constraint::deactivate()
 }
 
 void Lattice_constraint::ralloc
-(size_t nrows, size_t T, size_t m, size_t span)
+(size_t nrows, size_t T, size_t m, size_t span, bool buffer_x)
 {
     VERBOSE_MSG("allocating " << nrows << " rows to " << this <<
-		" at T=" << T << " m=" << m << " span=" << span);
+		" at T=" << T << " m=" << m << " span=" << span <<
+		(buffer_x ? " enabling x-buffer" : ""));
     for (; nrows; nrows--)
-	rows.push_back(f->ralloc(T, m, span));
+	rows.push_back(f->ralloc(T, m, span, buffer_x));
 }
 
 void Lattice_constraint::rfree()
