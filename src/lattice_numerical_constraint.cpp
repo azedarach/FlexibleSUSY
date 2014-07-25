@@ -29,7 +29,8 @@ void NumericalConstraint::init
     ForeignConstraint::init(flow, theory, site);
     x_local.resize(row.size());
     depends_on.resize(row.size());
-    for (auto i: nonzeros) depends_on[i] = true;
+    if (nonzeros.empty()) fill(depends_on.begin()+1, depends_on.end(), true);
+    else for (auto i: nonzeros) depends_on[i] = true;
     vector<size_t>().swap(nonzeros); // forces deallocation
 }
 
@@ -65,8 +66,12 @@ void NumericalMatching::init(RGFlow<Lattice> *flow, size_t lower_theory)
     w_local.resize(f->efts[TL  ].w->width);
     x_local.resize(f->efts[TL+1].w->width);
     depends_on.resize(row.size());
-    for (auto i: nonzerosL) depends_on[i               ] = true;
-    for (auto i: nonzerosH) depends_on[i+w_local.size()] = true;
+    if (nonzerosL.empty())
+	fill_n(depends_on.begin()+1, w_local.size()-1, true);
+    else for (auto i: nonzerosL) depends_on[i               ] = true;
+    if (nonzerosH.empty())
+	fill(depends_on.begin()+w_local.size()+1, depends_on.end(), true);
+    else for (auto i: nonzerosH) depends_on[i+w_local.size()] = true;
     vector<size_t>().swap(nonzerosL); // forces deallocation
     vector<size_t>().swap(nonzerosH); // forces deallocation
 }
