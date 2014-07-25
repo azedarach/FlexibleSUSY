@@ -1,0 +1,58 @@
+// ====================================================================
+// This file is part of FlexibleSUSY.
+//
+// FlexibleSUSY is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version.
+//
+// FlexibleSUSY is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with FlexibleSUSY.  If not, see
+// <http://www.gnu.org/licenses/>.
+// ====================================================================
+
+// File generated at @DateAndTime@
+
+#ifndef @ModelName@_LATTICE_EWSB_CONSTRAINT_H
+#define @ModelName@_LATTICE_EWSB_CONSTRAINT_H
+
+#include "lattice_compound_constraint.hpp"
+#include "@ModelName@_input_parameters.hpp"
+
+namespace flexiblesusy {
+
+template <class T>
+class @ModelName@;
+
+template <class T>
+class @ModelName@_ewsb_constraint;
+
+class Lattice;
+
+// auxiliary class for initializing own members before the base class
+// see http://www.boost.org/doc/libs/1_53_0/libs/utility/base_from_member.html
+struct @ModelName@_ewsb_constraint_ {
+    @ModelName@_ewsb_constraint_();
+    ~@ModelName@_ewsb_constraint_();
+    std::vector<Constraint<Lattice>*> members;
+    const @ModelName@_input_parameters *input;
+};
+
+template<>
+class @ModelName@_ewsb_constraint<Lattice> :
+    public @ModelName@_ewsb_constraint_,
+    public CompoundConstraint<Lattice> {
+public:
+    @ModelName@_ewsb_constraint();
+    @ModelName@_ewsb_constraint(const @ModelName@_input_parameters&);
+    virtual ~@ModelName@_ewsb_constraint();
+};
+
+} // namespace flexiblesusy
+
+#endif

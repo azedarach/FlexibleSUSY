@@ -1,0 +1,61 @@
+// ====================================================================
+// This file is part of FlexibleSUSY.
+//
+// FlexibleSUSY is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version.
+//
+// FlexibleSUSY is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with FlexibleSUSY.  If not, see
+// <http://www.gnu.org/licenses/>.
+// ====================================================================
+
+// File generated at @DateAndTime@
+
+#include "lattice_numerical_constraint.hpp"
+#include "wrappers.hpp"
+#include "@ModelName@_lattice_model.hpp"
+#include "@ModelName@_lattice_info.hpp"
+#include "@ModelName@_lattice_ewsb_constraint.hpp"
+
+namespace flexiblesusy {
+
+using namespace @ModelName@_lattice_info;
+
+#define CLASSNAME @ModelName@<Lattice>
+
+@ModelName@_ewsb_constraint<Lattice>::@ModelName@_ewsb_constraint() :
+    @ModelName@_ewsb_constraint_(),
+    CompoundConstraint<Lattice>(members)
+{
+}
+
+@ModelName@_ewsb_constraint<Lattice>::@ModelName@_ewsb_constraint
+(const @ModelName@_input_parameters& input_) :
+    @ModelName@_ewsb_constraint_(),
+    CompoundConstraint<Lattice>(members)
+{
+    input = &input_;
+}
+
+@ModelName@_ewsb_constraint<Lattice>::~@ModelName@_ewsb_constraint()
+{
+}
+
+@ModelName@_ewsb_constraint_::@ModelName@_ewsb_constraint_()
+{
+  members = @ewsbList@;
+}
+
+@ModelName@_ewsb_constraint_::~@ModelName@_ewsb_constraint_()
+{
+  for (auto m: members) delete static_cast<AnyNumericalConstraint *>(m);
+}
+
+} // namespace flexiblesusy

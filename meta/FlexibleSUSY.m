@@ -1409,7 +1409,8 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
 	       Lat$massMatrices, nPointFunctions,
 	       vertexRules,
 	       phases,
-	       Lat$gaugeCouplingRules, Complement[Lat$allParameterRules, Lat$gaugeCouplingRules],
+	       ewsbEquations,
+	       Lat$gaugeCouplingRules, Lat$vevRules, Complement[Lat$allParameterRules, Lat$gaugeCouplingRules, Lat$vevRules],
 	       GeneralReplacementRules[],
 	       FlexibleSUSY`FSModelName,
 	       Global`$flexiblesusyTemplateDir, Global`$flexiblesusyOutputDir];

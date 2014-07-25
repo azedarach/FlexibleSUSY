@@ -105,7 +105,8 @@ WriteLatticeCode[
     fsMassMatrices_, fsNPointFunctions_,
     vertexRules_,
     phases_,
-    gaugeCouplingRules_, otherParameterRules_, templateRules_,
+    fsEwsbEquations_,
+    gaugeCouplingRules_, vevRules_, otherParameterRules_, templateRules_,
     modelName_, templateDir_, outputDir_] :=
 
 Block[{
@@ -116,7 +117,8 @@ Block[{
     Format[d:drv[_, _], CForm] := Format[DrvToCFormString[d], OutputForm];
 
 Module[{
-	parameterRules = Join[gaugeCouplingRules, otherParameterRules],
+	parameterRules =
+	    Join[gaugeCouplingRules, vevRules, otherParameterRules],
 	gaugeCouplings = RealVariables[gaugeCouplingRules],
 	betaFunctionRules, betaFunctionDerivRules,
 	abbrRules, abbrDerivRules,
@@ -138,7 +140,11 @@ Module[{
 	    SelfEnergies`Private`ReplaceGhosts[FlexibleSUSY`FSEigenstates],
 	nPointDecls, nPointDefs,
 	phaseDefs,
-	p
+	vevs = Union @ Variables @ vevRules[[All,2]],
+	treeEwsbConstraints = fsEwsbEquations /. sarahOperatorReplacementRules,
+	softHiggsMasses,
+	treeEwsbEquations,
+	ewsbConstraints, ewsbList
     },
     DeclaredRealQ[_] := False;
     parameters = RealVariables[parameterRules];
@@ -186,6 +192,21 @@ Module[{
 	 FileNameJoin[{outputDir, modelName <> "_lattice_model.cpp"}]},
 	{FileNameJoin[{templateDir, "lattice_model_interactions.cpp.in"}],
 	 FileNameJoin[{outputDir, modelName <> "_lattice_model_interactions.cpp"}]}};
+(* if EWSB is demanded *)
+    softHiggsMasses = SoftHiggsMasses[treeEwsbConstraints];
+    treeEwsbEquations = ParametrizeEWSBEquations[
+	treeEwsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
+	parameterRules];
+    ewsbConstraints = EWSBConstraintsWithCorrections[treeEwsbConstraints];
+    ewsbList = CNConstraintsToCCode[EWSBConditionsToC[ParametrizeEWSBEquations[
+	ewsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
+	parameterRules]]];
+    replacementFiles = Join[replacementFiles, {
+	{FileNameJoin[{templateDir, "lattice_ewsb_constraint.hpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_ewsb_constraint.hpp"}]},
+	{FileNameJoin[{templateDir, "lattice_ewsb_constraint.cpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_ewsb_constraint.cpp"}]}}];
+(* end if *)
     WriteOut`ReplaceInFiles[replacementFiles,
 	Join[templateRules, {
 	"@abbrDecls@"	    -> IndentText[abbrDecls, 2],
@@ -195,6 +216,7 @@ Module[{
 	"@eigenVarDefs@"    -> IndentText[eigenVarDefs, 4],
 	"@eigenVarStmts@"   -> WrapText[eigenVarStmts],
 	"@enumParameters@"  -> WrapText@IndentText[enumParameters, 2],
+	"@ewsbList@"	    -> StringTrim@WrapText@IndentText[ewsbList, 2],
 	"@matrixDefs@"	    -> IndentText[matrixDefs, 4],
 	"@matrixStmts@"	    -> WrapText[matrixStmts],
 	"@nPointDecls@"	    -> IndentText[nPointDecls, 4],
@@ -223,6 +245,77 @@ Module[{
 	betaCFiles];
     WriteMakefile[templateDir, outputDir, cFiles, templateRules]
 ]];
+
+ParametrizeEWSBEquations[
+    constraints_List, assumptions_List, outputVars_, parameterRules_] :=
+Module[{
+	pConstraints = constraints /. parameterRules,
+	pAssumptions = assumptions /. parameterRules,
+	vars = Union@Variables[outputVars /. parameterRules],
+	eqs
+    },
+    eqs = Refine[Reduce[Join[# == 0& /@ pConstraints, pAssumptions], vars],
+		 pAssumptions];
+    If[MatchQ[eqs, HoldPattern[And[(_?(MemberQ[vars, #]&) == _)...]]],
+       List @@ eqs,
+       Print["Lattice`ParametrizeEWSBEquations[] failed to understand the result from Reduce[]: ", eqs];
+       Abort[]]
+];
+
+EWSBConditionsToC[pEquations_List] := EWSBConditionToC /@ pEquations;
+
+EWSBConditionToC[lhs_ == rhs_] := EWSBConditionToC[rhs - lhs];
+
+EWSBConditionToC[constraint_] := Module[{
+	cexp = ToCExp[constraint, x]
+    },
+    CNConstraint[
+	Dependence -> DependenceList[cexp],
+	Expr -> cexp
+    ]
+];
+
+DependenceList[cexp_] :=
+    SortBy[Union @
+	   Cases[cexp, x[enum_] :> enum, {0, Infinity}],
+	   ToExpression @ StringReplace[
+	       ToString[#], RegularExpression["^l([[:digit:]]+).*$"] :> "$1"] &
+    ];
+
+EWSBConstraintsWithCorrections[treeConstraints_List] := Module[{
+	tadpoles = (# /. {field_, index_} :>
+		    Symbol["Tadpole"<>ToString[field]][index-1])& /@
+		   FlexibleSUSY`Private`CreateHiggsToEWSBEqAssociation[]
+    },
+    treeConstraints - a tadpoles
+];
+
+SoftHiggsMasses[ewsbConstraints_] := Union @
+    Select[SARAH`ListSoftBreakingScalarMasses, !FreeQ[ewsbConstraints, #]&];
+
+ConditionPositiveVevs[vevs_List] := # > 0& /@ vevs;
+
+CNConstraintsToCCode[cncs_List] :=
+    StringJoin["{\n", Riffle[CNConstraintToCCode /@ cncs, ",\n"], "\n}"];
+
+CNConstraintToCCode[cnc_] := Module[{
+	dependence, expr
+    },
+    {dependence, expr} = {Dependence, Expr} /. List@@cnc;
+    StringJoin[
+	"  new AnyNumericalConstraint(\n",
+	"    { /* all except t */ },\n", (* TODO: reduce dependence set *)
+	"    [&](const AnyNumericalConstraint *self, const double *x) {\n",
+	"      double a = self->f->a;\n",
+	"      CLASSNAME::Interactions I;\n",
+	"      I.set(Eigen::Map<const Eigen::VectorXd>(x, eftWidth), self->f->scl0);\n",
+	"      return ",
+	Block[{CContext},
+	    CContext["CLASSNAME::Interactions::"] = "I.";
+	    CExpToCFormString @ ReCExp[expr]],
+	    ";\n",
+	"    })"]
+];
 
 restoreMassPowerRules = {
     (f:SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
@@ -554,6 +647,7 @@ CFxnToCCode[cfxn_] := Module[{
 	 {" ",Qualifier}, {" ATTR(",Attributes,")"}, Body} /.
 	List@@cfxn /. {Scope -> "CLASSNAME::", {___, Qualifier} -> {},
 		       {___, Attributes, ___} -> {}};
+    FormatCFxnCall[name, args, scope];
     argsInDecl = "(" <> Riffle[Riffle[#, " "]& /@ args, ", "] <> ")";
     argsInDef = "(" <> Riffle[
 	Riffle[If[Length[#] > 1 &&
@@ -572,6 +666,21 @@ StringGroup[strings_List, chunkSize_] := Module[{
 	(Sow[#, Quotient[size, chunkSize]]; size += StringLength[#])& /@
 	flattened]
 ];
+
+FormatCFxnCall[name_String, args_List, scope_String] := Module[{
+	symbol = Quiet[Check[Symbol[name], Undefined, {Symbol::symname}],
+		       {Symbol::symname}],
+	pattern
+    },
+    If[symbol =!= Undefined,
+       pattern = symbol @@ Table[_, {Length[args]}];
+       Format[p:pattern, CForm] := Format[
+	   CContext[scope] <> name <> "(" <>
+	   Riffle[ToString[CForm[#]]& /@ List@@p, ","] <> ")", OutputForm]
+    ]
+];
+
+CContext[_] = "";
 
 NPointFunctionToC[nPointFunction:_[_, rhs_]] := Module[{
 	cType, re
