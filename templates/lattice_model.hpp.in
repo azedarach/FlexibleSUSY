@@ -68,7 +68,7 @@ public:
 @eigenVarDefs@
 @phaseDefs@
 @dependenceNumDecls@
-  } interactions;
+  };
 
   // beta functions
 @betaDecls@
