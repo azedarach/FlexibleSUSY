@@ -27,11 +27,12 @@ Fmssm_fmssmn_gauge_couplings_n_::Fmssm_fmssmn_gauge_couplings_n_() :
 {
     vector<vector<vector<size_t>>> nonzeros(dependence());
     for (size_t i = 0; i < 3; i++) {
-	members[i] = new AnyNumericalMatching(nonzeros[i][0],nonzeros[i][1],
+	members[i] = new AnyNumericalMatching(
 	    [&,i](const AnyNumericalMatching *self,
 		  const Real *w, const Real *x) {
 		return fmssm_fmssmn_gauge_couplings_n_(self->f->scl0,w,x,i);
-	    });
+	    },
+	    nonzeros[i][0],nonzeros[i][1]);
     }
 }
 
@@ -46,11 +47,12 @@ Fmssm_fmssmn_yukawas_n_::Fmssm_fmssmn_yukawas_n_() :
 {
     vector<vector<vector<size_t>>> nonzeros(dependence());
     for (size_t i = 0; i < 54; i++) {
-	members[i] = new AnyNumericalMatching(nonzeros[i][0],nonzeros[i][1],
+	members[i] = new AnyNumericalMatching(
 	    [&,i](const AnyNumericalMatching *self,
 		  const Real *w, const Real *x) {
 		return fmssm_fmssmn_yukawas_n_(self->f->scl0,w,x,i);
-	    });
+	    },
+	    nonzeros[i][0],nonzeros[i][1]);
     }
 }
 
@@ -65,11 +67,12 @@ Fmssm_fmssmn_mu_b_n_::Fmssm_fmssmn_mu_b_n_() :
 {
     vector<vector<vector<size_t>>> nonzeros(dependence());
     for (size_t i = 0; i < 4; i++) {
-	members[i] = new AnyNumericalMatching(nonzeros[i][0],nonzeros[i][1],
+	members[i] = new AnyNumericalMatching(
 	    [&,i](const AnyNumericalMatching *self,
 		  const Real *w, const Real *x) {
 		return fmssm_fmssmn_mu_b_n_(self->f->scl0,w,x,i);
-	    });
+	    },
+	    nonzeros[i][0],nonzeros[i][1]);
     }
 }
     
@@ -84,11 +87,12 @@ Fmssm_fmssmn_gaugino_masses_n_::Fmssm_fmssmn_gaugino_masses_n_() :
 {
     vector<vector<vector<size_t>>> nonzeros(dependence());
     for (size_t i = 0; i < 6; i++) {
-	members[i] = new AnyNumericalMatching(nonzeros[i][0],nonzeros[i][1],
+	members[i] = new AnyNumericalMatching(
 	    [&,i](const AnyNumericalMatching *self,
 		  const Real *w, const Real *x) {
 		return fmssm_fmssmn_gaugino_masses_n_(self->f->scl0,w,x,i);
-	    });
+	    },
+	    nonzeros[i][0],nonzeros[i][1]);
     }
 }
 
@@ -103,11 +107,12 @@ Fmssm_fmssmn_higgs_masses_n_::Fmssm_fmssmn_higgs_masses_n_() :
 {
     vector<vector<vector<size_t>>> nonzeros(dependence());
     for (size_t i = 0; i < 2; i++) {
-	members[i] = new AnyNumericalMatching(nonzeros[i][0],nonzeros[i][1],
+	members[i] = new AnyNumericalMatching(
 	    [&,i](const AnyNumericalMatching *self,
 		  const Real *w, const Real *x) {
 		return fmssm_fmssmn_higgs_masses_n_(self->f->scl0,w,x,i);
-	    });
+	    },
+	    nonzeros[i][0],nonzeros[i][1]);
     }
 }
 
@@ -122,11 +127,12 @@ Fmssm_fmssmn_sfermion_masses_n_::Fmssm_fmssmn_sfermion_masses_n_() :
 {
     vector<vector<vector<size_t>>> nonzeros(dependence());
     for (size_t i = 0; i < 45; i++) {
-	members[i] = new AnyNumericalMatching(nonzeros[i][0],nonzeros[i][1],
+	members[i] = new AnyNumericalMatching(
 	    [&,i](const AnyNumericalMatching *self,
 		  const Real *w, const Real *x) {
 		return fmssm_fmssmn_sfermion_masses_n_(self->f->scl0,w,x,i);
-	    });
+	    },
+	    nonzeros[i][0],nonzeros[i][1]);
     }
 }
 
@@ -141,11 +147,12 @@ Fmssm_fmssmn_trilinears_n_::Fmssm_fmssmn_trilinears_n_() :
 {
     vector<vector<vector<size_t>>> nonzeros(dependence());
     for (size_t i = 0; i < 54; i++) {
-	members[i] = new AnyNumericalMatching(nonzeros[i][0],nonzeros[i][1],
+	members[i] = new AnyNumericalMatching(
 	    [&,i](const AnyNumericalMatching *self,
 		  const Real *w, const Real *x) {
 		return fmssm_fmssmn_trilinears_n_(self->f->scl0,w,x,i);
-	    });
+	    },
+	    nonzeros[i][0],nonzeros[i][1]);
     }
 }
 

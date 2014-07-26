@@ -304,7 +304,6 @@ CNConstraintToCCode[cnc_] := Module[{
     {dependence, expr} = {Dependence, Expr} /. List@@cnc;
     StringJoin[
 	"  new AnyNumericalConstraint(\n",
-	"    { /* all except t */ },\n", (* TODO: reduce dependence set *)
 	"    [&](const AnyNumericalConstraint *self, const double *x) {\n",
 	"      double a = self->f->a;\n",
 	"      CLASSNAME::Interactions I;\n",
@@ -312,9 +311,10 @@ CNConstraintToCCode[cnc_] := Module[{
 	"      return ",
 	Block[{CContext},
 	    CContext["CLASSNAME::Interactions::"] = "I.";
-	    CExpToCFormString @ ReCExp[expr]],
-	    ";\n",
-	"    })"]
+	    CExpToCFormString @ ReCExp[expr]], ";\n",
+	"    }\n",
+	" /* , { all except l0t } */\n", (* TODO: reduce dependence set *)
+	"  )"]
 ];
 
 restoreMassPowerRules = {

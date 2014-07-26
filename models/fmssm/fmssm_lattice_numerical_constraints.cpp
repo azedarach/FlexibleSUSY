@@ -45,7 +45,7 @@ Fmssm_constraint_on_gauge_couplings_n_() :
 {
     vector<vector<size_t>> nonzeros(dependence());
     for (size_t i = 0; i < 3; i++) {
-	members[i] = new AnyNumericalConstraint(nonzeros[i],
+	members[i] = new AnyNumericalConstraint(
 	    [&,i](const AnyNumericalConstraint *self, const Real *x) {
 		return fmssm_gauge_couplings_n_(g1,g2,g3,
 						nullptr,nullptr,nullptr,
@@ -56,7 +56,8 @@ Fmssm_constraint_on_gauge_couplings_n_() :
 						0,0,0,
 						0,0,
 						self->f->scl0, x, i);
-	    });
+	    },
+	    nonzeros[i]);
     }
 }
 
@@ -72,7 +73,7 @@ Fmssm_constraint_on_yukawas_n_::Fmssm_constraint_on_yukawas_n_() :
 {
     vector<vector<size_t>> nonzeros(dependence());
     for (size_t i = 0; i < 54; i++) {
-	members[i] = new AnyNumericalConstraint(nonzeros[i],
+	members[i] = new AnyNumericalConstraint(
 	    [&,i](const AnyNumericalConstraint *self, const Real *x) {
 		return fmssm_yukawas_n_(0,0,0,
 					Yu.data(),Yd.data(),Ye.data(),
@@ -83,7 +84,8 @@ Fmssm_constraint_on_yukawas_n_::Fmssm_constraint_on_yukawas_n_() :
 					0,0,0,
 					0,0,
 					self->f->scl0, x, i);
-	    });
+	    },
+	    nonzeros[i]);
     }
 }
 
@@ -98,7 +100,7 @@ Fmssm_constraint_on_ewsb_n_::Fmssm_constraint_on_ewsb_n_() :
 {
     vector<vector<size_t>> nonzeros(dependence());
     for (size_t i = 0; i < 4; i++) {
-	members[i] = new AnyNumericalConstraint(nonzeros[i],
+	members[i] = new AnyNumericalConstraint(
 	    [&,i](const AnyNumericalConstraint *self, const Real *x) {
 		return fmssm_ewsb_n_(0,0,0,
 				     nullptr,nullptr,nullptr,
@@ -109,7 +111,8 @@ Fmssm_constraint_on_ewsb_n_::Fmssm_constraint_on_ewsb_n_() :
 				     0,0,0,
 				     vu,vd,
 				     self->f->scl0, x, i);
-	    });
+	    },
+	    nonzeros[i]);
     }
 }
 

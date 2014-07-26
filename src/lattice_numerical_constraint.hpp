@@ -27,6 +27,7 @@
 namespace flexiblesusy {
 
 struct NumericalConstraintCommon {
+    static const std::vector<size_t> empty_vector;
     static constexpr Real default_epsilon = 1e-8;
 };
 
@@ -34,12 +35,8 @@ class NumericalConstraint :
     public NumericalConstraintCommon,
     public ForeignConstraint {
 public:
-    NumericalConstraint
-    (std::vector<size_t> dependence, Real epsilon = default_epsilon) :
-	ForeignConstraint(1), nonzeros(dependence), deriv_epsilon(epsilon) {
-	F_gsl.function = &c_wrap;
-	F_gsl.params = this;
-    }
+    NumericalConstraint(std::vector<size_t> dependence = empty_vector,
+			Real epsilon = default_epsilon);
     void init(RGFlow<Lattice> *flow, size_t theory, size_t site);
     void operator()();
     using ForeignConstraint::init;
@@ -58,8 +55,8 @@ private:
 class AnyNumericalConstraint : public NumericalConstraint {
 public:
     AnyNumericalConstraint
-    (std::vector<size_t> dependence,
-     std::function<Real(const AnyNumericalConstraint *, const Real *x)> fxn,
+    (std::function<Real(const AnyNumericalConstraint *, const Real *x)> fxn,
+     std::vector<size_t> dependence = empty_vector,
      Real epsilon = default_epsilon) :
 	NumericalConstraint(dependence, epsilon), fxn_(fxn)
 	{}
@@ -73,13 +70,9 @@ class NumericalMatching :
     public NumericalConstraintCommon,
     public ForeignMatching {
 public:
-    NumericalMatching(std::vector<size_t> depL, std::vector<size_t> depH,
-		      Real epsilon = default_epsilon) :
-	ForeignMatching(1), nonzerosL(depL), nonzerosH(depH),
-	deriv_epsilon(epsilon) {
-	F_gsl.function = &c_wrap;
-	F_gsl.params = this;
-    }
+    NumericalMatching(std::vector<size_t> depL = empty_vector,
+		      std::vector<size_t> depH = empty_vector,
+		      Real epsilon = default_epsilon);
     void init(RGFlow<Lattice> *flow, size_t lower_theory);
     void operator()();
     using ForeignMatching::init;
@@ -101,9 +94,10 @@ private:
 class AnyNumericalMatching : public NumericalMatching {
 public:
     AnyNumericalMatching
-    (std::vector<size_t> depL, std::vector<size_t> depH,
-     std::function<Real(const AnyNumericalMatching *,
+    (std::function<Real(const AnyNumericalMatching *,
 			const Real *w, const Real *x)> fxn,
+     std::vector<size_t> depL = empty_vector,
+     std::vector<size_t> depH = empty_vector,
      Real epsilon = default_epsilon) :
 	NumericalMatching(depL, depH, epsilon), fxn_(fxn)
 	{}

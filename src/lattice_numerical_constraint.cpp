@@ -22,6 +22,15 @@ namespace flexiblesusy {
 
 using namespace std;
 
+const std::vector<size_t> NumericalConstraintCommon::empty_vector;
+
+NumericalConstraint::NumericalConstraint
+(std::vector<size_t> dependence, Real epsilon) :
+    ForeignConstraint(1), nonzeros(dependence), deriv_epsilon(epsilon)
+{
+    F_gsl.function = &c_wrap;
+    F_gsl.params = this;
+}
 
 void NumericalConstraint::init
 (RGFlow<Lattice> *flow, size_t theory, size_t site)
@@ -58,6 +67,15 @@ double NumericalConstraint::c_wrap(double xj, void *params)
     NumericalConstraint *self = static_cast<NumericalConstraint *>(params);
     self->x_local[self->j] = xj;
     return self->c(&self->x_local[0]);
+}
+
+NumericalMatching::NumericalMatching
+(std::vector<size_t> depL, std::vector<size_t> depH, Real epsilon) :
+    ForeignMatching(1), nonzerosL(depL), nonzerosH(depH),
+    deriv_epsilon(epsilon)
+{
+    F_gsl.function = &c_wrap;
+    F_gsl.params = this;
 }
 
 void NumericalMatching::init(RGFlow<Lattice> *flow, size_t lower_theory)

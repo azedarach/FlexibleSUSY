@@ -29,7 +29,7 @@ Fmssmn_constraint_on_yn_n_::Fmssmn_constraint_on_yn_n_() :
 {
     vector<vector<size_t>> nonzeros(dependence());
     for (size_t i = 0; i < 18; i++) {
-	members[i] = new AnyNumericalConstraint(nonzeros[i],
+	members[i] = new AnyNumericalConstraint(
 	    [&,i](const AnyNumericalConstraint *self, const Real *x) {
 		return fmssmn_yn_n_(0,0,0,
 				    nullptr,nullptr,Yn.data(),nullptr,
@@ -40,7 +40,8 @@ Fmssmn_constraint_on_yn_n_::Fmssmn_constraint_on_yn_n_() :
 				    0,0,0,
 				    0,0,
 				    self->f->scl0, x, i);
-	    });
+	    },
+	    nonzeros[i]);
     }
 }
 
