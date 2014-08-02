@@ -112,7 +112,8 @@ WriteLatticeCode[
 Block[{
 	drv,
 	ToEnumSymbol,
-	DeclaredRealQ
+	DeclaredRealQ,
+	DependenceNode
     },
     Format[d:drv[_, _], CForm] := Format[DrvToCFormString[d], OutputForm];
 
@@ -266,18 +267,14 @@ EWSBConditionsToC[pEquations_List] := EWSBConditionToC /@ pEquations;
 
 EWSBConditionToC[lhs_ == rhs_] := EWSBConditionToC[rhs - lhs];
 
-EWSBConditionToC[constraint_] := Module[{
-	cexp = ToCExp[constraint, x]
-    },
+EWSBConditionToC[constraint_] :=
     CNConstraint[
-	Dependence -> DependenceList[cexp],
-	Expr -> cexp
-    ]
-];
+	Dependence -> DependenceList[constraint],
+	Expr -> ToCExp[constraint, x]
+    ];
 
-DependenceList[cexp_] :=
-    SortBy[Union @
-	   Cases[cexp, x[enum_] :> enum, {0, Infinity}],
+DependenceList[expr_] :=
+    SortBy[ToEnumSymbol@PrivatizeReIm@ToCExp[#]& /@ FindDependence[expr],
 	   ToExpression @ StringReplace[
 	       ToString[#], RegularExpression["^l([[:digit:]]+).*$"] :> "$1"] &
     ];
@@ -312,8 +309,8 @@ CNConstraintToCCode[cnc_] := Module[{
 	Block[{CContext},
 	    CContext["CLASSNAME::Interactions::"] = "I.";
 	    CExpToCFormString @ ReCExp[expr]], ";\n",
-	"    }\n",
-	" /* , { all except l0t } */\n", (* TODO: reduce dependence set *)
+	"    },\n",
+	"    ", ToString[dependence], "\n",
 	"  )"]
 ];
 
@@ -387,6 +384,7 @@ MatrixToC[symbol_ -> m_?MatrixQ] :=
 MatrixToC[m_, symbol_, scalarType_] := Module[{
 	d1, d2, name = CExpToCFormString@ToCExp[symbol]
     },
+    SetDependenceNode[symbol[_,_], m];
     {d1, d2} = Dimensions[m];
     If[scalarType === "double", DeclaredRealQ[symbol[_,_]] := True];
     CMatrix[
@@ -400,6 +398,7 @@ MatrixToC[m_, symbol_, scalarType_] := Module[{
 MassToC[m_, f_, cType_] := Module[{
 	ev = ToCMassName[f]
     },
+    SetDependenceNode[MassN[f], m];
     (* DeclaredRealQ[ev] := True by pattern matching *)
     CMatrix[
 	EigenDef -> cType <> " " <> ev <> ";",
@@ -410,6 +409,7 @@ MassToC[m_, f_, cType_] := Module[{
 SVDToC[m_, f_, IdentityMatrix, IdentityMatrix, scalarType_] := Module[{
 	d1, d2, ds, ev
     },
+    SetDependenceNode[MassN[f[{__}]], m];
     ds = Min[{d1, d2} = Dimensions[m]];
     ev = ToCMassName[f];
     CMatrix[
@@ -421,6 +421,7 @@ SVDToC[m_, f_, IdentityMatrix, IdentityMatrix, scalarType_] := Module[{
 SVDToC[m_, f_, u_, u_, scalarType_] := Module[{
 	d, ev
     },
+    SetDependenceNode[MassN[f[{__}]] | u[_,_], m];
     {d, d} = Dimensions[m];
     ev = ToCMassName[f];
     CMatrix[
@@ -440,6 +441,7 @@ SVDToC[m_, f_, u_, u_, scalarType_] := Module[{
 SVDToC[m_, f_, u_, v_, scalarType_] := Module[{
 	d1, d2, ds, ev
     },
+    SetDependenceNode[MassN[f[{__}]] | (u|v)[_,_], m];
     ds = Min[{d1, d2} = Dimensions[m]];
     ev = ToCMassName[f];
     If[scalarType === "double", DeclaredRealQ[(u|v)[_,_]] := True];
@@ -463,6 +465,7 @@ SVDToC[m_, f_, u_, v_, scalarType_] := Module[{
 HermitianToC[m_, f_, IdentityMatrix, scalarType_] := Module[{
 	d, ev
     },
+    SetDependenceNode[MassN[f[{__}]], m];
     {d, d} = Dimensions[m];
     ev = ToCMassName[f];
     CMatrix[
@@ -474,6 +477,7 @@ HermitianToC[m_, f_, IdentityMatrix, scalarType_] := Module[{
 HermitianToC[m_, f_, z_, scalarType_] := Module[{
 	d, ev
     },
+    SetDependenceNode[MassN[f[{__}]] | z[_,_], m];
     {d, d} = Dimensions[m];
     ev = ToCMassName[f];
     If[scalarType === "double", DeclaredRealQ[z[_,_]] := True];
@@ -683,15 +687,19 @@ FormatCFxnCall[name_String, args_List, scope_String] := Module[{
 CContext[_] = "";
 
 NPointFunctionToC[nPointFunction:_[_, rhs_]] := Module[{
-	cType, re
+	cType, re,
+	name, args
     },
     {cType, re} = If[RealQ[rhs], {"double", ReCExp},
 				 {"std::complex<double>", Identity}];
+    name = CNPointFunctionName[nPointFunction];
+    args = CNPointFunctionArgs[nPointFunction];
+    SetDependenceNode[Symbol[name] @@ Table[_, {Length[args]}], rhs];
     CFxn[
 	ReturnType -> cType,
 	Scope -> "CLASSNAME::Interactions::",
-	Name -> CNPointFunctionName[nPointFunction],
-	Args -> CNPointFunctionArgs[nPointFunction],
+	Name -> name,
+	Args -> args,
 	Qualifier -> "const",
 	Attributes -> "pure",
 	Body -> "{\n" <>
@@ -737,8 +745,12 @@ CNPointFunctionArgs[
     {"size_t", ToString[#]}& /@ {indices};
 
 VertexRuleToC[lhs_ -> rhs_] := Module[{
-	cType, re
+	cType, re,
+	name, args
     },
+    name = CVertexFunctionName[lhs];
+    args = CVertexFunctionArgs[lhs];
+    SetDependenceNode[Symbol[name] @@ Table[_, {Length[args]}], rhs];
     {cType, re} = If[RealQ[rhs],
 		     DeclaredRealQ[CVertexFunction[lhs]] := True;
 		     {"double", ReCExp},
@@ -746,8 +758,8 @@ VertexRuleToC[lhs_ -> rhs_] := Module[{
     CFxn[
 	ReturnType -> cType,
 	Scope -> "CLASSNAME::Interactions::",
-	Name -> CVertexFunctionName[lhs],
-	Args -> CVertexFunctionArgs[lhs],
+	Name -> name,
+	Args -> args,
 	Qualifier -> "const",
 	Attributes -> "pure",
 	Body -> "{\n" <>
@@ -775,19 +787,21 @@ CVertexFunctionArgs[cpPattern_] :=
 	       }]& /@
     Flatten[FieldIndexList /@ GetParticleList[cpPattern]];
 
-DepNumRuleToC[lhs_ -> rhs_] :=
-CFxn[
-    ReturnType -> If[RealQ[rhs], DeclaredRealQ[lhs[]] := True; "double",
-		     "std::complex<double>"],
-    Scope -> "CLASSNAME::Interactions::",
-    Name -> CExpToCFormString@ToCExp[lhs],
-    Args -> {},
-    Qualifier -> "const",
-    Attributes -> "pure",
-    Body -> "{\n" <>
-    "  return " <> CExpToCFormString@ToCExp[rhs, x] <> ";\n" <>
-    "}\n"
-];
+DepNumRuleToC[lhs_ -> rhs_] := (
+    SetDependenceNode[lhs[], rhs];
+    CFxn[
+	ReturnType -> If[RealQ[rhs], DeclaredRealQ[lhs[]] := True; "double",
+			 "std::complex<double>"],
+	Scope -> "CLASSNAME::Interactions::",
+	Name -> CExpToCFormString@ToCExp[lhs],
+	Args -> {},
+	Qualifier -> "const",
+	Attributes -> "pure",
+	Body -> "{\n" <>
+	"  return " <> CExpToCFormString@ToCExp[rhs, x] <> ";\n" <>
+	"}\n"
+    ]
+);
 
 AbbrRuleToC[lhs_ -> rhs_] :=
 CFxn[
@@ -1279,6 +1293,26 @@ CExpToCFormString[expr_] :=
 			   cExpToCFormStringDispatch, CForm,
 			   CharacterEncoding -> "ASCII"],
 		  RegularExpression["\\\\\\[(.*?)\\]"] :> "$1"];
+
+SetDependenceNode[form_, expr_] := DependenceNode[form] = expr /. {
+    HoldPattern[SARAH`Mass [f_]] :> Lattice`Private`M [f],
+    HoldPattern[SARAH`Mass2[f_]] :> Lattice`Private`M2[f]};
+
+FindDependence[expr_] := Module[{
+	explicit = Cases[
+	    expr,
+	    p:Re[_]|Im[_] /; ValueQ@ToEnumSymbol@PrivatizeReIm@ToCExp[p],
+	    {0, Infinity}],
+	children
+    },
+    children = Complement[
+	Cases[expr, _?(ValueQ@DependenceNode[#]&), {0, Infinity}],
+	explicit /. Re|Im -> Identity];
+    Union @
+    If[children === {},
+       explicit,
+       Flatten[{explicit, FindDependence /@ Union[DependenceNode/@children]}]]
+];
 
 End[] (* `Private` *)
 
