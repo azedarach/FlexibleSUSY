@@ -148,6 +148,8 @@ Module[{
 	ewsbConstraints, ewsbList
     },
     DeclaredRealQ[_] := False;
+    DependenceNode[(SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
+		    SARAH`F0|SARAH`G0|SARAH`H0)[m__]] := {Re[t], m};
     parameters = RealVariables[parameterRules];
     enumRules = EnumRules[parameters];
     enumParameters = EnumParameters[enumRules];
