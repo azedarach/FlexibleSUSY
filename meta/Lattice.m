@@ -118,8 +118,8 @@ Block[{
     Format[d:drv[_, _], CForm] := Format[DrvToCFormString[d], OutputForm];
 
 Module[{
-	parameterRules =
-	    Join[gaugeCouplingRules, vevRules, otherParameterRules],
+	parameterRules = Join[
+	    {t -> Re[t]}, gaugeCouplingRules, vevRules, otherParameterRules],
 	gaugeCouplings = RealVariables[gaugeCouplingRules],
 	betaFunctionRules, betaFunctionDerivRules,
 	abbrRules, abbrDerivRules,
@@ -572,12 +572,12 @@ WriteMakefile[templateDir_, outputDir_, cppFiles_, templateRules_] :=
 	cppFiles, templateRules];
 
 EnumRules[parameters_List] := MapIndexed[
-    #1 -> "l" <> ToString@First[#2] <>
+    #1 -> "l" <> ToString[First[#2] - 1] <>
 	  ToString[PrivatizeReIm@ToCExp[#1], CForm]&,
     parameters];
 
 EnumParameters[enumRules_List] :=
-    StringJoin["enum : size_t { l0t, ", {Last[#], ", "}& /@ enumRules,
+    StringJoin["enum : size_t { ", {Last[#], ", "}& /@ enumRules,
 	       "eftWidth };"];
 
 SetToEnumSymbol[parameter_ -> enum_String] :=
@@ -605,10 +605,12 @@ ScaleByA[b:BETA[1, _] -> rhs_, _] := b -> a rhs;
 ScaleByA[b:BETA[_Integer, _] -> rhs_, _] := b -> a rhs;
 
 RealVariables[parameterRules_] := Module[{
-	rvs = Variables[parameterRules[[All,2]]]
+	rhsList = Flatten@parameterRules[[All,2]],
+	rvs
     },
-    Assert[Complement[rvs, Union[rvs]] === {}];
-    SortBy[rvs, Position[Flatten@parameterRules[[All,2]], #]&]
+    rvs = Variables[rhsList];
+    Assert[Length[rvs] === Length@Union[rvs]];
+    SortBy[rvs, Position[rhsList, #]&]
 ];
 
 DifferentiateRules[rules_, parameters_, abbrRules_] :=
@@ -825,7 +827,7 @@ Reap[
 	Qualifier -> "const",
 	Body -> StringJoin["{\n",
 	"  dx.setZero();\n",
-	"  dx[l0t] = 1;\n",
+	"  dx[l0REt] = 1;\n",
 	MapIndexed[{
 	"\n  if (nloops < ", ToString@First[#2], ") return;\n",
 	Module[{flattened = Flatten[#1], nRules, name},
