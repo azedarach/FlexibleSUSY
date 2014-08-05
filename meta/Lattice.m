@@ -100,6 +100,9 @@ Format[Lattice`Private`LispAnd, CForm] := Format["LispAnd", OutputForm];
 Format[Lattice`Private`Complex, CForm] :=
     Format["std::complex<double>", OutputForm];
 
+Format[InCScope[scope_, z_], CForm] :=
+    Format[CContext[scope] <> ToString[CForm[z]], OutputForm];
+
 WriteLatticeCode[
     sarahAbbrs_List, betaFunctions_List, anomDims_List,
     fsMassMatrices_, fsNPointFunctions_,
@@ -113,7 +116,8 @@ Block[{
 	drv,
 	ToEnumSymbol,
 	DeclaredRealQ,
-	DependenceNode
+	DependenceNode,
+	CScope
     },
     Format[d:drv[_, _], CForm] := Format[DrvToCFormString[d], OutputForm];
 
@@ -655,7 +659,7 @@ CFxnToCCode[cfxn_] := Module[{
 	 {" ",Qualifier}, {" ATTR(",Attributes,")"}, Body} /.
 	List@@cfxn /. {Scope -> "CLASSNAME::", {___, Qualifier} -> {},
 		       {___, Attributes, ___} -> {}};
-    FormatCFxnCall[name, args, scope];
+    SetCFxnScope[name, args, scope];
     argsInDecl = "(" <> Riffle[Riffle[#, " "]& /@ args, ", "] <> ")";
     argsInDef = "(" <> Riffle[
 	Riffle[If[Length[#] > 1 &&
@@ -675,17 +679,16 @@ StringGroup[strings_List, chunkSize_] := Module[{
 	flattened]
 ];
 
-FormatCFxnCall[name_String, args_List, scope_String] := Module[{
+SetCFxnScope[
+    name_String, args_List, scope_String:"CLASSNAME::Interactions::"] :=
+Module[{
 	symbol = Quiet[Check[Symbol[name], Undefined, {Symbol::symname}],
 		       {Symbol::symname}],
 	pattern
     },
     If[symbol =!= Undefined,
        pattern = symbol @@ Table[_, {Length[args]}];
-       Format[p:pattern, CForm] := Format[
-	   CContext[scope] <> name <> "(" <>
-	   Riffle[ToString[CForm[#]]& /@ List@@p, ","] <> ")", OutputForm]
-    ]
+       CScope[pattern] = scope]
 ];
 
 CContext[_] = "";
@@ -1292,15 +1295,24 @@ cExpToCFormStringDispatch = Dispatch[{
 	Lattice`Private`LispAnd[HoldForm[a <= b], x]
 }];
 
+prefixCScopeDispatch = Dispatch[{
+    f_?(ValueQ@CScope[#]&) :> InCScope[CScope[f], f]
+}];
+
 CExpToCFormString[expr_] :=
     StringReplace[ToString[expr //. unrollInnermostSumDispatch //.
-			   cExpToCFormStringDispatch, CForm,
+			   cExpToCFormStringDispatch /.
+			   prefixCScopeDispatch, CForm,
 			   CharacterEncoding -> "ASCII"],
 		  RegularExpression["\\\\\\[(.*?)\\]"] :> "$1"];
 
-SetDependenceNode[form_, expr_] := DependenceNode[form] = expr /. {
-    HoldPattern[SARAH`Mass [f_]] :> Lattice`Private`M [f],
-    HoldPattern[SARAH`Mass2[f_]] :> Lattice`Private`M2[f]};
+SetDependenceNode[form_, expr_, cscope_String:"CLASSNAME::Interactions::"] := (
+    DependenceNode[form] = expr /. {
+	HoldPattern[SARAH`Mass [f_]] :> Lattice`Private`M [f],
+	HoldPattern[SARAH`Mass2[f_]] :> Lattice`Private`M2[f]
+    };
+    CScope[form] = cscope;
+);
 
 FindDependence[expr_] := Module[{
 	explicit = Cases[
