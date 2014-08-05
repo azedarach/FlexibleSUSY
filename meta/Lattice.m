@@ -298,26 +298,30 @@ SoftHiggsMasses[ewsbConstraints_] := Union @
 
 ConditionPositiveVevs[vevs_List] := # > 0& /@ vevs;
 
-CNConstraintsToCCode[cncs_List] :=
-    StringJoin["{\n", Riffle[CNConstraintToCCode /@ cncs, ",\n"], "\n}"];
+CNConstraintsToCCode[cncs_List] := StringJoin[
+    "{\n",
+    IndentText[StringJoin @ Riffle[
+     {"new ", CNConstraintToCCode[#]}& /@ cncs, ",\n"], 2],
+    "\n}"];
 
 CNConstraintToCCode[cnc_] := Module[{
 	dependence, expr
     },
     {dependence, expr} = {Dependence, Expr} /. List@@cnc;
     StringJoin[
-	"  new AnyNumericalConstraint(\n",
-	"    [&](const AnyNumericalConstraint *self, const double *x) {\n",
-	"      double a = self->f->a;\n",
-	"      CLASSNAME::Interactions I;\n",
-	"      I.set(Eigen::Map<const Eigen::VectorXd>(x, eftWidth), self->f->scl0);\n",
-	"      return ",
+	"AnyNumericalConstraint(\n",
+	"  [&](const AnyNumericalConstraint *self, const double *x) {\n",
+	"    double a    = self->f->a;\n",
+	"    double scl0 = self->f->scl0;\n",
+	"    CLASSNAME::Interactions I;\n",
+	"    I.set(Eigen::Map<const Eigen::VectorXd>(x, eftWidth), scl0);\n",
+	"    return ",
 	Block[{CContext},
 	    CContext["CLASSNAME::Interactions::"] = "I.";
 	    CExpToCFormString @ ReCExp[expr]], ";\n",
-	"    },\n",
-	"    ", ToString[dependence], "\n",
-	"  )"]
+	"  },\n",
+	"  ", ToString[dependence], "\n",
+	")"]
 ];
 
 restoreMassPowerRules = {
