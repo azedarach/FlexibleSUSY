@@ -1,0 +1,46 @@
+// ====================================================================
+// This file is part of FlexibleSUSY.
+//
+// FlexibleSUSY is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version.
+//
+// FlexibleSUSY is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with FlexibleSUSY.  If not, see
+// <http://www.gnu.org/licenses/>.
+// ====================================================================
+
+// File generated at @DateAndTime@
+
+#ifndef @ModelName@_LATTICE_TSUSY_CONSTRAINT_H
+#define @ModelName@_LATTICE_TSUSY_CONSTRAINT_H
+
+#include "lattice_numerical_constraint.hpp"
+#include "@ModelName@_input_parameters.hpp"
+
+namespace flexiblesusy {
+
+template <class T>
+class @ModelName@;
+
+template <class T>
+class @ModelName@_tsusy_constraint;
+
+class Lattice;
+
+template<>
+class @ModelName@_tsusy_constraint<Lattice> : public AnyNumericalConstraint {
+public:
+    @ModelName@_tsusy_constraint();
+    virtual ~@ModelName@_tsusy_constraint();
+};
+
+} // namespace flexiblesusy
+
+#endif

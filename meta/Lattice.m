@@ -68,6 +68,8 @@ Format[a, CForm] := Format["a", OutputForm];
 
 Format[Lattice`Private`p2, CForm] := Format["p2", OutputForm];
 
+Format[scl0, CForm] := Format["scl0", OutputForm];
+
 Format[drv[ap_, p_], CForm] :=
     Format[DrvToCFormString[drv[ap, p]], OutputForm];
 
@@ -149,8 +151,10 @@ Module[{
 	treeEwsbConstraints = fsEwsbEquations /. sarahOperatorReplacementRules,
 	softHiggsMasses,
 	treeEwsbEquations,
-	ewsbConstraints, ewsbList
+	ewsbConstraints, ewsbList,
+	fixTsusy, tsusyConstraint = (Exp[t] scl0)^4 - Lattice`Private`M2[Global`Su[{1}]] Lattice`Private`M2[Global`Su[{6}]] /. sarahOperatorReplacementRules
     },
+    DeclaredRealQ[a | scl0] := True;
     DeclaredRealQ[_] := False;
     DependenceNode[(SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
 		    SARAH`F0|SARAH`G0|SARAH`H0)[m__]] := {Re[t], m};
@@ -208,7 +212,12 @@ Module[{
     ewsbList = CNConstraintsToCCode[EWSBConditionsToC[ParametrizeEWSBEquations[
 	ewsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
 	parameterRules]]];
+    fixTsusy = CNConstraintToCCode[NConstraintToC[tsusyConstraint /. parameterRules]];
     replacementFiles = Join[replacementFiles, {
+	{FileNameJoin[{templateDir, "lattice_tsusy_constraint.hpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_tsusy_constraint.hpp"}]},
+	{FileNameJoin[{templateDir, "lattice_tsusy_constraint.cpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_tsusy_constraint.cpp"}]},
 	{FileNameJoin[{templateDir, "lattice_ewsb_constraint.hpp.in"}],
 	 FileNameJoin[{outputDir, modelName <> "_lattice_ewsb_constraint.hpp"}]},
 	{FileNameJoin[{templateDir, "lattice_ewsb_constraint.cpp.in"}],
@@ -224,6 +233,7 @@ Module[{
 	"@eigenVarStmts@"   -> WrapText[eigenVarStmts],
 	"@enumParameters@"  -> WrapText@IndentText[enumParameters, 2],
 	"@ewsbList@"	    -> StringTrim@WrapText@IndentText[ewsbList, 2],
+	"@fixTsusy@"        -> StringTrim@WrapText@IndentText[fixTsusy, 2],
 	"@matrixDefs@"	    -> IndentText[matrixDefs, 4],
 	"@matrixStmts@"	    -> WrapText[matrixStmts],
 	"@nPointDecls@"	    -> IndentText[nPointDecls, 4],
@@ -271,9 +281,9 @@ Module[{
 
 EWSBConditionsToC[pEquations_List] := EWSBConditionToC /@ pEquations;
 
-EWSBConditionToC[lhs_ == rhs_] := EWSBConditionToC[rhs - lhs];
+EWSBConditionToC[lhs_ == rhs_] := NConstraintToC[rhs - lhs];
 
-EWSBConditionToC[constraint_] :=
+NConstraintToC[constraint_] :=
     CNConstraint[
 	Dependence -> DependenceList[constraint],
 	Expr -> ToCExp[constraint, x]
@@ -1293,6 +1303,7 @@ cExpToCFormStringDispatch = Dispatch[{
 (*
     p:Power[_?NumericQ, _?NumericQ] :> N[p],
 *)
+    Power[E,z_]			    :> exp[z],
     Power[a_,2]			    :> Global`Sqr[a],
     Power[a_,-2]		    :> 1/Global`Sqr[a],
     Lattice`Private`ThetaStep[a_, b_, x_] :>

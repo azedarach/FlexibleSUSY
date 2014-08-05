@@ -63,11 +63,11 @@ public:
 @nPointDecls@
     // vertices
 @vertexDecls@
-  private:
 @matrixDefs@
 @eigenVarDefs@
 @phaseDefs@
 @dependenceNumDecls@
+  private:
   };
 
   // beta functions
