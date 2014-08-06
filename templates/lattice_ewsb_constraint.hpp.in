@@ -40,7 +40,7 @@ struct @ModelName@_ewsb_constraint_ {
     @ModelName@_ewsb_constraint_();
     ~@ModelName@_ewsb_constraint_();
     std::vector<Constraint<Lattice>*> members;
-    const @ModelName@_input_parameters *input;
+    // const @ModelName@_input_parameters *input;
 };
 
 template<>
@@ -49,7 +49,7 @@ class @ModelName@_ewsb_constraint<Lattice> :
     public CompoundConstraint<Lattice> {
 public:
     @ModelName@_ewsb_constraint();
-    @ModelName@_ewsb_constraint(const @ModelName@_input_parameters&);
+    // @ModelName@_ewsb_constraint(const @ModelName@_input_parameters&);
     virtual ~@ModelName@_ewsb_constraint();
 };
 

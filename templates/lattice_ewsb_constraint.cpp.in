@@ -36,6 +36,7 @@ using namespace @ModelName@_lattice_info;
 {
 }
 
+#if 0
 @ModelName@_ewsb_constraint<Lattice>::@ModelName@_ewsb_constraint
 (const @ModelName@_input_parameters& input_) :
     @ModelName@_ewsb_constraint_(),
@@ -43,6 +44,7 @@ using namespace @ModelName@_lattice_info;
 {
     input = &input_;
 }
+#endif
 
 @ModelName@_ewsb_constraint<Lattice>::~@ModelName@_ewsb_constraint()
 {
