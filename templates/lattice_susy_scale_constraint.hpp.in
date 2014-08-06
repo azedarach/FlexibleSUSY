@@ -23,7 +23,9 @@
 
 #include "@ModelName@_susy_scale_constraint.hpp"
 #include "@ModelName@_input_parameters.hpp"
-#include "lattice_constraint.hpp"
+#include "lattice_compound_constraint.hpp"
+#include "@ModelName@_lattice_tsusy_constraint.hpp"
+#include "@ModelName@_lattice_ewsb_constraint.hpp"
 
 namespace flexiblesusy {
 
@@ -32,13 +34,23 @@ class @ModelName@;
 
 class Lattice;
 
+// auxiliary class for initializing own members before the base class
+// see http://www.boost.org/doc/libs/1_53_0/libs/utility/base_from_member.html
+struct @ModelName@_susy_scale_constraint_ {
+    @ModelName@_susy_scale_constraint_();
+    ~@ModelName@_susy_scale_constraint_();
+    @ModelName@_tsusy_constraint<Lattice> tsusy;
+    @ModelName@_ewsb_constraint<Lattice> ewsb;
+};
+
 template<>
-class @ModelName@_susy_scale_constraint<Lattice> : public Constraint<Lattice> {
+class @ModelName@_susy_scale_constraint<Lattice> :
+    public @ModelName@_susy_scale_constraint_,
+    public CompoundConstraint<Lattice> {
 public:
    @ModelName@_susy_scale_constraint();
    @ModelName@_susy_scale_constraint(const @ModelName@_input_parameters&);
    virtual ~@ModelName@_susy_scale_constraint();
-   virtual double get_scale() const;
 };
 
 } // namespace flexiblesusy

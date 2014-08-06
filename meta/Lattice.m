@@ -214,6 +214,10 @@ Module[{
 	parameterRules]]];
     fixTsusy = CNConstraintToCCode[NConstraintToC[tsusyConstraint /. parameterRules]];
     replacementFiles = Join[replacementFiles, {
+	{FileNameJoin[{templateDir, "lattice_susy_scale_constraint.hpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_susy_scale_constraint.hpp"}]},
+	{FileNameJoin[{templateDir, "lattice_susy_scale_constraint.cpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_susy_scale_constraint.cpp"}]},
 	{FileNameJoin[{templateDir, "lattice_tsusy_constraint.hpp.in"}],
 	 FileNameJoin[{outputDir, modelName <> "_lattice_tsusy_constraint.hpp"}]},
 	{FileNameJoin[{templateDir, "lattice_tsusy_constraint.cpp.in"}],
