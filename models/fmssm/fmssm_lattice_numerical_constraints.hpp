@@ -10,8 +10,8 @@ namespace flexiblesusy {
 
 class Fmssm_constraint_on_ms_n : public NumericalConstraint {
 public:
-    Fmssm_constraint_on_ms_n() : NumericalConstraint(dependence()[0]) {}
-    Real c(const Real *x) const;
+    Fmssm_constraint_on_ms_n() : NumericalConstraint(1, dependence()[0]) {}
+    Eigen::ArrayXd cs(const double *x) const;
     Real vu, vd;
 private:
     std::vector<std::vector<size_t>> dependence();

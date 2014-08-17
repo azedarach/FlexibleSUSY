@@ -45,8 +45,8 @@ public:
 		  0,0,0,
 		  0,0,
 		  f->scl0, nullptr, 0,
-		  &row[0], &rhs);
-	copy_row(0);
+		  rows.data(), &rhss(0));
+	copy_rows();
     }
 };
 
@@ -63,8 +63,8 @@ public:
 		  0,0,0,
 		  vu,vd,
 		  f->scl0, &x()[0], 0,
-		  &row[0], &rhs);
-	copy_row(0);
+		  rows.data(), &rhss(0));
+	copy_rows();
     }
     Real vu, vd;
 };
@@ -73,6 +73,7 @@ class Fmssm_constraint_on_gauge_couplings : public ForeignConstraint {
 public:
     Fmssm_constraint_on_gauge_couplings() : ForeignConstraint(3) {}
     void operator()() {
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 3; i++) {
 	    fmssm_gauge_couplings_(g1,g2,g3,
 				   nullptr,nullptr,nullptr,
@@ -83,9 +84,10 @@ public:
 				   0,0,0,
 				   0,0,
 				   f->scl0, nullptr, i,
-				   &row[0], &rhs);
-	    copy_row(i);
+				   rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     Real g1, g2, g3;
 };
@@ -94,6 +96,7 @@ class Fmssm_constraint_on_yukawas : public ForeignConstraint {
 public:
     Fmssm_constraint_on_yukawas() : ForeignConstraint(54) {}
     void operator()() {
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 54; i++) {
 	    fmssm_yukawas_(0,0,0,
 			   Yu.data(),Yd.data(),Ye.data(),
@@ -104,9 +107,10 @@ public:
 			   0,0,0,
 			   0,0,
 			   f->scl0, nullptr, i,
-			   &row[0], &rhs);
-	    copy_row(i);
+			   rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     CM33 Yu, Yd, Ye;
 };
@@ -115,19 +119,21 @@ class Fmssm_constraint_on_ewsb : public ForeignConstraint {
 public:
     Fmssm_constraint_on_ewsb() : ForeignConstraint(4) {}
     void operator()() {
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 4; i++) {
 	    fmssm_ewsb_(0,0,0,
-		       nullptr,nullptr,nullptr,
-		       0,0,
-		       nullptr,nullptr,nullptr,
-		       nullptr,nullptr,
-		       nullptr,nullptr,nullptr,
-		       0,0,0,
-		       vu,vd,
-		       f->scl0, &x()[0], i,
-		       &row[0], &rhs);
-	    copy_row(i);
+			nullptr,nullptr,nullptr,
+			0,0,
+			nullptr,nullptr,nullptr,
+			nullptr,nullptr,
+			nullptr,nullptr,nullptr,
+			0,0,0,
+			vu,vd,
+			f->scl0, &x()[0], i,
+			rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     Real vu, vd;
 };
@@ -138,6 +144,7 @@ public:
     void operator()() {
 	Real m2Hu = (1-f->a)*m2Hu_ini + f->a*m2Hu_fin;
 	Real m2Hd = (1-f->a)*m2Hd_ini + f->a*m2Hd_fin;
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 2; i++) {
 	    fmssm_higgs_masses_(0,0,0,
 				nullptr,nullptr,nullptr,
@@ -148,9 +155,10 @@ public:
 				0,0,0,
 				0,0,
 				f->scl0, nullptr, i,
-				&row[0], &rhs);
-	    copy_row(i);
+				rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     Real m2Hu_ini, m2Hu_fin;
     Real m2Hd_ini, m2Hd_fin;
@@ -160,6 +168,7 @@ class Fmssm_constraint_on_gaugino_masses : public ForeignConstraint {
 public:
     Fmssm_constraint_on_gaugino_masses() : ForeignConstraint(6) {}
     void operator()() {
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 6; i++) {
 	    fmssm_gaugino_masses_(0,0,0,
 				  nullptr,nullptr,nullptr,
@@ -170,9 +179,10 @@ public:
 				  M1,M2,M3,
 				  0,0,
 				  f->scl0, nullptr, i,
-				  &row[0], &rhs);
-	    copy_row(i);
+				  rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     Comp M1, M2, M3;
 };
@@ -181,6 +191,7 @@ class Fmssm_constraint_on_sfermion_masses : public ForeignConstraint {
 public:
     Fmssm_constraint_on_sfermion_masses() : ForeignConstraint(45) {}
     void operator()() {
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 45; i++) {
 	    fmssm_sfermion_masses_(0,0,0,
 				   nullptr,nullptr,nullptr,
@@ -191,9 +202,10 @@ public:
 				   0,0,0,
 				   0,0,
 				   f->scl0, nullptr, i,
-				   &row[0], &rhs);
-	    copy_row(i);
+				   rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     CM33 m2Q, m2U, m2D, m2L, m2E;
 };
@@ -202,6 +214,7 @@ class Fmssm_constraint_trilinear_factors : public ForeignConstraint {
 public:
     Fmssm_constraint_trilinear_factors() : ForeignConstraint(54) {}
     void operator()() {
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 54; i++) {
 	    fmssm_trilinear_factors_(0,0,0,
 				     nullptr,nullptr,nullptr,
@@ -212,9 +225,10 @@ public:
 				     0,0,0,
 				     0,0,
 				     f->scl0, nullptr, i,
-				     &row[0], &rhs);
-	    copy_row(i);
+				     rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     CM33 Au, Ad, Ae;
 };
@@ -223,6 +237,7 @@ class Fmssm_constraint_real_trilinear_factors : public ForeignConstraint {
 public:
     Fmssm_constraint_real_trilinear_factors() : ForeignConstraint(54) {}
     void operator()() {
+	rows.transposeInPlace();
 	for (size_t i = 0; i < 54; i++) {
 	    fmssm_real_trilinear_factors_(0,0,0,
 					  nullptr,nullptr,nullptr,
@@ -233,9 +248,10 @@ public:
 					  0,0,0,
 					  0,0,
 					  f->scl0, nullptr, i,
-					  &row[0], &rhs);
-	    copy_row(i);
+					  rows.col(i).data(), &rhss(i));
 	}
+	rows.transposeInPlace();
+	copy_rows();
     }
     CM33 Au, Ad, Ae;		// imaginary parts are unused
 };

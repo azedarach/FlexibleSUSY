@@ -20,8 +20,6 @@
 #define lattice_numerical_constraint_hpp
 
 
-#include <gsl/gsl_deriv.h>
-
 #include "lattice_foreign_constraint.hpp"
 
 namespace flexiblesusy {
@@ -35,77 +33,79 @@ class NumericalConstraint :
     public NumericalConstraintCommon,
     public ForeignConstraint {
 public:
-    NumericalConstraint(std::vector<size_t> dependence = empty_vector,
+    NumericalConstraint(size_t nrows,
+			std::vector<size_t> dependence = empty_vector,
 			Real epsilon = default_epsilon);
     void init(RGFlow<Lattice> *flow, size_t theory, size_t site);
     void operator()();
     using ForeignConstraint::init;
 protected:
-    virtual Real c(const Real *x) const = 0;
+    virtual Eigen::ArrayXd cs(const double *x) const = 0;
 private:
-    std::vector<double> x_local;
     std::vector<size_t> nonzeros;
     std::vector<bool> depends_on;
-    gsl_function F_gsl;
-    static double c_wrap(double xj, void *params);
-    size_t j;
     Real deriv_epsilon;
 };
 
 class AnyNumericalConstraint : public NumericalConstraint {
 public:
     AnyNumericalConstraint
+    (size_t nrows,
+     std::function
+     <Eigen::ArrayXd(const AnyNumericalConstraint *, const Real *x)> fxn,
+          std::vector<size_t> dependence = empty_vector,
+     Real epsilon = default_epsilon);
+    AnyNumericalConstraint
     (std::function<Real(const AnyNumericalConstraint *, const Real *x)> fxn,
      std::vector<size_t> dependence = empty_vector,
-     Real epsilon = default_epsilon) :
-	NumericalConstraint(dependence, epsilon), fxn_(fxn)
-	{}
+     Real epsilon = default_epsilon);
 protected:
-    Real c(const Real *x) const { return fxn_(this, x); }
+    Eigen::ArrayXd cs(const double *x) const { return fxn_(this, x); }
 private:
-    std::function<Real(const AnyNumericalConstraint *, const Real *x)> fxn_;
+    std::function
+    <Eigen::ArrayXd(const AnyNumericalConstraint *, const double *x)> fxn_;
 };
 
 class NumericalMatching :
     public NumericalConstraintCommon,
     public ForeignMatching {
 public:
-    NumericalMatching(std::vector<size_t> depL = empty_vector,
+    NumericalMatching(size_t nrows,
+		      std::vector<size_t> depL = empty_vector,
 		      std::vector<size_t> depH = empty_vector,
 		      Real epsilon = default_epsilon);
     void init(RGFlow<Lattice> *flow, size_t lower_theory);
     void operator()();
     using ForeignMatching::init;
 protected:
-    virtual Real c(const Real *w, const Real *x) const = 0;
+    virtual Eigen::ArrayXd cs(const Real *w, const Real *x) const = 0;
 private:
-    std::vector<double> w_local;
-    std::vector<double> x_local;
     std::vector<size_t> nonzerosL, nonzerosH;
     std::vector<bool> depends_on;
-    gsl_function F_gsl;
-    static double c_wrap(double wxj, void *params);
-    size_t j;
-    Real &wx_local(size_t j)
-    { return j < w_local.size() ? w_local[j] : x_local[j - w_local.size()]; }
     Real deriv_epsilon;
 };
 
 class AnyNumericalMatching : public NumericalMatching {
 public:
     AnyNumericalMatching
+    (size_t nrows,
+     std::function<Eigen::ArrayXd(const AnyNumericalMatching *,
+				  const Real *w, const Real *x)> fxn,
+     std::vector<size_t> depL = empty_vector,
+     std::vector<size_t> depH = empty_vector,
+     Real epsilon = default_epsilon);
+    AnyNumericalMatching
     (std::function<Real(const AnyNumericalMatching *,
 			const Real *w, const Real *x)> fxn,
      std::vector<size_t> depL = empty_vector,
      std::vector<size_t> depH = empty_vector,
-     Real epsilon = default_epsilon) :
-	NumericalMatching(depL, depH, epsilon), fxn_(fxn)
-	{}
+     Real epsilon = default_epsilon);
 protected:
-    Real c(const Real *w, const Real *x) const { return fxn_(this, w, x); }
+    Eigen::ArrayXd cs(const Real *w, const Real *x) const
+    { return fxn_(this, w, x); }
 private:
-    std::function<Real(const AnyNumericalMatching *,
-		       const Real *w, const Real *x)> fxn_;
+    std::function<Eigen::ArrayXd(const AnyNumericalMatching *,
+				 const Real *w, const Real *x)> fxn_;
 };
 
 }

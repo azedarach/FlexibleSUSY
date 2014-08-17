@@ -16,28 +16,27 @@
 // <http://www.gnu.org/licenses/>.
 // ====================================================================
 
+#include "array_deriv.hpp"
 #include "lattice_numerical_constraint.hpp"
 
 namespace flexiblesusy {
 
 using namespace std;
+using namespace Eigen;
 
-const std::vector<size_t> NumericalConstraintCommon::empty_vector;
+const vector<size_t> NumericalConstraintCommon::empty_vector;
 
 NumericalConstraint::NumericalConstraint
-(std::vector<size_t> dependence, Real epsilon) :
-    ForeignConstraint(1), nonzeros(dependence), deriv_epsilon(epsilon)
+(size_t nrows, vector<size_t> dependence, Real epsilon) :
+    ForeignConstraint(nrows), nonzeros(dependence), deriv_epsilon(epsilon)
 {
-    F_gsl.function = &c_wrap;
-    F_gsl.params = this;
 }
 
 void NumericalConstraint::init
 (RGFlow<Lattice> *flow, size_t theory, size_t site)
 {
     ForeignConstraint::init(flow, theory, site);
-    x_local.resize(row.size());
-    depends_on.resize(row.size());
+    depends_on.resize(rows.cols());
     if (nonzeros.empty()) fill(depends_on.begin(), depends_on.end(), true);
     else for (auto i: nonzeros) depends_on[i] = true;
     vector<size_t>().swap(nonzeros); // forces deallocation
@@ -45,80 +44,124 @@ void NumericalConstraint::init
 
 void NumericalConstraint::operator()()
 {
-    x_local = x();
-    Real BC0 = c(&x_local[0]);
-    for (j = 0; j < row.size(); j++) {
-	Real dc;
+    vector<double> x_local = x();
+    VectorXd BC0 = cs(&x_local[0]);
+    for (size_t j = 0; j < rows.cols(); j++) {
+	ArrayXd dcs(rows.rows());
 	Real xj = x_local[j];
 	if (depends_on[j]) {
-	    Real abserr;
-	    gsl_deriv_central(&F_gsl, xj, deriv_epsilon*u(j), &dc, &abserr);
+	    ArrayXd abserr;
+	    array_deriv_central(
+		[&](double xj) {
+		    x_local[j] = xj;
+		    return cs(&x_local[0]);
+		},
+		xj, deriv_epsilon*u(j), dcs, abserr);
 	    x_local[j] = xj;
 	}
-	else dc = 0;
-	BC0 -= xj * (row[j] = dc);
+	else dcs.setZero();
+	BC0 -= xj * (rows.col(j) = dcs);
     }
-    rhs = -BC0;
-    copy_row(0);
+    rhss = -BC0;
+    copy_rows();
 }
 
-double NumericalConstraint::c_wrap(double xj, void *params)
+AnyNumericalConstraint::AnyNumericalConstraint
+(size_t nrows,
+ function<ArrayXd(const AnyNumericalConstraint *, const double *x)> fxn,
+ vector<size_t> dependence, double epsilon) :
+    NumericalConstraint(nrows, dependence, epsilon), fxn_(fxn)
 {
-    NumericalConstraint *self = static_cast<NumericalConstraint *>(params);
-    self->x_local[self->j] = xj;
-    return self->c(&self->x_local[0]);
+}
+
+AnyNumericalConstraint::AnyNumericalConstraint
+(function<double(const AnyNumericalConstraint *, const double *x)> fxn,
+ vector<size_t> dependence, double epsilon) :
+    AnyNumericalConstraint(
+	1,
+	[=](const AnyNumericalConstraint *self, const double *x) {
+	    return (ArrayXd(1) << fxn(self, x)).finished();
+	},
+	dependence, epsilon)
+{
 }
 
 NumericalMatching::NumericalMatching
-(std::vector<size_t> depL, std::vector<size_t> depH, Real epsilon) :
-    ForeignMatching(1), nonzerosL(depL), nonzerosH(depH),
+(size_t nrows, vector<size_t> depL, vector<size_t> depH,
+ Real epsilon) :
+    ForeignMatching(nrows), nonzerosL(depL), nonzerosH(depH),
     deriv_epsilon(epsilon)
 {
-    F_gsl.function = &c_wrap;
-    F_gsl.params = this;
 }
 
 void NumericalMatching::init(RGFlow<Lattice> *flow, size_t lower_theory)
 {
     ForeignMatching::init(flow, lower_theory);
-    w_local.resize(f->efts[TL  ].w->width);
-    x_local.resize(f->efts[TL+1].w->width);
-    depends_on.resize(row.size());
+    depends_on.resize(rows.cols());
     if (nonzerosL.empty())
-	fill_n(depends_on.begin(), w_local.size(), true);
-    else for (auto i: nonzerosL) depends_on[i               ] = true;
+	fill_n(depends_on.begin(), f->efts[TL].w->width, true);
+    else for (auto i: nonzerosL) depends_on[i			  ] = true;
     if (nonzerosH.empty())
-	fill(depends_on.begin()+w_local.size(), depends_on.end(), true);
-    else for (auto i: nonzerosH) depends_on[i+w_local.size()] = true;
+	fill(depends_on.begin()+f->efts[TL].w->width, depends_on.end(), true);
+    else for (auto i: nonzerosH) depends_on[i+f->efts[TL].w->width] = true;
     vector<size_t>().swap(nonzerosL); // forces deallocation
     vector<size_t>().swap(nonzerosH); // forces deallocation
 }
 
-void NumericalMatching::operator()()
+namespace {
+
+double& cat(vector<double>& w, vector<double>& x, size_t j)
 {
-    w_local = w(); x_local = x();
-    Real MC0 = c(&w_local[0], &x_local[0]);
-    for (j = 0; j < depends_on.size(); j++) {
-	Real dc;
-	Real wxj = wx_local(j);
-	if (depends_on[j]) {
-	    Real uj = j < w_local.size() ? u(0,j) : u(1,j-w_local.size());
-	    Real abserr;
-	    gsl_deriv_central(&F_gsl, wxj, deriv_epsilon*uj, &dc, &abserr);
-	    wx_local(j) = wxj;
-	}
-	else dc = 0;
-	MC0 -= wxj * (row[j] = dc);
-    }
-    rhs = -MC0;
-    copy_row(0);
+    return j < w.size() ? w[j] : x[j - w.size()];
 }
 
-double NumericalMatching::c_wrap(double wxj, void *params)
+}
+
+void NumericalMatching::operator()()
 {
-    NumericalMatching *self = static_cast<NumericalMatching *>(params);
-    self->wx_local(self->j) = wxj;
-    return self->c(&self->w_local[0], &self->x_local[0]);
+    vector<double> w_local = w(), x_local = x();
+    VectorXd MC0 = cs(&w_local[0], &x_local[0]);
+    for (size_t j = 0; j < depends_on.size(); j++) {
+	ArrayXd dcs(rows.rows());
+	Real wxj = cat(w_local, x_local, j);
+	if (depends_on[j]) {
+	    Real uj = j < w_local.size() ? u(0,j) : u(1,j-w_local.size());
+	    ArrayXd abserr;
+	    array_deriv_central(
+		[&](double wxj) {
+		    cat(w_local, x_local, j) = wxj;
+		    return cs(&w_local[0], &x_local[0]);
+		},
+		wxj, deriv_epsilon*uj, dcs, abserr);
+	    cat(w_local, x_local, j) = wxj;
+	}
+	else dcs.setZero();
+	MC0 -= wxj * (rows.col(j) = dcs);
+    }
+    rhss = -MC0;
+    copy_rows();
+}
+
+AnyNumericalMatching::AnyNumericalMatching
+(size_t nrows,
+ function<ArrayXd(const AnyNumericalMatching *,
+		  const double *w, const double *x)> fxn,
+ vector<size_t> depL, vector<size_t> depH, double epsilon) :
+    NumericalMatching(nrows, depL, depH, epsilon), fxn_(fxn)
+{
+}
+
+AnyNumericalMatching::AnyNumericalMatching
+(function<double(const AnyNumericalMatching *,
+		 const double *w, const double *x)> fxn,
+ vector<size_t> depL, vector<size_t> depH, double epsilon) :
+    AnyNumericalMatching(
+	1,
+	[=](const AnyNumericalMatching *sf, const double *w, const double *x) {
+	    return (ArrayXd(1) << fxn(sf, w, x)).finished();
+	},
+	depL, depH, epsilon)
+{
 }
 
 }

@@ -5,7 +5,7 @@
 namespace flexiblesusy {
 
 using namespace std;
-
+using namespace Eigen;
 
 #define fortran_fmssm_bc_n(name)			\
 							\
@@ -26,9 +26,10 @@ fortran_fmssm_bc_n(fmssm_yukawas)
 fortran_fmssm_bc_n(fmssm_ewsb)
 
 
-Real Fmssm_constraint_on_ms_n::c(const Real *x) const
+ArrayXd Fmssm_constraint_on_ms_n::cs(const Real *x) const
 {
-    return fmssm_ms_n_(0,0,0,
+    ArrayXd c(1);
+    c(0) = fmssm_ms_n_(0,0,0,
 		       nullptr,nullptr,nullptr,
 		       0,0,
 		       nullptr,nullptr,nullptr,
@@ -37,6 +38,7 @@ Real Fmssm_constraint_on_ms_n::c(const Real *x) const
 		       0,0,0,
 		       vu,vd,
 		       f->scl0, x, 0);
+    return c;
 }
 
 Fmssm_constraint_on_gauge_couplings_n_::
