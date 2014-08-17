@@ -19,6 +19,8 @@ TEMPLATES    := \
 		$(DIR)/susy_scale_constraint.hpp.in \
 		$(DIR)/lattice_convergence_tester.hpp.in \
 		$(DIR)/lattice_convergence_tester.cpp.in \
+		$(DIR)/lattice_ewsb_constraint.cpp.in \
+		$(DIR)/lattice_ewsb_constraint.hpp.in \
 		$(DIR)/lattice_high_scale_constraint.hpp.in \
 		$(DIR)/lattice_high_scale_constraint.cpp.in \
 		$(DIR)/lattice_info.hpp.in \
@@ -33,6 +35,8 @@ TEMPLATES    := \
 		$(DIR)/lattice_model_betafunctions.cpp.in \
 		$(DIR)/lattice_susy_scale_constraint.hpp.in \
 		$(DIR)/lattice_susy_scale_constraint.cpp.in \
+		$(DIR)/lattice_tsusy_constraint.cpp.in \
+		$(DIR)/lattice_tsusy_constraint.hpp.in \
 		$(DIR)/plot_rgflow.gnuplot.in \
 		$(DIR)/plot_spectrum.gnuplot.in \
 		$(DIR)/spectrum_generator.hpp.in \
