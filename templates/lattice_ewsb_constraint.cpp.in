@@ -18,7 +18,6 @@
 
 // File generated at @DateAndTime@
 
-#include "lattice_numerical_constraint.hpp"
 #include "wrappers.hpp"
 #include "@ModelName@_lattice_model.hpp"
 #include "@ModelName@_lattice_info.hpp"
@@ -31,33 +30,27 @@ using namespace @ModelName@_lattice_info;
 #define CLASSNAME @ModelName@<Lattice>
 
 @ModelName@_ewsb_constraint<Lattice>::@ModelName@_ewsb_constraint() :
-    @ModelName@_ewsb_constraint_(),
-    CompoundConstraint<Lattice>(members)
+  NumericalConstraint(
+    @nRowsEwsb@,
+    @ewsbDep@
+  )
 {
 }
-
-#if 0
-@ModelName@_ewsb_constraint<Lattice>::@ModelName@_ewsb_constraint
-(const @ModelName@_input_parameters& input_) :
-    @ModelName@_ewsb_constraint_(),
-    CompoundConstraint<Lattice>(members)
-{
-    input = &input_;
-}
-#endif
 
 @ModelName@_ewsb_constraint<Lattice>::~@ModelName@_ewsb_constraint()
 {
 }
 
-@ModelName@_ewsb_constraint_::@ModelName@_ewsb_constraint_()
+Eigen::ArrayXd @ModelName@_ewsb_constraint<Lattice>::cs(const double *x) const
 {
-  members = @ewsbList@;
-}
+  double a    = f->a;
+  double scl0 = f->scl0;
+  CLASSNAME::Interactions I;
+  I.set(Eigen::Map<const Eigen::VectorXd>(x, eftWidth), scl0);
 
-@ModelName@_ewsb_constraint_::~@ModelName@_ewsb_constraint_()
-{
-  for (auto m: members) delete static_cast<AnyNumericalConstraint *>(m);
+  return (Eigen::ArrayXd(@nRowsEwsb@) <<
+    @ewsbList@
+  ).finished();
 }
 
 } // namespace flexiblesusy

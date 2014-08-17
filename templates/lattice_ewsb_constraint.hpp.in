@@ -21,8 +21,7 @@
 #ifndef @ModelName@_LATTICE_EWSB_CONSTRAINT_H
 #define @ModelName@_LATTICE_EWSB_CONSTRAINT_H
 
-#include "lattice_compound_constraint.hpp"
-#include "@ModelName@_input_parameters.hpp"
+#include "lattice_numerical_constraint.hpp"
 
 namespace flexiblesusy {
 
@@ -34,23 +33,12 @@ class @ModelName@_ewsb_constraint;
 
 class Lattice;
 
-// auxiliary class for initializing own members before the base class
-// see http://www.boost.org/doc/libs/1_53_0/libs/utility/base_from_member.html
-struct @ModelName@_ewsb_constraint_ {
-    @ModelName@_ewsb_constraint_();
-    ~@ModelName@_ewsb_constraint_();
-    std::vector<Constraint<Lattice>*> members;
-    // const @ModelName@_input_parameters *input;
-};
-
 template<>
-class @ModelName@_ewsb_constraint<Lattice> :
-    public @ModelName@_ewsb_constraint_,
-    public CompoundConstraint<Lattice> {
+class @ModelName@_ewsb_constraint<Lattice> : public NumericalConstraint {
 public:
     @ModelName@_ewsb_constraint();
-    // @ModelName@_ewsb_constraint(const @ModelName@_input_parameters&);
     virtual ~@ModelName@_ewsb_constraint();
+    Eigen::ArrayXd cs(const double *x) const;
 };
 
 } // namespace flexiblesusy

@@ -151,7 +151,7 @@ Module[{
 	treeEwsbConstraints = fsEwsbEquations /. sarahOperatorReplacementRules,
 	softHiggsMasses,
 	treeEwsbEquations,
-	ewsbConstraints, ewsbList,
+	ewsbConstraints, ewsbEquations, ewsbDep, ewsbList,
 	fixTsusy, tsusyConstraint = (Exp[t] scl0)^4 - Lattice`Private`M2[Global`Su[{1}]] Lattice`Private`M2[Global`Su[{6}]] /. sarahOperatorReplacementRules
     },
     DeclaredRealQ[a | scl0] := True;
@@ -209,9 +209,11 @@ Module[{
 	treeEwsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
 	parameterRules];
     ewsbConstraints = EWSBConstraintsWithCorrections[treeEwsbConstraints];
-    ewsbList = CNConstraintsToCCode[EWSBConditionsToC[ParametrizeEWSBEquations[
+    ewsbEquations = ParametrizeEWSBEquations[
 	ewsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
-	parameterRules]]];
+	parameterRules];
+    {ewsbDep, ewsbList} = CNConstraintsToCCode @
+			  EWSBConditionsToC[ewsbEquations];
     fixTsusy = CNConstraintToCCode[NConstraintToC[tsusyConstraint /. parameterRules]];
     replacementFiles = Join[replacementFiles, {
 	{FileNameJoin[{templateDir, "lattice_susy_scale_constraint.hpp.in"}],
@@ -236,7 +238,9 @@ Module[{
 	"@eigenVarDefs@"    -> IndentText[eigenVarDefs, 4],
 	"@eigenVarStmts@"   -> WrapText[eigenVarStmts],
 	"@enumParameters@"  -> WrapText@IndentText[enumParameters, 2],
-	"@ewsbList@"	    -> StringTrim@WrapText@IndentText[ewsbList, 2],
+	"@nRowsEwsb@"	    -> ToString@Length[ewsbEquations],
+	"@ewsbDep@"	    -> StringTrim@WrapText@IndentText[ewsbDep, 4],
+	"@ewsbList@"	    -> StringTrim@WrapText@IndentText[ewsbList, 4],
 	"@fixTsusy@"        -> StringTrim@WrapText@IndentText[fixTsusy, 2],
 	"@matrixDefs@"	    -> IndentText[matrixDefs, 4],
 	"@matrixStmts@"	    -> WrapText[matrixStmts],
@@ -294,7 +298,10 @@ NConstraintToC[constraint_] :=
     ];
 
 DependenceList[expr_] :=
-    SortBy[ToEnumSymbol@PrivatizeReIm@ToCExp[#]& /@ FindDependence[expr],
+    SortEnums[ToEnumSymbol@PrivatizeReIm@ToCExp[#]& /@ FindDependence[expr]];
+
+SortEnums[enums_List] :=
+    SortBy[enums,
 	   ToExpression @ StringReplace[
 	       ToString[#], RegularExpression["^l([[:digit:]]+).*$"] :> "$1"] &
     ];
@@ -312,11 +319,19 @@ SoftHiggsMasses[ewsbConstraints_] := Union @
 
 ConditionPositiveVevs[vevs_List] := # > 0& /@ vevs;
 
-CNConstraintsToCCode[cncs_List] := StringJoin[
-    "{\n",
-    IndentText[StringJoin @ Riffle[
-     {"new ", CNConstraintToCCode[#]}& /@ cncs, ",\n"], 2],
-    "\n}"];
+CNConstraintsToCCode[cncs_List] := Module[{
+	dependences, dependence,
+	exprs, csl
+    },
+    {dependences, exprs} = Transpose[({Dependence, Expr} /. List@@#)& /@ cncs];
+    dependence = ToString @ SortEnums @ Union @ Flatten[dependences];
+    csl = StringJoin @
+	  Riffle[Block[{CContext},
+		       CContext["CLASSNAME::Interactions::"] = "I.";
+		       CExpToCFormString @ ReCExp[#]]& /@ exprs,
+		 ",\n"];
+    {dependence, csl}
+];
 
 CNConstraintToCCode[cnc_] := Module[{
 	dependence, expr
