@@ -103,7 +103,8 @@ Format[Lattice`Private`Complex, CForm] :=
     Format["std::complex<double>", OutputForm];
 
 Format[InCScope[scope_, z_], CForm] :=
-    Format[CContext[scope] <> ToString[CForm[z]], OutputForm];
+    Format[If[ValueQ@CContext[scope], CContext[scope], ""] <>
+	   ToString[CForm[z]], OutputForm];
 
 WriteLatticeCode[
     sarahAbbrs_List, betaFunctions_List, anomDims_List,
@@ -734,8 +735,6 @@ Module[{
        pattern = symbol @@ Table[_, {Length[args]}];
        CScope[pattern] = scope]
 ];
-
-CContext[_] = "";
 
 NPointFunctionToC[nPointFunction:_[_, rhs_]] := Module[{
 	cType, re,
