@@ -150,7 +150,7 @@ Module[{
 	vevs = Union @ Variables @ vevRules[[All,2]],
 	treeEwsbConstraints = fsEwsbEquations /. sarahOperatorReplacementRules,
 	softHiggsMasses,
-	treeEwsbEquations,
+	treeEwsbEquations, shiftHiggsMasses,
 	ewsbConstraints, ewsbEquations, ewsbDep, ewsbList,
 	fixTsusy, tsusyConstraint = (Exp[t] scl0)^4 - Lattice`Private`M2[Global`Su[{1}]] Lattice`Private`M2[Global`Su[{6}]] /. sarahOperatorReplacementRules
     },
@@ -208,6 +208,7 @@ Module[{
     treeEwsbEquations = ParametrizeEWSBEquations[
 	treeEwsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
 	parameterRules];
+    shiftHiggsMasses = CShiftHiggsMasses[treeEwsbEquations];
     ewsbConstraints = EWSBConstraintsWithCorrections[treeEwsbConstraints];
     ewsbEquations = ParametrizeEWSBEquations[
 	ewsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
@@ -247,6 +248,7 @@ Module[{
 	"@nPointDecls@"	    -> IndentText[nPointDecls, 4],
 	"@nPointDefs@"	    -> WrapText[StringJoin@nPointDefs],
 	"@phaseDefs@"	    -> IndentText[phaseDefs, 4],
+	"@shiftHiggsMasses@"-> WrapText@IndentText[shiftHiggsMasses, 2],
 	"@vertexDecls@"	    -> IndentText[vertexDecls, 4],
 	"@vertexDefs@"	    -> WrapText[StringJoin@vertexDefs]
     }]];
@@ -290,6 +292,16 @@ Module[{
 EWSBConditionsToC[pEquations_List] := EWSBConditionToC /@ pEquations;
 
 EWSBConditionToC[lhs_ == rhs_] := NConstraintToC[rhs - lhs];
+
+CShiftHiggsMasses[treeEwsbEquations_List] :=
+    StringJoin[CShiftHiggsMass /@ treeEwsbEquations];
+
+CShiftHiggsMass[lhs_ == rhs_] := Module[{
+	clhs = CExpToCFormString @ ToCExp[lhs, x],
+	crhs = CExpToCFormString @ ToCExp[rhs, x]
+    },
+    clhs <> " = " <> crhs <> ";\n"
+];
 
 NConstraintToC[constraint_] :=
     CNConstraint[

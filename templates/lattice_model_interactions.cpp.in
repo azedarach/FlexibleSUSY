@@ -39,8 +39,17 @@ void CLASSNAME::Interactions::set(const Eigen::VectorXd& x_, double scl0_)
 {
   Lattice_model_interactions::set(x_, scl0_);
 
+  Eigen::VectorXd x = Lattice_model_interactions::x;
+  eliminate_soft_higgs_masses_at_tree_level(x);
+
 @matrixStmts@
 @eigenVarStmts@
+}
+
+void CLASSNAME::Interactions::eliminate_soft_higgs_masses_at_tree_level
+(Eigen::VectorXd& x)
+{
+@shiftHiggsMasses@
 }
 
 @nPointDefs@

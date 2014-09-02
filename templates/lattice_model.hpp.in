@@ -68,6 +68,7 @@ public:
 @phaseDefs@
 @dependenceNumDecls@
   private:
+    void eliminate_soft_higgs_masses_at_tree_level(Eigen::VectorXd& x);
   };
 
   // beta functions
