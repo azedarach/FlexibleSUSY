@@ -36,42 +36,42 @@ using namespace passarino_veltman;
 
 double Lattice_model_interactions::A0(double m2) const
 {
-    return ReA0(m2, Sqr(get_scale()));
+    return ReA0(m2, Sqr(scl()));
 }
 
 double Lattice_model_interactions::B0(double p2, double m21, double m22) const
 {
-    return ReB0(p2, m21, m22, Sqr(get_scale()));
+    return ReB0(p2, m21, m22, Sqr(scl()));
 }
 
 double Lattice_model_interactions::B1(double p2, double m21, double m22) const
 {
-    return ReB1(p2, m21, m22, Sqr(get_scale()));
+    return ReB1(p2, m21, m22, Sqr(scl()));
 }
 
 double Lattice_model_interactions::B00(double p2, double m21, double m22) const
 {
-    return ReB00(p2, m21, m22, Sqr(get_scale()));
+    return ReB00(p2, m21, m22, Sqr(scl()));
 }
 
 double Lattice_model_interactions::B22(double p2, double m21, double m22) const
 {
-    return ReB22(p2, m21, m22, Sqr(get_scale()));
+    return ReB22(p2, m21, m22, Sqr(scl()));
 }
 
 double Lattice_model_interactions::H0(double p2, double m21, double m22) const
 {
-    return ReH0(p2, m21, m22, Sqr(get_scale()));
+    return ReH0(p2, m21, m22, Sqr(scl()));
 }
 
 double Lattice_model_interactions::F0(double p2, double m21, double m22) const
 {
-    return ReF0(p2, m21, m22, Sqr(get_scale()));
+    return ReF0(p2, m21, m22, Sqr(scl()));
 }
 
 double Lattice_model_interactions::G0(double p2, double m21, double m22) const
 {
-    return ReG0(p2, m21, m22, Sqr(get_scale()));
+    return ReG0(p2, m21, m22, Sqr(scl()));
 }
 
 }

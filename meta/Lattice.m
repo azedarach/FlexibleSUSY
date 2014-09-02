@@ -70,6 +70,8 @@ Format[Lattice`Private`p2, CForm] := Format["p2", OutputForm];
 
 Format[scl0, CForm] := Format["scl0", OutputForm];
 
+Format[scl[], CForm] := Format["scl()", OutputForm];
+
 Format[drv[ap_, p_], CForm] :=
     Format[DrvToCFormString[drv[ap, p]], OutputForm];
 
@@ -153,12 +155,13 @@ Module[{
 	softHiggsMasses,
 	treeEwsbEquations, shiftHiggsMasses,
 	ewsbConstraints, ewsbEquations, ewsbDep, ewsbList,
-	fixTsusy, tsusyConstraint = (Exp[t] scl0)^4 - Lattice`Private`M2[Global`Su[{1}]] Lattice`Private`M2[Global`Su[{6}]] /. sarahOperatorReplacementRules
+	fixTsusy, tsusyConstraint = (scl[])^4 - Lattice`Private`M2[Global`Su[{1}]] Lattice`Private`M2[Global`Su[{6}]] /. sarahOperatorReplacementRules,
     },
-    DeclaredRealQ[a | scl0] := True;
+    DeclaredRealQ[a | scl0 | scl[]] := True;
     DeclaredRealQ[_] := False;
     DependenceNode[(SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
 		    SARAH`F0|SARAH`G0|SARAH`H0)[m__]] := {Re[t], m};
+    SetDependenceNode[scl[], Re[t]];
     parameters = RealVariables[parameterRules];
     enumRules = EnumRules[parameters];
     enumParameters = EnumParameters[enumRules];
