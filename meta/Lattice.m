@@ -95,6 +95,8 @@ Format[Lattice`Private`M[f_], CForm] :=
 Format[Lattice`Private`M2[f_], CForm] :=
     Format["M2" <> ToValidCSymbolString[f], OutputForm];
 
+Format[ComplexLog, CForm] := Format["ComplexLog", OutputForm];
+
 Format[Lattice`Private`SUM, CForm] := Format["SUM", OutputForm];
 
 Format[Lattice`Private`USUM, CForm] := Format["USUM", OutputForm];
@@ -373,7 +375,11 @@ CNConstraintToCCode[cnc_] := Module[{
 restoreMassPowerRules = {
     (f:SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
      SARAH`F0|SARAH`G0|SARAH`H0)[a___,FlexibleSUSY`M[b_],c___] :>
-    f[a,Lattice`Private`M2[b],c]
+    f[a,Lattice`Private`M2[b],c],
+    Global`FiniteLog[Abs[FlexibleSUSY`M[f_][i_] / scl_]] :>
+	ComplexLog[Lattice`Private`M2[f[{i}]] / scl^2] / 2,
+    Global`FiniteLog[Abs[FlexibleSUSY`M[f_] / scl_]] :>
+	ComplexLog[Lattice`Private`M2[f] / scl^2] / 2
 };
 
 ParametrizeNPointFunction[h_[field_, expr_], replaceGhosts_] :=

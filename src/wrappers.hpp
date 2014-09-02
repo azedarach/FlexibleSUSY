@@ -181,6 +181,16 @@ typename Eigen::MatrixBase<Derived>::PlainObject Diag(const Eigen::MatrixBase<De
    return diag;
 }
 
+inline std::complex<double> ComplexLog(const std::complex<double>& z)
+{
+   return std::log(z);
+}
+
+inline std::complex<double> ComplexLog(double x)
+{
+   return std::log(std::complex<double>(x));
+}
+
 inline double FiniteLog(double a)
 {
    return a > std::numeric_limits<double>::epsilon() ? std::log(a) : 0;
