@@ -452,10 +452,11 @@ MatrixToC[m_, symbol_, scalarType_] := Module[{
 ];
 
 MassToC[m_, f_, cType_] := Module[{
+	massN = MassN[f],
 	ev = ToCMassName[f]
     },
-    SetDependenceNode[MassN[f], m];
-    (* DeclaredRealQ[ev] := True by pattern matching *)
+    SetDependenceNode[massN, m];
+    If[cType === "double", DeclaredRealQ[massN] := True];
     CMatrix[
 	EigenDef -> cType <> " " <> ev <> ";",
 	SetStmt -> "  " <> ev <> " = " <> CExpToCFormString@ToCExp[m, x] <> ";"
@@ -610,9 +611,13 @@ conjugateExpandDispatch = Dispatch[{
 		 _Power|
 		 _Sin|_ArcSin|
 		 _Cos|_ArcCos|
-		 _Tan|_ArcTan)] :> Conjugate /@ z,
+		 _Tan|_ArcTan|
+		 _Sec|_ArcSec|
+		 _Csc|_ArcCsc|
+		 _Cot|_ArcCot)] :> Conjugate /@ z,
     Conjugate[SARAH`sum[a_, b_, c_, z_]] :> SARAH`sum[a, b, c, Conjugate[z]],
-    Conjugate[z:(_SARAH`Delta|_SARAH`ThetaStep|_SARAH`Mass|_SARAH`Mass2)] :> z,
+    Conjugate[z:(_SARAH`Delta|_SARAH`ThetaStep|
+		 HoldPattern[SARAH`Mass[_[{__}]]]|_SARAH`Mass2)] :> z,
     (* take real part of a loop function *)
     Conjugate[z:(_SARAH`A0|_SARAH`B0|_SARAH`B1|_SARAH`B00|_SARAH`B22|
 		 _SARAH`F0|_SARAH`G0|_SARAH`H0)] :> z,
@@ -709,6 +714,9 @@ CFxnToCCode[cfxn_] := Module[{
 	 {" ",Qualifier}, {" ATTR(",Attributes,")"}, Body} /.
 	List@@cfxn /. {Scope -> "CLASSNAME::", {___, Qualifier} -> {},
 		       {___, Attributes, ___} -> {}};
+    If[returnType === "double",
+       With[{form = Symbol[name] @@ Table[_, {Length[args]}]},
+	    DeclaredRealQ[form] := True]];
     SetCFxnScope[name, args, scope];
     argsInDecl = "(" <> Riffle[Riffle[#, " "]& /@ args, ", "] <> ")";
     argsInDef = "(" <> Riffle[
@@ -806,7 +814,6 @@ VertexRuleToC[lhs_ -> rhs_] := Module[{
     args = CVertexFunctionArgs[lhs];
     SetDependenceNode[Symbol[name] @@ Table[_, {Length[args]}], rhs];
     {cType, re} = If[RealQ[rhs],
-		     DeclaredRealQ[CVertexFunction[lhs]] := True;
 		     {"double", ReCExp},
 		     {"std::complex<double>", Identity}];
     CFxn[
@@ -844,8 +851,7 @@ CVertexFunctionArgs[cpPattern_] :=
 DepNumRuleToC[lhs_ -> rhs_] := (
     SetDependenceNode[lhs[], rhs];
     CFxn[
-	ReturnType -> If[RealQ[rhs], DeclaredRealQ[lhs[]] := True; "double",
-			 "std::complex<double>"],
+	ReturnType -> If[RealQ[rhs], "double", "std::complex<double>"],
 	Scope -> "CLASSNAME::Interactions::",
 	Name -> CExpToCFormString@ToCExp[lhs],
 	Args -> {},
@@ -1062,7 +1068,10 @@ CRealTypeQ[z_Plus|z_Times|
 	   z_Power|
 	   z_Sin|z_ArcSin|
 	   z_Cos|z_ArcCos|
-	   z_Tan|z_ArcTan] := And @@ (CRealTypeQ /@ List@@z);
+	   z_Tan|z_ArcTan|
+	   z_Sec|z_ArcSec|
+	   z_Csc|z_ArcCsc|
+	   z_Cot|z_ArcCot] := And @@ (CRealTypeQ /@ List@@z);
 
 CRealTypeQ[_AbsSqr] := True;
 
@@ -1072,8 +1081,13 @@ CRealTypeQ[Lattice`Private`SUM[_, _, _, z_] |
 
 CRealTypeQ[_SARAH`Delta|_KroneckerDelta|_SARAH`ThetaStep] := True;
 
-CRealTypeQ[_SARAH`Mass|_SARAH`Mass2|
-	   _Lattice`Private`M|_Lattice`Private`M2] := True;
+(* singular values in the form of SARAH`Mass[_[{__}]] |
+   Lattice`Private`M[_[{__}]] are assumed to be real,
+   reality of other dimension-1 mass parameters is declared
+   individually by MassToC[] *)
+CRealTypeQ[HoldPattern[SARAH`Mass[_[{__}]]]|_SARAH`Mass2|
+	   HoldPattern[Lattice`Private`M[_[{__}]]]|_Lattice`Private`M2] :=
+    True;
 
 CRealTypeQ[_SARAH`A0|_SARAH`B0|_SARAH`B1|_SARAH`B00|_SARAH`B22|
 	   _SARAH`F0|_SARAH`G0|_SARAH`H0] := True;
