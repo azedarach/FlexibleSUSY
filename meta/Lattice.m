@@ -219,6 +219,7 @@ Module[{
 	parameterRules];
     {ewsbDep, ewsbList} = CNConstraintsToCCode @
 			  EWSBConditionsToC[ewsbEquations];
+    ewsbDep = ToString[ewsbDep];
     fixTsusy = CNConstraintToCCode[NConstraintToC[tsusyConstraint /. parameterRules]];
     replacementFiles = Join[replacementFiles, {
 	{FileNameJoin[{templateDir, "lattice_susy_scale_constraint.hpp.in"}],
@@ -340,7 +341,7 @@ CNConstraintsToCCode[cncs_List] := Module[{
 	exprs, csl
     },
     {dependences, exprs} = Transpose[({Dependence, Expr} /. List@@#)& /@ cncs];
-    dependence = ToString @ SortEnums @ Union @ Flatten[dependences];
+    dependence = SortEnums[Union @@ dependences];
     csl = StringJoin @
 	  Riffle[Block[{CContext},
 		       CContext["CLASSNAME::Interactions::"] = "I.";
