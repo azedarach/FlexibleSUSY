@@ -66,7 +66,7 @@ Format[ddx[i_,j_], CForm] := Format["ddx(" <> ToString[CForm[i]] <> "," <>
 
 Format[a, CForm] := Format["a", OutputForm];
 
-Format[Lattice`Private`p2, CForm] := Format["p2", OutputForm];
+Format[p2, CForm] := Format["p2", OutputForm];
 
 Format[scl0, CForm] := Format["scl0", OutputForm];
 
@@ -156,13 +156,14 @@ Module[{
 	treeEwsbConstraints = fsEwsbEquations /. sarahOperatorReplacementRules,
 	softHiggsMasses,
 	treeEwsbEquations, shiftHiggsMasses,
-	ewsbConstraints, ewsbEquations, ewsbDep, ewsbList,
+	ewsbConstraints, ewsbEquations,
+	cnEwsbConstraints, ewsbDep, ewsbList,
 	fixTsusy, tsusyConstraint = (scl[])^4 - Lattice`Private`M2[Global`Su[{1}]] Lattice`Private`M2[Global`Su[{6}]] /. sarahOperatorReplacementRules,
     },
     DeclaredRealQ[a | scl0 | scl[]] := True;
     DeclaredRealQ[_] := False;
-    DependenceNode[(SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
-		    SARAH`F0|SARAH`G0|SARAH`H0)[m__]] := {Re[t], m};
+    SetDependenceNode[(SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
+		       SARAH`F0|SARAH`G0|SARAH`H0)[m__], {Re[t], m}];
     SetDependenceNode[scl[], Re[t]];
     parameters = RealVariables[parameterRules];
     enumRules = EnumRules[parameters];
@@ -219,8 +220,8 @@ Module[{
     ewsbEquations = ParametrizeEWSBEquations[
 	ewsbConstraints, ConditionPositiveVevs[vevs], softHiggsMasses,
 	parameterRules];
-    {ewsbDep, ewsbList} = CNConstraintsToCCode @
-			  EWSBConditionsToC[ewsbEquations];
+    cnEwsbConstraints = EWSBConditionsToC[ewsbEquations];
+    {ewsbDep, ewsbList} = CNConstraintsToCCode[cnEwsbConstraints];
     ewsbDep = ToString[ewsbDep];
     fixTsusy = CNConstraintToCCode[NConstraintToC[tsusyConstraint /. parameterRules]];
     replacementFiles = Join[replacementFiles, {
@@ -246,7 +247,7 @@ Module[{
 	"@eigenVarDefs@"    -> IndentText[eigenVarDefs, 4],
 	"@eigenVarStmts@"   -> WrapText[eigenVarStmts],
 	"@enumParameters@"  -> WrapText@IndentText[enumParameters, 2],
-	"@nRowsEwsb@"	    -> ToString@Length[ewsbEquations],
+	"@nRowsEwsb@"	    -> ToString@Length[cnEwsbConstraints],
 	"@ewsbDep@"	    -> StringTrim@WrapText@IndentText[ewsbDep, 4],
 	"@ewsbList@"	    -> StringTrim@WrapText@IndentText[ewsbList, 4],
 	"@fixTsusy@"        -> StringTrim@WrapText@IndentText[fixTsusy, 2],
@@ -384,7 +385,7 @@ restoreMassPowerRules = {
 
 ParametrizeNPointFunction[h_[field_, expr_], replaceGhosts_] :=
     h[field,
-      expr /. p^2 -> Lattice`Private`p2 /. C -> 1 /.
+      expr /. p^2 -> p2 /. C -> 1 /.
       sarahOperatorReplacementRules /.
       cp:_SARAH`Cp|_SARAH`Cp[_] :> CVertexFunction[cp] /. replaceGhosts //.
       matrixOpRules];
