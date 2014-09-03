@@ -1364,7 +1364,7 @@ SetDependenceNode[form_, expr_, cscope_String:"CLASSNAME::Interactions::"] := (
 FindDependence[expr_] := Module[{
 	explicit = Cases[
 	    expr,
-	    p:Re[_]|Im[_] /; ValueQ@ToEnumSymbol@PrivatizeReIm@ToCExp[p],
+	    p:Re[_]|Im[_] /; With[{cexp=ToCExp[p]}, ValueQ@ToEnumSymbol@cexp],
 	    {0, Infinity}],
 	children
     },
