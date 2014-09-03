@@ -18,18 +18,29 @@
 
 // File generated at @DateAndTime@
 
+#include "wrappers.hpp"
+#include "ew_input.hpp"
 #include "@ModelName@_lattice_low_scale_constraint.hpp"
-#include "@ModelName@_lattice_model.hpp"
+#include "@ModelName@_lattice_info.hpp"
 
 namespace flexiblesusy {
 
-@ModelName@_low_scale_constraint<Lattice>::@ModelName@_low_scale_constraint()
-   : Constraint<Lattice>()
+using namespace @ModelName@_lattice_info;
+
+#define SM(p) Electroweak_constants::p
+
+#define CLASSNAME @ModelName@<Lattice>
+#define CONSTRAINTNAME @ModelName@_lowe_constraint<Lattice>
+
+@ModelName@_low_scale_constraint<Lattice>::@ModelName@_low_scale_constraint() :
+  @ModelName@_low_scale_constraint_(nullptr),
+  CompoundConstraint({&tlow, &low_energy_data})
 {
 }
 
-@ModelName@_low_scale_constraint<Lattice>::@ModelName@_low_scale_constraint(const @ModelName@_input_parameters&)
-   : Constraint<Lattice>()
+@ModelName@_low_scale_constraint<Lattice>::@ModelName@_low_scale_constraint(const @ModelName@_input_parameters& input) :
+  @ModelName@_low_scale_constraint_(&input),
+  CompoundConstraint({&tlow, &low_energy_data})
 {
 }
 
@@ -37,9 +48,94 @@ namespace flexiblesusy {
 {
 }
 
-double @ModelName@_low_scale_constraint<Lattice>::get_scale() const
+@ModelName@_low_scale_constraint_::@ModelName@_low_scale_constraint_(const @ModelName@_input_parameters *input) :
+  tlow(@lowScale@),
+  low_energy_data(input)
 {
-   return 0.;
 }
+
+@ModelName@_low_scale_constraint_::~@ModelName@_low_scale_constraint_()
+{
+}
+
+@ModelName@_lowe_constraint<Lattice>::@ModelName@_lowe_constraint(const @ModelName@_input_parameters *input_) :
+  NumericalConstraint(
+    @nRowsLowe@,
+    @loweDep@
+  )
+{
+  input = input_;
+}
+
+@ModelName@_lowe_constraint<Lattice>::~@ModelName@_lowe_constraint()
+{
+}
+
+Eigen::ArrayXd @ModelName@_lowe_constraint<Lattice>::cs(const double *x) const
+{
+  double a    = f->a;
+  double scl0 = f->scl0;
+  CLASSNAME::Interactions I;
+  I.set(Eigen::Map<const Eigen::VectorXd>(x, eftWidth), scl0);
+
+  double AlphaEmMSbar = oneset.displayAlpha(ALPHA);
+  double AlphaSMSbar  = oneset.displayAlpha(ALPHAS);
+  double AlphaEm = AlphaEmMSbar / (1 - a * deltaAlphaEm(I, AlphaEmMSbar));
+  double AlphaS  = AlphaSMSbar  / (1 - a * deltaAlphaS (I, AlphaSMSbar ));
+  double EDRbar  = Sqrt(4 * Pi * AlphaEm);
+
+  double M2ZDRbar = M2@VectorZ@DRbar(I, Sqr(Electroweak_constants::MZ));
+  double M2WDRbar = M2@VectorW@DRbar(I, Sqr(Electroweak_constants::MW));
+@setThetaW@
+  Eigen::Matrix<std::complex<double>, 3, 3> M@TopQuark@Data;
+  M@TopQuark@Data <<
+      oneset.displayMass(mUp), 0, 0,
+      0, oneset.displayMass(mCharm), 0,
+      0, 0, M@TopQuark@DRbar(I, oneset.displayMass(mTop), 2);
+  Eigen::Matrix<std::complex<double>, 3, 3> M@BottomQuark@Data;
+  M@BottomQuark@Data <<
+      oneset.displayMass(mDown), 0, 0,
+      0, oneset.displayMass(mStrange), 0,
+      0, 0, M@BottomQuark@DRbar(I, oneset.displayMass(mBottom), 2);
+  Eigen::Matrix<std::complex<double>, 3, 3> M@Electron@Data;
+  M@Electron@Data <<
+      oneset.displayMass(mElectron), 0, 0,
+      0, oneset.displayMass(mMuon), 0,
+      0, 0, M@Electron@DRbar(I, oneset.displayMass(mTau), 2);
+
+  return (Eigen::ArrayXd(@nRowsLowe@) <<
+    // constraints on gauge couplings
+    @gaugeList@
+    ,
+    // constraints on Yukawa couplings
+    @yukawaList@
+  ).finished();
+}
+
+double CONSTRAINTNAME::deltaAlphaEm
+(const CLASSNAME::Interactions& I, double alphaEm) const
+{
+  double deltaAlphaEm_SM =
+    @dAlphaEmSM@
+    ;
+  double deltaAlphaEm_NP =
+    @dAlphaEmNP@
+    ;
+  return deltaAlphaEm_SM + deltaAlphaEm_NP;
+}
+
+double CONSTRAINTNAME::deltaAlphaS
+(const CLASSNAME::Interactions& I, double alphaS) const
+{
+  double deltaAlphaS_SM =
+    @dAlphaSSM@
+    ;
+  double deltaAlphaS_NP =
+    @dAlphaSNP@
+    ;
+  return deltaAlphaS_SM + deltaAlphaS_NP;
+}
+
+@drbarMassFxnDefs@
 
 } // namespace flexiblesusy

@@ -24,8 +24,10 @@ BeginPackage["Lattice`", {
     "SARAH`",
     "BetaFunction`",
     "Parametrization`",
+    "Parameters`",
     "Traces`",
     "TreeMasses`",
+    "ThresholdCorrections`",
     "Phases`",
     "Vertices`",
     "SelfEnergies`",
@@ -66,7 +68,21 @@ Format[ddx[i_,j_], CForm] := Format["ddx(" <> ToString[CForm[i]] <> "," <>
 
 Format[a, CForm] := Format["a", OutputForm];
 
+Format[EDRbar, CForm] := Format["EDRbar", OutputForm];
+
+Format[M2ZDRbar, CForm] := Format["M2ZDRbar", OutputForm];
+
+Format[M2WDRbar, CForm] := Format["M2WDRbar", OutputForm];
+
+Format[p, CForm] := Format["p", OutputForm];
+
 Format[p2, CForm] := Format["p2", OutputForm];
+
+Format[mPole, CForm] := Format["mPole", OutputForm];
+
+Format[m2Pole, CForm] := Format["m2Pole", OutputForm];
+
+Format[idx, CForm] := Format["idx", OutputForm];
 
 Format[scl0, CForm] := Format["scl0", OutputForm];
 
@@ -159,8 +175,15 @@ Module[{
 	ewsbConstraints, ewsbEquations,
 	cnEwsbConstraints, ewsbDep, ewsbList,
 	fixTsusy, tsusyConstraint = (scl[])^4 - Lattice`Private`M2[Global`Su[{1}]] Lattice`Private`M2[Global`Su[{6}]] /. sarahOperatorReplacementRules,
+	loweDep, nRowsLowe,
+	lowScale, dAlphaEmSM, dAlphaEmNP, dAlphaSSM, dAlphaSNP,
+	drbarMassFxnDecls, drbarMassFxnDefs,
+	setThetaW,
+	cnGaugeConstraints, gaugeDep, gaugeList,
+	cnYukawaConstraints, yukawaDep, yukawaList
     },
     DeclaredRealQ[a | scl0 | scl[]] := True;
+    DeclaredRealQ[SM[_]] := True;
     DeclaredRealQ[_] := False;
     SetDependenceNode[(SARAH`A0|SARAH`B0|SARAH`B1|SARAH`B00|SARAH`B22|
 		       SARAH`F0|SARAH`G0|SARAH`H0)[m__], {Re[t], m}];
@@ -238,12 +261,39 @@ Module[{
 	{FileNameJoin[{templateDir, "lattice_ewsb_constraint.cpp.in"}],
 	 FileNameJoin[{outputDir, modelName <> "_lattice_ewsb_constraint.cpp"}]}}];
 (* end if *)
+(* if low-scale constraint is demanded *)
+    lowScale = LowScaleToC[];
+    {dAlphaEmSM, dAlphaEmNP, dAlphaSSM, dAlphaSNP} =
+	{DAlphaEmSM, DAlphaEmNP, DAlphaSSM, DAlphaSNP} /.
+	DeltaAlphaToC[];
+    {drbarMassFxnDecls, drbarMassFxnDefs} =
+	CFxnsToCCode @ DRbarMassesToC[massMatrices];
+    setThetaW = CSetThetaW[];
+    cnGaugeConstraints = GaugeCouplingConstraintsToC[];
+    {gaugeDep, gaugeList} = CNConstraintsToCCode[cnGaugeConstraints];
+    cnYukawaConstraints =
+        YukawaCouplingConstraintsToC[massMatrices, parameterRules];
+    {yukawaDep, yukawaList} = CNConstraintsToCCode[cnYukawaConstraints];
+    loweDep = ToString @ SortEnums @ Union[gaugeDep, yukawaDep];
+    nRowsLowe = Length[cnGaugeConstraints] + Length[cnYukawaConstraints];
+    replacementFiles = Join[replacementFiles, {
+	{FileNameJoin[{templateDir, "lattice_low_scale_constraint.hpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_low_scale_constraint.hpp"}]},
+	{FileNameJoin[{templateDir, "lattice_low_scale_constraint.cpp.in"}],
+	 FileNameJoin[{outputDir, modelName <> "_lattice_low_scale_constraint.cpp"}]}}];
+(* end if *)
     WriteOut`ReplaceInFiles[replacementFiles,
 	Join[templateRules, {
 	"@abbrDecls@"	    -> IndentText[abbrDecls, 2],
 	"@betaDecls@"	    -> IndentText[betaDecls, 2],
+	"@dAlphaEmSM@"	    -> StringTrim@WrapText@IndentText[dAlphaEmSM, 4],
+	"@dAlphaEmNP@"	    -> StringTrim@WrapText@IndentText[dAlphaEmNP, 4],
+	"@dAlphaSSM@"	    -> StringTrim@WrapText@IndentText[dAlphaSSM, 4],
+	"@dAlphaSNP@"	    -> StringTrim@WrapText@IndentText[dAlphaSNP, 4],
 	"@dependenceNumDecls@" -> IndentText[dependenceNumDecls, 4],
 	"@dependenceNumDefs@"  -> WrapText[StringJoin@dependenceNumDefs],
+	"@drbarMassFxnDecls@" -> IndentText[drbarMassFxnDecls, 2],
+	"@drbarMassFxnDefs@"  -> WrapText[StringJoin@drbarMassFxnDefs],
 	"@eigenVarDefs@"    -> IndentText[eigenVarDefs, 4],
 	"@eigenVarStmts@"   -> WrapText[eigenVarStmts],
 	"@enumParameters@"  -> WrapText@IndentText[enumParameters, 2],
@@ -251,14 +301,20 @@ Module[{
 	"@ewsbDep@"	    -> StringTrim@WrapText@IndentText[ewsbDep, 4],
 	"@ewsbList@"	    -> StringTrim@WrapText@IndentText[ewsbList, 4],
 	"@fixTsusy@"        -> StringTrim@WrapText@IndentText[fixTsusy, 2],
+	"@gaugeList@"	    -> StringTrim@WrapText@IndentText[gaugeList, 4],
+	"@loweDep@"	    -> StringTrim@WrapText@IndentText[loweDep, 4],
+	"@lowScale@"	    -> lowScale,
 	"@matrixDefs@"	    -> IndentText[matrixDefs, 4],
 	"@matrixStmts@"	    -> WrapText[matrixStmts],
 	"@nPointDecls@"	    -> IndentText[nPointDecls, 4],
 	"@nPointDefs@"	    -> WrapText[StringJoin@nPointDefs],
+	"@nRowsLowe@"	    -> ToString[nRowsLowe],
 	"@phaseDefs@"	    -> IndentText[phaseDefs, 4],
+	"@setThetaW@"	    -> WrapText@IndentText[setThetaW, 2],
 	"@shiftHiggsMasses@"-> WrapText@IndentText[shiftHiggsMasses, 2],
 	"@vertexDecls@"	    -> IndentText[vertexDecls, 4],
-	"@vertexDefs@"	    -> WrapText[StringJoin@vertexDefs]
+	"@vertexDefs@"	    -> WrapText[StringJoin@vertexDefs],
+	"@yukawaList@"	    -> StringTrim@WrapText@IndentText[yukawaList, 4]
     }]];
     defChunks = Join[abbrDefs, betaDefs];
     nDefChunks = Length[defChunks];
@@ -280,6 +336,226 @@ Module[{
 	betaCFiles];
     WriteMakefile[templateDir, outputDir, cFiles, templateRules]
 ]];
+
+LowScaleToC[] :=
+    CExpToCFormString @ ReCExp @ ToCExp @
+    ConvertExpression[FlexibleSUSY`LowScale];
+
+GaugeCouplingConstraintsToC[] := (
+    SetDependenceNode[
+	EDRbar, deltaAlphaEm[I, AlphaEmMSbar], "CONSTRAINTNAME::cs::"];
+    SetDependenceNode[
+	Global`AlphaS, deltaAlphaS[I, AlphaSMSbar], "CONSTRAINTNAME::cs::"];
+    DeclaredRealQ[EDRbar | Global`AlphaS] := True;
+    NConstraintToC /@ (
+	Parameters`FindSymbolDef[#] -
+	Re[#] Parameters`GetGUTNormalization[#] & /@ {
+		SARAH`hyperchargeCoupling,
+		SARAH`leftCoupling,
+		SARAH`strongCoupling
+	    } /. SARAH`electricCharge -> EDRbar
+    )
+);
+
+DeltaAlphaToC[] := Module[{
+	mTop = TreeMasses`GetThirdGenerationMass[SARAH`TopQuark],
+	prefactorEm = Global`alphaEm / (2 Pi),
+	deltaEmSM, deltaEmNP,
+	prefactorS  = Global`alphaS  / (2 Pi),
+	deltaSSM , deltaSNP
+    },
+    deltaEmSM = prefactorEm *
+	ConvertExpression[1/3 - 16/9 Global`FiniteLog[Abs[mTop/scl[]]]];
+    deltaEmNP = prefactorEm *
+	ConvertExpression @
+	ThresholdCorrections`Private`CalculateDRbarElectromagneticCoupling[];
+    deltaSSM = prefactorS *
+	ConvertExpression[- 2/3 Global`FiniteLog[Abs[mTop/scl[]]]];
+    deltaSNP = prefactorS *
+	ConvertExpression @
+	ThresholdCorrections`Private`CalculateDRbarColorCoupling[];
+    SetDependenceNode[
+	deltaAlphaEm[_,_], {deltaEmSM, deltaEmNP}, "CONSTRAINTNAME::"];
+    SetDependenceNode[
+	deltaAlphaS [_,_], {deltaSSM , deltaSNP }, "CONSTRAINTNAME::"];
+    DeclaredRealQ[Global`alphaEm | Global`alphaS] := True;
+    Block[{CContext},
+	  CContext["CLASSNAME::Interactions::"] = "I.";
+	{
+	    DAlphaEmSM -> "LispAnd(threshold_corrections_loop_order >= 1, " <>
+		CExpToCFormString@ReCExp@ToCExp[deltaEmSM] <> ")",
+	    DAlphaEmNP -> "LispAnd(threshold_corrections_loop_order >= 1, " <>
+		CExpToCFormString@ReCExp@ToCExp[deltaEmNP] <> ")",
+	    DAlphaSSM  -> "LispAnd(threshold_corrections_loop_order >= 1, " <>
+		CExpToCFormString@ReCExp@ToCExp[deltaSSM ] <> ")",
+	    DAlphaSNP  -> "LispAnd(threshold_corrections_loop_order >= 1, " <>
+		CExpToCFormString@ReCExp@ToCExp[deltaSNP ] <> ")"
+	}
+    ]
+];
+
+CSetThetaW[] := Module[{
+	expr = Parameters`FindSymbolDef[SARAH`Weinberg] /. {
+	    SARAH`Mass[SARAH`VectorZ] -> Sqrt[M2ZDRbar],
+	    SARAH`Mass[SARAH`VectorW] -> Sqrt[M2WDRbar]
+	},
+	M2VZDRbar  =
+	    Symbol["M2" <> ToValidCSymbolString[SARAH`VectorZ] <> "DRbar"],
+	M2VWmDRbar =
+	    Symbol["M2" <> ToValidCSymbolString[SARAH`VectorW] <> "DRbar"]
+    },
+    SetDependenceNode[SARAH`Weinberg, expr, "CONSTRAINTNAME::cs::"];
+    SetDependenceNode[M2ZDRbar, M2VZDRbar [_, _], "CONSTRAINTNAME::cs::"];
+    SetDependenceNode[M2WDRbar, M2VWmDRbar[_, _], "CONSTRAINTNAME::cs::"];
+    DeclaredRealQ[SARAH`Weinberg] := True;
+    DeclaredRealQ[M2ZDRbar | M2WDRbar] := True;
+    "double " <> ToValidCSymbolString[SARAH`Weinberg] <> " = " <>
+	CExpToCFormString@ToCExp[expr] <> ";"
+];
+
+YukawaCouplingConstraintsToC[massMatrices_, parameterRules_] :=
+    NConstraintToC /@ Flatten[
+	YukawaCouplingConstraints[#, massMatrices, parameterRules]& /@
+	{SARAH`UpQuark, SARAH`DownQuark, SARAH`Electron}];
+
+YukawaCouplingConstraints[
+    particle_, massMatrices:{___, FSMassMatrix[m_?MatrixQ, particle_, _], ___},
+    parameterRules_] := Module[{
+	drbarMassMatrixInParameters = ParametrizeMasses[m, parameterRules],
+	drbarMassMatrixFromData,
+	drbarMassFunction = Symbol @ DRbarMassFunctionName[particle],
+	dataMass
+    },
+    dataMass = Symbol[ToCMassName[particle] <> "Data"];
+    drbarMassMatrixFromData = Table[dataMass[i,j], {i,0,2}, {j,0,2}];
+    SetDependenceNode[dataMass[2,2], drbarMassFunction[I, _, 2],
+		      "CONSTRAINTNAME::cs::"];
+    DeleteCases[
+	Flatten @
+	MapThread[
+	    ComplexExpand[
+		Which[PossibleZeroQ[#1],  0,
+		      RealQ[#1]	       ,  Re[#2 - #1],
+		      True	       , {Re[#2 - #1], Im[#2 - #1]}],
+		Except[_?RealQ]] &,
+	    {drbarMassMatrixInParameters, drbarMassMatrixFromData}, 2],
+	_?PossibleZeroQ]
+];
+
+DRbarMassesToC[massMatrices_] :=
+    DRbarMassToC[#, massMatrices]& /@
+    LoopMasses`Private`GetRunningOneLoopDRbarParticles[];
+
+DRbarMassToC[particle_, massMatrices_] := Module[{
+	name = DRbarMassFunctionName[particle],
+	args = DRbarMassFunctionArgs[particle, massMatrices],
+	form, body
+    },
+    form = Symbol[name] @@ Table[_, {Length[args]}];
+    body = DRbarMassFunctionBody[particle, massMatrices, form];
+    CFxn[
+	ReturnType -> "double",
+	Scope -> "CONSTRAINTNAME::",
+	Name -> name,
+	Args -> args,
+	Qualifier -> "const",
+	Attributes -> "pure",
+	Body -> body
+    ]
+];
+
+DRbarMassFunctionName[particle_] := ToCMassName[particle] <> "DRbar";
+
+DRbarMassFunctionArgs[
+    particle_, massMatrices:{___, FSMassMatrix[_?MatrixQ,particle_,_], ___}] :=
+    {{"const " <> FlexibleSUSY`FSModelName <> "<Lattice>::Interactions&", "I"},
+     {"double", DRbarMassFunctionMassArgName[particle]}, {"size_t", "idx"}};
+
+DRbarMassFunctionArgs[particle_, massMatrices_] :=
+    {{"const " <> FlexibleSUSY`FSModelName <> "<Lattice>::Interactions&", "I"},
+     {"double", DRbarMassFunctionMassArgName[particle]}};
+
+(*
+DRbarMassFunctionMassArgName[particle_] /;
+    FieldMassDimension[particle] === 1   := "m2MSbarSM";
+
+DRbarMassFunctionMassArgName[particle_] /;
+    FieldMassDimension[particle] === 3/2 := "mMSbarSM";
+*)
+
+DRbarMassFunctionMassArgName[particle_] /;
+    FieldMassDimension[particle] === 1   := "m2Pole";
+
+DRbarMassFunctionMassArgName[particle_] /;
+    FieldMassDimension[particle] === 3/2 := "mPole";
+
+DRbarMassFunctionBody[particle_?IsMassless, _, _] := "{\n  return 0;\n}\n";
+
+DRbarMassFunctionBody[particle_?IsFermion, massMatrices_, form_] := Module[{
+	mArgName = DRbarMassFunctionMassArgName[particle],
+	mArg,
+	selfEnergyFunctionS  = SelfEnergyFunction[particle, "1" ],
+	selfEnergyFunctionPL = SelfEnergyFunction[particle, "PL"],
+	selfEnergyFunctionPR = SelfEnergyFunction[particle, "PR"],
+	corr1
+    },
+    mArg = Symbol[mArgName];
+    corr1 = If[MemberQ[massMatrices, FSMassMatrix[_?MatrixQ, particle, _]],
+	       a Re @ selfEnergyFunctionS[p, idx, idx] +
+	       a mArg (Re @ selfEnergyFunctionPL[p, idx, idx] +
+			Re @ selfEnergyFunctionPR[p, idx, idx]),
+	       a Re @ selfEnergyFunctionS[p] +
+	       a mArg (Re @ selfEnergyFunctionPL[p] +
+			Re @ selfEnergyFunctionPR[p])];
+    SetDependenceNode[form, corr1, "CONSTRAINTNAME::"];
+    Block[{CContext},
+	  CContext["CLASSNAME::Interactions::"] = "I.";
+	  StringJoin[
+	      "{\n",
+	      "  double a = f->a;\n",
+	      "  double p = ", mArgName, ";\n",
+	      "  return ", mArgName, " +\n",
+	      "    LispAnd(threshold_corrections_loop_order >= 1, ",
+	      CExpToCFormString @ ToCExp[corr1], ");\n",
+	      "}\n"
+	  ]
+    ]
+];
+
+DRbarMassFunctionBody[particle_, _, form_] := Module[{
+	m2ArgName = DRbarMassFunctionMassArgName[particle],
+	selfEnergyFunction = SelfEnergyFunction[particle],
+	corr1
+    },
+    corr1 = a Re @ selfEnergyFunction[p2];
+    SetDependenceNode[form, corr1, "CONSTRAINTNAME::"];
+    Block[{CContext},
+	  CContext["CLASSNAME::Interactions::"] = "I.";
+	  StringJoin[
+	      "{\n",
+	      "  double a = f->a;\n",
+	      "  double p2 = ", m2ArgName, ";\n",
+	      "  return ", m2ArgName, " +\n",
+	      "    LispAnd(threshold_corrections_loop_order >= 1, ",
+	      CExpToCFormString @ ToCExp[corr1], ");\n",
+	      "}\n"
+	  ]
+    ]
+];
+
+SelfEnergyFunction[particle_, lor_] :=
+    Symbol[ToString@SelfEnergyFunction[particle] <> ToString[lor]];
+
+SelfEnergyFunction[particle_] :=
+    Symbol["FSSelfEnergy" <> ToValidCSymbolString[particle]];
+
+ConvertExpression[expr_] := expr /.
+    sarahOperatorReplacementRules //.
+    restoreMassPowerRules /. {
+	FlexibleSUSY`M[f_][i_] :> Lattice`Private`M[f[{i}]],
+	FlexibleSUSY`M[f_]     :> Lattice`Private`M[f]
+    } /.
+    Global`currentScale -> scl[];
 
 ParametrizeEWSBEquations[
     constraints_List, assumptions_List, outputVars_, parameterRules_] :=

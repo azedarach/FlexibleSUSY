@@ -21,9 +21,13 @@
 #ifndef @ModelName@_LATTICE_LOW_SCALE_CONSTRAINT_H
 #define @ModelName@_LATTICE_LOW_SCALE_CONSTRAINT_H
 
+#include "lowe.h"
+#include "cextensions.hpp"
+#include "@ModelName@_lattice_model.hpp"
 #include "@ModelName@_low_scale_constraint.hpp"
 #include "@ModelName@_input_parameters.hpp"
-#include "lattice_constraint.hpp"
+#include "lattice_compound_constraint.hpp"
+#include "lattice_numerical_constraint.hpp"
 
 namespace flexiblesusy {
 
@@ -32,13 +36,47 @@ class @ModelName@;
 
 class Lattice;
 
+template<class T>
+class @ModelName@_lowe_constraint;
+
 template<>
-class @ModelName@_low_scale_constraint<Lattice> : public Constraint<Lattice> {
+class @ModelName@_lowe_constraint<Lattice> :
+  public NumericalConstraint {
 public:
-   @ModelName@_low_scale_constraint();
-   @ModelName@_low_scale_constraint(const @ModelName@_input_parameters&);
-   virtual ~@ModelName@_low_scale_constraint();
-   virtual double get_scale() const;
+  @ModelName@_lowe_constraint(const @ModelName@_input_parameters *);
+  virtual ~@ModelName@_lowe_constraint();
+  Eigen::ArrayXd cs(const double *x) const;
+
+private:
+  double deltaAlphaEm(const @ModelName@<Lattice>::Interactions&,
+		      double alphaEm_MSbar) const ATTR(pure);
+  double deltaAlphaS (const @ModelName@<Lattice>::Interactions&,
+		      double alphaS_MSbar ) const ATTR(pure);
+
+@drbarMassFxnDecls@
+
+  const @ModelName@_input_parameters *input;
+  QedQcd oneset;
+  size_t threshold_corrections_loop_order;
+};
+
+// auxiliary class for initializing own members before the base class
+// see http://www.boost.org/doc/libs/1_53_0/libs/utility/base_from_member.html
+struct @ModelName@_low_scale_constraint_ {
+  @ModelName@_low_scale_constraint_(const @ModelName@_input_parameters *);
+  ~@ModelName@_low_scale_constraint_();
+  Fixed_t tlow;
+  @ModelName@_lowe_constraint<Lattice> low_energy_data;
+};
+
+template<>
+class @ModelName@_low_scale_constraint<Lattice> :
+  public @ModelName@_low_scale_constraint_,
+  public CompoundConstraint<Lattice> {
+public:
+  @ModelName@_low_scale_constraint();
+  @ModelName@_low_scale_constraint(const @ModelName@_input_parameters&);
+  virtual ~@ModelName@_low_scale_constraint();
 };
 
 } // namespace flexiblesusy
