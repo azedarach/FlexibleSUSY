@@ -679,7 +679,7 @@ CFxnsToCCode[cfxns_, chunkSize_:Infinity] := Module[{
 	decls, defs
     },
     {decls, defs} = Transpose[CFxnToCCode /@ Flatten[cfxns]];
-    {StringJoin[decls], StringGroup[defs, chunkSize]}
+    {StringJoin[decls], StringGroup[StringJoin /@ defs, chunkSize, "\n"]}
 ];
 
 CFxnToCCode[cfxn_] := Module[{
@@ -703,13 +703,12 @@ CFxnToCCode[cfxn_] := Module[{
      {returnType, " ", scope, name, argsInDef, qualifier, "\n", body, "\n"}}
 ];
 
-StringGroup[strings_List, chunkSize_] := Module[{
-	flattened = Flatten[strings],
+StringGroup[strings_List, chunkSize_, separator_:""] := Module[{
 	size = 0
     },
-    StringJoin /@ Last@Reap[
+    StringJoin@Riffle[#, "\n"]& /@ Last@Reap[
 	(Sow[#, Quotient[size, chunkSize]]; size += StringLength[#])& /@
-	flattened]
+	strings]
 ];
 
 SetCFxnScope[
