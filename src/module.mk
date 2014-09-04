@@ -60,6 +60,7 @@ LIBFLEXI_HDR := \
 		$(DIR)/numerics.h \
 		$(DIR)/numerics.hpp \
 		$(DIR)/problems.hpp \
+		$(DIR)/product.hpp \
 		$(DIR)/pv.hpp \
 		$(DIR)/rge.h \
 		$(DIR)/rg_flow.hpp \

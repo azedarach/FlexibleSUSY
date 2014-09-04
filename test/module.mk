@@ -31,6 +31,7 @@ TEST_SRC := \
 ifneq ($(findstring lattice,$(ALGORITHMS)),)
 TEST_SRC += \
 		$(DIR)/test_complex_op_int.cpp \
+		$(DIR)/test_product.cpp \
 		$(DIR)/test_sum.cpp
 endif
 
