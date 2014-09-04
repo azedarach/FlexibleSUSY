@@ -31,7 +31,7 @@ using namespace @ModelName@_lattice_info;
 #define CLASSNAME @ModelName@<Lattice>
 
 @ModelName@_tsusy_constraint<Lattice>::@ModelName@_tsusy_constraint() :
-  @fixTsusy@
+@fixTsusy@
 {
 }
 

@@ -57,37 +57,37 @@ TestEquality[IndentText["abc\n\n\n\ndef",1], " abc\n\n\n\n def"];
 
 Print["testing WrapText[] ..."];
 
-TestEquality[WrapText["a"  ,1,0], "a\n"];
+TestEquality[WrapText["a"  ,1,0], "a"];
 TestEquality[WrapText["a\n",1,0], "a\n"];
-TestEquality[WrapText["a  ",1,0], "a\n"];
-TestEquality[WrapText["a b",2,0], "a\nb\n"];
-TestEquality[WrapText["a b c",1,0], "a\nb\nc\n"];
-TestEquality[WrapText["abc def",3,0], "abc\ndef\n"];
-TestEquality[WrapText["abc def",4,0], "abc\ndef\n"];
+TestEquality[WrapText["a  ",1,0], "a"];
+TestEquality[WrapText["a b",2,0], "a\nb"];
+TestEquality[WrapText["a b c",1,0], "a\nb\nc"];
+TestEquality[WrapText["abc def",3,0], "abc\ndef"];
+TestEquality[WrapText["abc def",4,0], "abc\ndef"];
 
 (* test indentation *)
-TestEquality[WrapText[" abc,def",5,0], " abc,\n def\n"];
-TestEquality[WrapText[" abc,def",6,0], " abc,\n def\n"];
-TestEquality[WrapText[" abc def",5,0], " abc\n def\n"];
+TestEquality[WrapText[" abc,def",5,0], " abc,\n def"];
+TestEquality[WrapText[" abc,def",6,0], " abc,\n def"];
+TestEquality[WrapText[" abc def",5,0], " abc\n def"];
 
 (* test indentation + offset *)
-TestEquality[WrapText[" abc,def",5,1], " abc,\n  def\n"];
-TestEquality[WrapText[" abc,def",6,1], " abc,\n  def\n"];
+TestEquality[WrapText[" abc,def",5,1], " abc,\n  def"];
+TestEquality[WrapText[" abc,def",6,1], " abc,\n  def"];
 
 (* test string constants *)
-TestEquality[WrapText[" _ab;_,def",5,0], " _ab;\n _,\n def\n"];
-TestEquality[WrapText[" \"ab;\",def",5,0], " \"ab;\"\n ,def\n"];
-TestEquality[WrapText[" \"ab\"\"cd\"",5,0], " \"ab\"\n \"cd\"\n"];
-TestEquality[WrapText[" \"ab\\\"\\\"cd\"",5,0], " \"ab\\\"\\\"cd\"\n"];
+TestEquality[WrapText[" _ab;_,def",5,0], " _ab;\n _,\n def"];
+TestEquality[WrapText[" \"ab;\",def",5,0], " \"ab;\"\n ,def"];
+TestEquality[WrapText[" \"ab\"\"cd\"",5,0], " \"ab\"\n \"cd\""];
+TestEquality[WrapText[" \"ab\\\"\\\"cd\"",5,0], " \"ab\\\"\\\"cd\""];
 
 (* test multi-char operators *)
-TestEquality[WrapText[" abc:de",5,0], " abc:\n de\n"];
-TestEquality[WrapText[" abc::de",5,0], " abc\n ::de\n"];
-TestEquality[WrapText[" abc+def",5,0], " abc+\n def\n"];
-TestEquality[WrapText[" abc+=def",5,0], " abc\n +=\n def\n"];
+TestEquality[WrapText[" abc:de",5,0], " abc:\n de"];
+TestEquality[WrapText[" abc::de",5,0], " abc\n ::de"];
+TestEquality[WrapText[" abc+def",5,0], " abc+\n def"];
+TestEquality[WrapText[" abc+=def",5,0], " abc\n +=\n def"];
 
 (* there was a bug such that this was split into three lines *)
 TestEquality[WrapText["void some_func(Eigen::VectorXd& dx) const", 30, 0],
-		      "void some_func(Eigen::\nVectorXd& dx) const\n"];
+		      "void some_func(Eigen::\nVectorXd& dx) const"];
 
 PrintTestSummary[];

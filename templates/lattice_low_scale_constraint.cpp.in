@@ -61,7 +61,7 @@ using namespace @ModelName@_lattice_info;
 @ModelName@_lowe_constraint<Lattice>::@ModelName@_lowe_constraint(const @ModelName@_input_parameters *input_) :
   NumericalConstraint(
     @nRowsLowe@,
-    @loweDep@
+@loweDep@
   )
 {
   input = input_;
@@ -87,6 +87,7 @@ Eigen::ArrayXd @ModelName@_lowe_constraint<Lattice>::cs(const double *x) const
   double M2ZDRbar = M2@VectorZ@DRbar(I, Sqr(Electroweak_constants::MZ));
   double M2WDRbar = M2@VectorW@DRbar(I, Sqr(Electroweak_constants::MW));
 @setThetaW@
+
   Eigen::Matrix<std::complex<double>, 3, 3> M@TopQuark@Data;
   M@TopQuark@Data <<
       oneset.displayMass(mUp), 0, 0,
@@ -105,10 +106,10 @@ Eigen::ArrayXd @ModelName@_lowe_constraint<Lattice>::cs(const double *x) const
 
   return (Eigen::ArrayXd(@nRowsLowe@) <<
     // constraints on gauge couplings
-    @gaugeList@
+@gaugeList@
     ,
     // constraints on Yukawa couplings
-    @yukawaList@
+@yukawaList@
   ).finished();
 }
 
@@ -116,10 +117,10 @@ double CONSTRAINTNAME::deltaAlphaEm
 (const CLASSNAME::Interactions& I, double alphaEm) const
 {
   double deltaAlphaEm_SM =
-    @dAlphaEmSM@
+@dAlphaEmSM@
     ;
   double deltaAlphaEm_NP =
-    @dAlphaEmNP@
+@dAlphaEmNP@
     ;
   return deltaAlphaEm_SM + deltaAlphaEm_NP;
 }
@@ -128,10 +129,10 @@ double CONSTRAINTNAME::deltaAlphaS
 (const CLASSNAME::Interactions& I, double alphaS) const
 {
   double deltaAlphaS_SM =
-    @dAlphaSSM@
+@dAlphaSSM@
     ;
   double deltaAlphaS_NP =
-    @dAlphaSNP@
+@dAlphaSNP@
     ;
   return deltaAlphaS_SM + deltaAlphaS_NP;
 }

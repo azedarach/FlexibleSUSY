@@ -286,10 +286,10 @@ Module[{
 	Join[templateRules, {
 	"@abbrDecls@"	    -> IndentText[abbrDecls, 2],
 	"@betaDecls@"	    -> IndentText[betaDecls, 2],
-	"@dAlphaEmSM@"	    -> StringTrim@WrapText@IndentText[dAlphaEmSM, 4],
-	"@dAlphaEmNP@"	    -> StringTrim@WrapText@IndentText[dAlphaEmNP, 4],
-	"@dAlphaSSM@"	    -> StringTrim@WrapText@IndentText[dAlphaSSM, 4],
-	"@dAlphaSNP@"	    -> StringTrim@WrapText@IndentText[dAlphaSNP, 4],
+	"@dAlphaEmSM@"	    -> WrapText@IndentText[dAlphaEmSM, 4],
+	"@dAlphaEmNP@"	    -> WrapText@IndentText[dAlphaEmNP, 4],
+	"@dAlphaSSM@"	    -> WrapText@IndentText[dAlphaSSM, 4],
+	"@dAlphaSNP@"	    -> WrapText@IndentText[dAlphaSNP, 4],
 	"@dependenceNumDecls@" -> IndentText[dependenceNumDecls, 4],
 	"@dependenceNumDefs@"  -> WrapText[StringJoin@dependenceNumDefs],
 	"@drbarMassFxnDecls@" -> IndentText[drbarMassFxnDecls, 2],
@@ -298,11 +298,11 @@ Module[{
 	"@eigenVarStmts@"   -> WrapText[eigenVarStmts],
 	"@enumParameters@"  -> WrapText@IndentText[enumParameters, 2],
 	"@nRowsEwsb@"	    -> ToString@Length[cnEwsbConstraints],
-	"@ewsbDep@"	    -> StringTrim@WrapText@IndentText[ewsbDep, 4],
-	"@ewsbList@"	    -> StringTrim@WrapText@IndentText[ewsbList, 4],
-	"@fixTsusy@"        -> StringTrim@WrapText@IndentText[fixTsusy, 2],
-	"@gaugeList@"	    -> StringTrim@WrapText@IndentText[gaugeList, 4],
-	"@loweDep@"	    -> StringTrim@WrapText@IndentText[loweDep, 4],
+	"@ewsbDep@"	    -> WrapText@IndentText[ewsbDep, 4],
+	"@ewsbList@"	    -> WrapText@IndentText[ewsbList, 4],
+	"@fixTsusy@"        -> WrapText@IndentText[fixTsusy, 2],
+	"@gaugeList@"	    -> WrapText@IndentText[gaugeList, 4],
+	"@loweDep@"	    -> WrapText@IndentText[loweDep, 4],
 	"@lowScale@"	    -> lowScale,
 	"@matrixDefs@"	    -> IndentText[matrixDefs, 4],
 	"@matrixStmts@"	    -> WrapText[matrixStmts],
@@ -314,7 +314,7 @@ Module[{
 	"@shiftHiggsMasses@"-> WrapText@IndentText[shiftHiggsMasses, 2],
 	"@vertexDecls@"	    -> IndentText[vertexDecls, 4],
 	"@vertexDefs@"	    -> WrapText[StringJoin@vertexDefs],
-	"@yukawaList@"	    -> StringTrim@WrapText@IndentText[yukawaList, 4]
+	"@yukawaList@"	    -> WrapText@IndentText[yukawaList, 4]
     }]];
     defChunks = Join[abbrDefs, betaDefs];
     nDefChunks = Length[defChunks];
@@ -578,13 +578,13 @@ EWSBConditionsToC[pEquations_List] := EWSBConditionToC /@ pEquations;
 EWSBConditionToC[lhs_ == rhs_] := NConstraintToC[rhs - lhs];
 
 CShiftHiggsMasses[treeEwsbEquations_List] :=
-    StringJoin[CShiftHiggsMass /@ treeEwsbEquations];
+    StringJoin@Riffle[CShiftHiggsMass /@ treeEwsbEquations, "\n"];
 
 CShiftHiggsMass[lhs_ == rhs_] := Module[{
 	clhs = CExpToCFormString @ ToCExp[lhs, x],
 	crhs = CExpToCFormString @ ToCExp[rhs, x]
     },
-    clhs <> " = " <> crhs <> ";\n"
+    clhs <> " = " <> crhs <> ";"
 ];
 
 NConstraintToC[constraint_] :=
@@ -1008,7 +1008,7 @@ CFxnToCCode[cfxn_] := Module[{
 	    Most[#], #], " "]& /@ args,
 	", "] <> ")";
     {{returnType, " ", name, argsInDecl, qualifier, attributes, ";\n"},
-     {returnType, " ", scope, name, argsInDef, qualifier, "\n", body, "\n"}}
+     {returnType, " ", scope, name, argsInDef, qualifier, "\n", body}}
 ];
 
 StringGroup[strings_List, chunkSize_, separator_:""] := Module[{

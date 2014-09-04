@@ -81,10 +81,10 @@ WrapText[text_String, maxWidth_Integer:79, indentation_Integer:2] := Block[{
     $IterationLimit = Max[Global`$flexiblesusyCSrcChunkSize / 32,
 			  global$IterationLimit]
   },
-  StringJoin[WrapLine /@ StringSplit[text, "\n"]]
+  StringJoin @ Riffle[WrapLine /@ StringSplit[text, "\n", All], "\n"]
 ];
 
-WrapLine[blank_String] := "\n" /;
+WrapLine[blank_String] := {} /;
   StringMatchQ[blank, RegularExpression["^[[:space:]]*$"]];
 
 WrapLine[line_String] := Block[{
@@ -99,7 +99,7 @@ WrapLine[line_String] := Block[{
   firstBlankStr = StringJoin@Table[" ", {nLeadingSpaces}];
   otherBlankStr = StringJoin@Table[" ", {absSkip}];
   If[lst === {}, {},
-     {firstBlankStr, First[lst], "\n", {otherBlankStr, #, "\n"}& /@ Rest[lst]}]
+     {firstBlankStr, First[lst], {"\n", otherBlankStr, #}& /@ Rest[lst]}]
 ];
 
 NLeadingSpaces[line_String] := Module[{
