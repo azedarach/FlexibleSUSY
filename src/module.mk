@@ -69,6 +69,7 @@ LIBFLEXI_HDR := \
 		$(DIR)/sfermions.hpp \
 		$(DIR)/slha_io.hpp \
 		$(DIR)/spectrum_generator_settings.hpp \
+		$(DIR)/sum.hpp \
 		$(DIR)/utils.h \
 		$(DIR)/wrappers.hpp \
 		$(DIR)/xpr-base.h \
@@ -112,6 +113,7 @@ LIBFLEXI_HDR += \
 		$(DIR)/lattice_foreign_constraint.hpp \
 		$(DIR)/lattice_initial_guesser.hpp \
 		$(DIR)/lattice_model.hpp \
+		$(DIR)/lattice_model_interactions.hpp \
 		$(DIR)/lattice_numerical_constraint.hpp \
 		$(DIR)/lattice_solver.hpp \
 		$(DIR)/SM.hpp
