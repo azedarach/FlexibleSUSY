@@ -5,7 +5,7 @@ FSModelName = "@CLASSNAME@";
 
 MINPAR={ {1, LambdaIN} };
 
-EWSBOutputParameters = { Mu2 };
+EWSBOutputParameters = { mu2 };
 
 BoundaryLowScaleInput = {
     {v, 2 MZDRbar / Sqrt[GUTNormalization[g1]^2 g1^2 + g2^2]},
@@ -13,3 +13,8 @@ BoundaryLowScaleInput = {
 };
 
 OnlyLowEnergyFlexibleSUSY = True;
+
+SARAH`ParameterDefinitions = Append[
+    Cases[SARAH`ParameterDefinitions, {p_ /; p =!= SARAH`\[Lambda], ___}],
+    {SARAH`\[Lambda], { Description -> "SM Higgs Selfcouplings" } }
+];

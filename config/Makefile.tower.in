@@ -10,7 +10,7 @@ ENABLE_THREADS   := @ENABLE_THREADS@
 
 LIBEXT          := @LIBEXT@
 
-MODEL1          := MSSM
+MODEL1          := MSSMD5O
 MODEL2          := MSSMRHN
 
 MODEL1DIR       := $(ABSBASEDIR)/models/$(MODEL1)
@@ -45,6 +45,7 @@ FC              := @FC@
 FFLAGS          := @FFLAGS@
 FLIBS           := @FLIBS@
 FOR_DEP_GEN     := @FOR_DEP_GEN@
+BLASLIBS        := @BLASLIBS@
 BOOSTTESTLIBS   := @BOOSTTESTLIBS@
 BOOSTTHREADLIBS := @BOOSTTHREADLIBS@
 BOOSTFLAGS      := @BOOSTFLAGS@
@@ -67,8 +68,8 @@ endif
 
 TOWER_SRC := \
 		run_tower.cpp \
-		MSSM_MSSMRHN_two_scale_matching.cpp \
-		MSSM_MSSMRHN_two_scale_initial_guesser.cpp
+		MSSMD5O_MSSMRHN_two_scale_matching.cpp \
+		MSSMD5O_MSSMRHN_two_scale_initial_guesser.cpp
 
 TOWER_OBJ := \
 		$(patsubst %.cpp, %.o, $(filter %.cpp, $(TOWER_SRC))) \
@@ -108,7 +109,7 @@ $(TOWER_DEP) $(TOWER_OBJ): CPPFLAGS += $(LOOPFUNCFLAGS)
 endif
 
 $(TOWER_EXE): $(TOWER_OBJ) $(LIBMODEL1) $(LIBMODEL2) $(LIBFLEXI) $(LIBLEGACY) $(filter-out -%,$(LOOPFUNCLIBS))
-		$(CXX) -o $@ $(call abspathx,$^) $(filter -%,$(LOOPFUNCLIBS)) $(GSLLIBS) $(BOOSTTHREADLIBS) $(THREADLIBS) $(LAPACKLIBS) $(FLIBS)
+		$(CXX) -o $@ $(call abspathx,$^) $(filter -%,$(LOOPFUNCLIBS)) $(GSLLIBS) $(BOOSTTHREADLIBS) $(THREADLIBS) $(LAPACKLIBS) $(BLASLIBS) $(FLIBS)
 
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),clean-dep)
@@ -160,6 +161,7 @@ showbuild:
 	@echo "FLIBS              = $(FLIBS)"
 	@echo "FOR_DEP_GEN        = $(FOR_DEP_GEN)"
 	@echo "LIBEXT             = $(LIBEXT)"
+	@echo "BLASLIBS           = $(BLASLIBS)"
 	@echo "BOOSTTESTLIBS      = $(BOOSTTESTLIBS)"
 	@echo "BOOSTTHREADLIBS    = $(BOOSTTHREADLIBS)"
 	@echo "BOOSTFLAGS         = $(BOOSTFLAGS)"

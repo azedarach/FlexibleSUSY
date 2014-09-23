@@ -247,6 +247,7 @@ GeneralReplacementRules[] :=
       "@Electron@"    -> ToValidCSymbolString[SARAH`Electron],
       "@Neutrino@"    -> ToValidCSymbolString[SARAH`Neutrino],
       "@HiggsBoson@"  -> ToValidCSymbolString[SARAH`HiggsBoson],
+      "@HiggsBoson_" ~~ num_ ~~ "@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`HiggsBoson] <> If[TreeMasses`GetDimension[SARAH`HiggsBoson] > 1, "(" <> num <> ")", ""],
       "@UpYukawa@"       -> ToValidCSymbolString[SARAH`UpYukawa],
       "@DownYukawa@"     -> ToValidCSymbolString[SARAH`DownYukawa],
       "@ElectronYukawa@" -> ToValidCSymbolString[SARAH`ElectronYukawa],
@@ -417,6 +418,9 @@ CreateHiggsToEWSBEqAssociation[] :=
            vevs = SARAH`DEFINITION[FlexibleSUSY`FSEigenstates][SARAH`VEVs];
            numberOfVEVs = Length[vevs];
            numberOfHiggses = SARAH`getGen[SARAH`HiggsBoson, FlexibleSUSY`FSEigenstates];
+           If[numberOfHiggses == 1,
+              Return[{{SARAH`HiggsBoson, 1}}];
+             ];
            (* d V/d phi_i *)
            For[v = 1, v <= numberOfVEVs, v++,
                (* find CP even gauge-eigenstate Higgs for the vev *)
@@ -562,13 +566,15 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
            restoreEwsbOutputParameters  = Parameters`RestoreParameter[FlexibleSUSY`EWSBOutputParameters, "one_loop_", ""];
            If[Head[SARAH`ListSoftBreakingScalarMasses] === List,
               softScalarMasses          = DeleteDuplicates[SARAH`ListSoftBreakingScalarMasses];,
-              Print["Error: no soft breaking scalar masses found!"];
               softScalarMasses          = {};
              ];
            softHiggsMasses              = Select[softScalarMasses, (!FreeQ[ewsbEquations, #])&];
            saveSoftHiggsMasses          = Parameters`SaveParameterLocally[softHiggsMasses, "old_", ""];
            restoreSoftHiggsMasses       = Parameters`RestoreParameter[softHiggsMasses, "old_", ""];
-           solveTreeLevelEWSBviaSoftHiggsMasses = EWSB`SolveTreeLevelEwsbVia[ewsbEquations, softHiggsMasses];
+           If[Head[softHiggsMasses] === List && Length[softHiggsMasses] > 0,
+              solveTreeLevelEWSBviaSoftHiggsMasses = EWSB`SolveTreeLevelEwsbVia[ewsbEquations, softHiggsMasses];,
+              solveTreeLevelEWSBviaSoftHiggsMasses = "";
+             ];
            gslEWSBRootFinders           = EWSB`CreateEWSBRootFinders[FlexibleSUSY`FSEWSBSolvers];
            reorderDRbarMasses           = TreeMasses`ReorderGoldstoneBosons[""];
            reorderPoleMasses            = TreeMasses`ReorderGoldstoneBosons["PHYSICAL"];
@@ -630,10 +636,17 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
                           } ];
           ];
 
-WriteUserExample[files_List] :=
-    Module[{},
+WriteUserExample[inputParameters_List, freePhases_List,
+                 lesHouchesInputParameters_List, files_List] :=
+    Module[{allIndexReplacementRules, parseCmdLineOptions,
+            printCommandLineOptions},
+           allParameters = Join[inputParameters,freePhases,lesHouchesInputParameters];
+           parseCmdLineOptions = WriteOut`ParseCmdLineOptions[allParameters];
+           printCommandLineOptions = WriteOut`PrintCmdLineOptions[allParameters];
            WriteOut`ReplaceInFiles[files,
-                          { Sequence @@ GeneralReplacementRules[]
+                          { "@parseCmdLineOptions@" -> IndentText[IndentText[parseCmdLineOptions]],
+                            "@printCommandLineOptions@" -> IndentText[IndentText[printCommandLineOptions]],
+                            Sequence @@ GeneralReplacementRules[]
                           } ];
           ];
 
@@ -764,6 +777,9 @@ GetRGEFileNames[outputDir_String] :=
            If[SARAH`AddDiracGauginos === True,
               AppendTo[fileNames, "BetaDGi.m"];
              ];
+           If[SARAH`SupersymmetricModel === False,
+              AppendTo[fileNames, "BetaLijkl.m"];
+             ];
            FileNameJoin[{rgeDir, #}]& /@ fileNames
           ];
 
@@ -882,7 +898,7 @@ FSPrepareRGEs[] :=
                      SARAH`BetaLi, SARAH`BetaGauge, SARAH`BetaVEV,
                      SARAH`BetaQijkl, SARAH`BetaTijk, SARAH`BetaBij,
                      SARAH`BetaLSi, SARAH`Betam2ij, SARAH`BetaMi,
-                     SARAH`BetaDGi };
+                     SARAH`BetaDGi, SARAH`BetaLijkl };
            If[Head[#] === Symbol && !ValueQ[#], Set[#,{}]]& /@ betas;
            If[!ValueQ[SARAH`Gij] || Head[SARAH`Gij] =!= List,
               SARAH`Gij = {};
@@ -1042,7 +1058,8 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
            Parameters`SetInputParameters[FlexibleSUSY`InputParameters];
 
            (* pick beta functions of supersymmetric parameters *)
-           susyBetaFunctions = { SARAH`BetaWijkl,
+           susyBetaFunctions = { SARAH`BetaLijkl,
+                                 SARAH`BetaWijkl,
                                  SARAH`BetaYijk ,
                                  SARAH`BetaMuij ,
                                  SARAH`BetaLi   ,
@@ -1177,7 +1194,8 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
                          "two_scale_soft_beta_.cpp.in",
                          {{FileNameJoin[{Global`$flexiblesusyTemplateDir, "two_scale.mk.in"}],
                            FileNameJoin[{Global`$flexiblesusyOutputDir, "two_scale_soft.mk"}]}},
-                         SARAH`TraceAbbr, numberOfSusyParameters];
+                         If[Head[SARAH`TraceAbbr] === List, SARAH`TraceAbbr, {}],
+                         numberOfSusyParameters];
 
            ewsbEquations = SARAH`TadpoleEquations[FSEigenstates] /.
                            Parameters`ApplyGUTNormalization[] /.
@@ -1419,7 +1437,10 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
            spectrumGeneratorInputFile = "spectrum_generator.hpp.in";
            If[FlexibleSUSY`OnlyLowEnergyFlexibleSUSY,
               spectrumGeneratorInputFile = "low_scale_spectrum_generator.hpp.in";];
-           WriteUserExample[{{FileNameJoin[{Global`$flexiblesusyTemplateDir, spectrumGeneratorInputFile}],
+           WriteUserExample[FlexibleSUSY`InputParameters,
+                            Complement[freePhases, FlexibleSUSY`InputParameters],
+                            {#[[2]], #[[3]]}& /@ lesHouchesInputParameters,
+                            {{FileNameJoin[{Global`$flexiblesusyTemplateDir, spectrumGeneratorInputFile}],
                               FileNameJoin[{Global`$flexiblesusyOutputDir, FlexibleSUSY`FSModelName <> "_spectrum_generator.hpp"}]},
                              {FileNameJoin[{Global`$flexiblesusyTemplateDir, "run.cpp.in"}],
                               FileNameJoin[{Global`$flexiblesusyOutputDir, "run_" <> FlexibleSUSY`FSModelName <> ".cpp"}]},

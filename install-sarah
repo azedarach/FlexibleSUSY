@@ -9,19 +9,63 @@ BASEDIR=$(dirname $0)
 # absolute path to this script
 ABSBASEDIR=$(cd $BASEDIR; pwd)
 
-# default SARAH version
-sarah_version="4.2.3"
+# operating system
+operating_system="`(uname -s) 2>/dev/null || echo unknown`"
 
-mathematica_dir="${HOME}/.Mathematica"
+# default SARAH version
+sarah_version="4.3.1"
+
+# determine Mathematica user directory
+case "$operating_system" in
+    Darwin)     mathematica_dir="${HOME}/Library/Mathematica" ;;
+    CYGWIN_NT*) mathematica_dir="${USERPROFILE}/AppData/Roaming/Mathematica" ;;
+    # Linux, *BSD
+    *)          mathematica_dir="${HOME}/.Mathematica" ;;
+esac
+
 mathematica_kernel_dir="${mathematica_dir}/Kernel"
 mathematica_applications_dir="${mathematica_dir}/Applications"
 mathematica_init="${mathematica_kernel_dir}/init.m"
 
 install_path="${mathematica_applications_dir}"
 sarah_link="${install_path}/SARAH"
+sarah_link_for_math="$sarah_link"
+
+case "$operating_system" in CYGWIN_NT*)
+    mathematica_kernel_dir=$(cygpath -u "$mathematica_kernel_dir")
+    mathematica_applications_dir=$(cygpath -u "$mathematica_applications_dir")
+    mathematica_init=$(cygpath -u "$mathematica_init")
+    install_path=$(cygpath -u "$install_path")
+    sarah_link=$(cygpath -u "$sarah_link")
+    sarah_link_for_math=$(cygpath -w "$sarah_link_for_math")
+esac
+
+escaped_sarah_link_for_math=$(echo "$sarah_link_for_math" | sed 's,\\,\\\\,g')
 
 # installation flags
 overwrite="no"
+
+#_____________________________________________________________________
+create_symlink() {
+    # This function tries to create a symlink [$2] pointing to target [$1]
+
+    case "$operating_system" in
+    CYGWIN_NT*)
+        exists_in_path "cygstart" || {
+            echo "Error: cygstart not found!"
+            echo "   Please install Cygwin package cygutils."
+            exit 1
+        }
+        # creates an NTFS symbolic link supported by Windows Vista or newer
+        # see http://stackoverflow.com/questions/18654162/enable-ntfs-symbolic-links-for-cygwin
+        # and http://stackoverflow.com/questions/4090301/root-user-sudo-equivalent-in-cygwin
+        cygstart --action=runas env CYGWIN=winsymlinks:nativestrict \
+            /usr/bin/ln -s "$@" ;;
+
+    # *nix
+    *)  ln -s "$@" ;;
+    esac
+}
 
 #_____________________________________________________________________
 exists_in_path () {
@@ -52,7 +96,7 @@ Usage: ./`basename $0` [options]
 
 Options:
   --version=         SARAH version (default: ${sarah_version}).
-                     Example: --version=4.2.3
+                     Example: --version=${sarah_version}
 
   --force,-f         Overwrite an already existing SARAH link.
 
@@ -89,7 +133,7 @@ Example:
   SARAH@  SARAH-${sarah_version}/  SARAH-${sarah_version}.tar.gz
   $ cat ${mathematica_init}
   (** User Mathematica initialization file **)
-  AppendTo[\$Path, "${sarah_link}"];
+  AppendTo[\$Path, "${escaped_sarah_link_for_math}"];
   $ math
   $ Mathematica 7.0 for Linux x86 (64-bit)
   Copyright 1988-2008 Wolfram Research, Inc.
@@ -144,6 +188,11 @@ if echo "${sarah_version}" | grep -v '[0-9]\+.[0-9]\+.[0-9]\+' > /dev/null 2>&1 
     exit 1
 fi
 
+exists_in_path "math" || {
+    echo "Error: math not found!"
+    echo "   Please install math and put its location in PATH."
+    exit 1
+}
 printf "Checking for SARAH installation ... "
 math -run "If[Needs[\"SARAH\`\"] === \$Failed, Quit[0]]; Quit[1]" > /dev/null 2>&1
 sarah_is_installed="$?"
@@ -197,22 +246,22 @@ echo "Creating link ${sarah_link} -> ${install_path}/${sarah_dir} ..."
 if exists_in_path "ln"; then
     if test "${overwrite}" = "yes" -o \( ! -e ${sarah_link} \) ; then
         rm -rf ${sarah_link}
-        ln -s ${install_path}/${sarah_dir} ${sarah_link}
+        create_symlink ${install_path}/${sarah_dir} ${sarah_link}
     else
         echo "Error: file ${sarah_link} already exists!"
         echo "   Use the --force option to overwrite it."
         exit 1
     fi
 else
-    echo "Error: tar not found!"
-    echo "   Please install tar to extract the SARAH package."
+    echo "Error: ln not found!"
+    echo "   Please install ln to create a symbolic link."
     exit 1
 fi
 
 # append path to SARAH link to Mathematica's init.m
-echo "Appending link path ${sarah_link} to \$Path in ${mathematica_init} ..."
+echo "Appending link path ${sarah_link_for_math} to \$Path in ${mathematica_init} ..."
 if [ -d "${mathematica_kernel_dir}" ] ; then
-    echo "AppendTo[\$Path, \"${sarah_link}\"];" >> ${mathematica_init}
+    echo "AppendTo[\$Path, \"${escaped_sarah_link_for_math}\"];" >> "${mathematica_init}"
 else
     echo "Error: Mathematica kernel directory not found:"
     echo "   ${mathematica_kernel_dir}"

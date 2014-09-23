@@ -114,21 +114,34 @@ void @ModelName@_slha_io::fill_physical(@ModelName@<T>& model) const
 @readLesHouchesPhyicalParameters@
 }
 
+/**
+ * Stores the model (DR-bar) parameters in the SLHA object.
+ *
+ * @param model model class
+ */
 template <class T>
 void @ModelName@_slha_io::set_model_parameters(const @ModelName@<T>& model)
 {
 @writeSLHAModelParametersBlocks@
 }
 
+/**
+ * Stores the model (DR-bar) parameters, masses and mixing matrices in
+ * the SLHA object.
+ *
+ * @param model model class
+ */
 template <class T>
 void @ModelName@_slha_io::set_spectrum(const @ModelName@<T>& model)
 {
    @ModelName@_physical physical(model.get_physical());
    convert_to_slha_convention(physical);
 
+   const bool write_sm_masses = model.do_calculate_sm_pole_masses();
+
    set_model_parameters(model);
-   set_mass(physical, model.do_calculate_sm_pole_masses());
-   set_mixing_matrices(physical, model.do_calculate_sm_pole_masses());
+   set_mass(physical, write_sm_masses);
+   set_mixing_matrices(physical, write_sm_masses);
 }
 
 } // namespace flexiblesusy

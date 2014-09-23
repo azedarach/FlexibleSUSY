@@ -16,6 +16,8 @@ ConvertMixingsToSLHAConvention::usage="";
 GetDRbarBlockNames::usage="";
 GetNumberOfDRbarBlocks::usage="";
 StringJoinWithSeparator::usage="Joins a list of strings with a given separator string";
+ParseCmdLineOptions::usage="";
+PrintCmdLineOptions::usage="";
 
 Begin["`Private`"];
 
@@ -128,7 +130,7 @@ WriteSLHAMassBlock[massMatrices_List] :=
            (susyMassesStr = susyMassesStr <> WriteSLHAMass[#])& /@ susyMasses;
            susyMassesStr = "mass << \"Block MASS\\n\"\n" <>
                            TextFormatting`IndentText[susyMassesStr] <> ";\n\n";
-           smMassesStr = "if (calculate_sm_pole_masses) {\n" <>
+           smMassesStr = "if (write_sm_masses) {\n" <>
                          TextFormatting`IndentText["mass\n" <>
                              TextFormatting`IndentText[smMassesStr] <> ";"] <>
                          "\n}\n\n";
@@ -212,7 +214,7 @@ WriteSLHAMixingMatricesBlocks[] :=
            (smMixStr = smMixStr <> WriteSLHAMatrix[#,"LOCALPHYSICAL"])& /@ smMix;
            (susyMixStr = susyMixStr <> WriteSLHAMatrix[#,"LOCALPHYSICAL"])& /@ susyMix;
            result = susyMixStr <> "\n" <>
-                    "if (calculate_sm_pole_masses) {\n" <>
+                    "if (write_sm_mixing_matrics) {\n" <>
                     TextFormatting`IndentText[smMixStr] <> "}\n";
            Return[result];
           ];
@@ -433,6 +435,42 @@ ConvertMixingsToSLHAConvention[massMatrices_List] :=
               ];
            Return[result];
           ];
+
+ParseCmdLineOption[parameter_Symbol] :=
+    Module[{parameterStr},
+           parameterStr = ToValidCSymbolString[parameter];
+           "\
+if(set_input_parameter(option, \"--" <> parameterStr <> "=\", &input." <> parameterStr <>"))
+   continue;
+
+"
+          ];
+
+ParseCmdLineOption[FlexibleSUSY`Sign[phase_]] :=
+    Module[{parameterStr},
+           parameterStr = ToValidCSymbolString[FlexibleSUSY`Sign[phase]];
+           "\
+if(set_input_parameter(option, \"--" <> parameterStr <> "=\", &input." <> parameterStr <>"))
+   continue;
+
+"
+          ];
+
+ParseCmdLineOption[_] := "";
+
+ParseCmdLineOptions[inputParameters_List] :=
+    StringJoin[ParseCmdLineOption /@ inputParameters];
+
+PrintCmdLineOption[parameter_Symbol] :=
+    "\"  --" <> ToValidCSymbolString[parameter] <> "=<value>\\n\"\n";
+
+PrintCmdLineOption[FlexibleSUSY`Sign[phase_]] :=
+    "\"  --" <> ToValidCSymbolString[FlexibleSUSY`Sign[phase]] <> "=<value>\\n\"\n";
+
+PrintCmdLineOption[_] := "";
+
+PrintCmdLineOptions[inputParameters_List] :=
+    StringJoin[PrintCmdLineOption /@ inputParameters];
 
 End[];
 

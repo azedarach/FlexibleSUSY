@@ -39,19 +39,19 @@ public:
       pole_mass_loop_order,  ///< loop-order for calculation of pole masses
       ewsb_loop_order,       ///< loop-order for solving the EWSB eqs.
       beta_loop_order,       ///< loop-order of beta-functions
-      threshold_corrections, ///< disable/enable threshold corrections
+      threshold_corrections_loop_order, ///< threshold corrections loop order
       NUMBER_OF_OPTIONS      ///< number of possible options
    };
 
    Spectrum_generator_settings();
    ~Spectrum_generator_settings() {}
 
-   double get(Settings) const;
-   void set(Settings, double);
-   void reset();
+   double get(Settings) const; ///< get value of spectrum generator setting
+   void set(Settings, double); ///< set value of spectrum generator setting
+   void reset();               ///< resets all settings to their defaults
 
 private:
-   double values[NUMBER_OF_OPTIONS];
+   double values[NUMBER_OF_OPTIONS]; ///< spectrum generator settings
 };
 
 } // namespace flexiblesusy

@@ -52,13 +52,18 @@ Command_line_options::~Command_line_options()
 {
 }
 
+/**
+ * Parse string of program options and store the given option values
+ * in the member variables of this class.
+ *
+ * @param argc number of program arguments
+ * @param argv program arguments
+ */
 void Command_line_options::parse(int argc, const char* argv[])
 {
    assert(argc > 0);
+   reset();
    program = argv[0];
-   do_exit = false;
-   do_print_model_info = false;
-   exit_status = EXIT_SUCCESS;
 
    for (int i = 1; i < argc; ++i) {
       const std::string option(argv[i]);
@@ -125,6 +130,29 @@ void Command_line_options::print_usage(std::ostream& ostr) const
         << std::endl;
 }
 
+/**
+ * Resets all command line options to their initial values.
+ */
+void Command_line_options::reset()
+{
+   do_exit = false;
+   do_print_model_info = false;
+   exit_status = EXIT_SUCCESS;
+   program.clear();
+   rgflow_file.clear();
+   slha_input_file.clear();
+   slha_output_file.clear();
+   spectrum_file.clear();
+}
+
+/**
+ * Returns true if the string str starts with prefix, false otherwise.
+ *
+ * @param str string to search in
+ * @param prefix string to search for
+ *
+ * @return true if the string str starts with prefix, false otherwise
+ */
 bool Command_line_options::starts_with(const std::string& str,
                                        const std::string& prefix)
 {
