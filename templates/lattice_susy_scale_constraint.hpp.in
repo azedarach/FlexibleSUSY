@@ -37,8 +37,6 @@ class Lattice;
 // auxiliary class for initializing own members before the base class
 // see http://www.boost.org/doc/libs/1_53_0/libs/utility/base_from_member.html
 struct @ModelName@_susy_scale_constraint_ {
-    @ModelName@_susy_scale_constraint_();
-    ~@ModelName@_susy_scale_constraint_();
     @ModelName@_tsusy_constraint<Lattice> tsusy;
     @ModelName@_ewsb_constraint<Lattice> ewsb;
 };
