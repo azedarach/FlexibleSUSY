@@ -161,6 +161,15 @@ Module[{
 	matrixDefs, matrixStmts,
 	eigenVarsDefs, eigenVarsStmts,
 	dependenceNumDecls, dependenceNumDefs,
+	cpRedundancies = Dispatch[
+	    VertexRedundancyRules[vertexRules] /.
+	    sarahOperatorReplacementRules /.
+	    cp:_SARAH`Cp|_SARAH`Cp[_] :> CVertexFunction[cp] /.
+	    Parametrization`cnj :> Conjugate],
+	splitCpsIntoParts = Dispatch[
+	    SplitVerticesIntoParts[vertexRules] /.
+	    sarahOperatorReplacementRules /.
+	    cp:_SARAH`Cp|_SARAH`Cp[_] :> CVertexFunction[cp]],
 	vertexDecls, vertexDefs,
 	nPointFunctions = fsNPointFunctions //. restoreMassPowerRules /.
 	    FlexibleSUSY`M -> Lattice`Private`M,
@@ -221,7 +230,8 @@ Module[{
 	VertexRuleToC /@
 	ParametrizeVertexRules[vertexRules, parameterRules]];
     {nPointDecls, nPointDefs} = CFxnsToCCode[
-	NPointFunctionToC@ParametrizeNPointFunction[#, replaceGhosts]& /@
+	NPointFunctionToC[ParametrizeNPointFunction[#, replaceGhosts],
+			  cpRedundancies, splitCpsIntoParts]& /@
 	nPointFunctions];
     phaseDefs = Phases`CreatePhasesDefinition[phases];
     replacementFiles = {
@@ -1031,12 +1041,14 @@ Module[{
        CScope[pattern] = scope]
 ];
 
-NPointFunctionToC[nPointFunction:_[_, rhs_]] := Module[{
+NPointFunctionToC[nPointFunction:_[_, rhs_],
+		  cpRedundancies_, splitCpsIntoParts_] := Module[{
 	cType, re,
 	name, args
     },
-    {cType, re} = If[RealQ[rhs], {"double", ReCExp},
-				 {"std::complex<double>", Identity}];
+    {cType, re} = If[RealQ[rhs /. cpRedundancies /. splitCpsIntoParts],
+		     {"double", ReCExp},
+		     {"std::complex<double>", Identity}];
     name = CNPointFunctionName[nPointFunction];
     args = CNPointFunctionArgs[nPointFunction];
     SetDependenceNode[Symbol[name] @@ Table[_, {Length[args]}], rhs];
