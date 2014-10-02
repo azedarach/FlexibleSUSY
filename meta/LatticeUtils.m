@@ -31,6 +31,7 @@ DoneLn::usage;
 FormatShortTime::usage;
 MajoranaQ::usage;
 MajoranaMassMatrixQ::usage;
+EmbedSarahSum::usage="EmbedSarahSum[expr] eliminates SARAH`sum[]s in expr by transforming them to expressions under the convention that repeated indices are summed over.";
 
 Begin["`Private`"]
 
@@ -77,6 +78,20 @@ MajoranaMassQ[FSMassMatrix[_, _?MajoranaQ, _]] := True;
 MajoranaMassQ[_FSMassMatrix] := False;
 
 MajoranaQ[field_] := MemberQ[SARAH`MajoranaPart, field];
+
+EmbedSarahSum[expr_] := expr //.
+    SARAH`sum[a_, b_, c_, x_ /; FreeQ[x, SARAH`sum]] :>
+    ReplaceSarahSumIndex[a, b, c, x];
+
+ReplaceSarahSumIndex[a_, b_, c_, x_] := Module[{
+	embeddedSarahSumIndices =
+	    Cases[x, idx[_Integer, _Integer, _Integer], {0, Infinity}],
+	idxIdx
+    },
+    idxIdx = If[embeddedSarahSumIndices === {},
+		1, Max[First /@ embeddedSarahSumIndices] + 1];
+    x /. a -> idx[idxIdx, b, c]
+];
 
 SingleCase[args__] := Module[{
 	cases = Cases[args]
