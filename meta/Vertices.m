@@ -42,6 +42,10 @@ ToRotatedField::usage;
 ReplaceUnrotatedFields::usage;
 StripGroupStructure::usage="Removes group generators and Kronecker deltas.";
 
+VertexRedundancyRules::usage="VertexRedundancyRules[vertexRules] finds as many pairs of out of vertexRules as possible each of which consists of a Cp[] that can be expressed as a trivial algebraic function of the other, and returns a list of rules that eliminate a Cp[] out of each pair in favor of the other.";
+
+SplitVerticesIntoParts::usage="SplitVerticesInParts[vertexRules] finds purely real or imaginary Cp[] patterns and returns a list of rules that wrap such Cp[] objects in Re[] or Im[].";
+
 Begin["`Private`"]
 
 VertexRules[nPointFunctions_, massMatrices_] := Block[{
@@ -531,6 +535,114 @@ ReplaceUnrotatedFields[SARAH`Cp[p__]] :=
 
 ReplaceUnrotatedFields[SARAH`Cp[p__][lorentz_]] :=
     ReplaceUnrotatedFields[SARAH`Cp[p]][lorentz];
+
+VertexRedundancyRules[vertexRules_List] :=
+    Flatten[
+	VertexRedundancyRulesInGroup /@
+	GatherBy[vertexRules, Sort[FieldHead /@ GetParticleList @ First[#]]&]];
+
+VertexRedundancyRulesInGroup[vertexRules:{_}] := {};
+
+VertexRedundancyRulesInGroup[vertexRules:{fst_, rest__}] :=
+    RelateVertexRules[fst, #]& /@ {rest};
+
+SplitVerticesIntoParts[vertexRules_List] :=
+    Flatten[SplitVertexIntoParts /@ vertexRules];
+
+SplitVertexIntoParts[vertexRule : (cpForm_ -> expr_)] := Block[{
+	cp = ToCp[cpForm],
+	relations = Replace[#, (form_ -> z_) -> (ToCp[form] -> z)]& /@
+		    Flatten @ RelateVertexRules[vertexRule, vertexRule],
+	indexLists,
+	unrollIndicesRuleLists,
+	equations,
+	realVariables,
+	reductionRules
+    },
+    indexLists = Flatten[FieldIndexList /@ #]& /@
+		 FieldListsToMap @ GetParticleList[cp];
+    unrollIndicesRuleLists = Thread[Flatten[indexLists] -> Flatten[#]]& /@
+	Tuples[Tuples[#, Length[#]]& /@ indexLists];
+    equations = Flatten[(relations /. #)& /@ unrollIndicesRuleLists] /.
+		c : _SARAH`Cp|_SARAH`Cp[_] -> Re[c] + I Im[c] /.
+		Susyno`LieGroups`conj[p:_Re|_Im] -> p /. Rule -> Equal;
+    realVariables = Union @
+	Cases[equations, (Re|Im)[_SARAH`Cp|_SARAH`Cp[_]], {0, Infinity}];
+    reductionRules = Reduce[equations, realVariables] /.
+	True -> {} /. And -> List /. Equal -> Rule;
+    DeleteCases[
+	Union[(cpForm -> Re[cp] + I Im[cp] /. #)& /@
+	      unrollIndicesRuleLists,
+	      SameTest -> (MatchQ[First[#1], First[#2]] &&
+			   MatchQ[First[#2], First[#1]] &)] /.
+	reductionRules,
+	_ -> Re[z_] + I Im[z_] | Re[z_] - I Im[z_]]
+];
+
+(*
+ * WARNING:
+ * Susyno`LieGroups`conj[SARAH`sum[a, b, c, z]] === SARAH`sum[a, b, c, z]
+ *)
+
+RelateVertexRules[cpForm1_ -> expr1_, cpForm2_ -> expr2_] := Block[{
+	fields1 = GetParticleList @ ToCp[cpForm1],
+	fields2 = GetParticleList @ ToCp[cpForm2],
+	expr1e = EmbedSarahSum[expr1],
+	expr2e = EmbedSarahSum[expr2]
+    },
+    CompareVertexRules[cpForm1 -> expr1e, cpForm2 -> expr2e, {},
+		       IndexListPairsToMap[fields1, fields2]]
+];
+
+CompareVertexRules[cpForm_ -> _, cpForm_ -> _,
+		   {(_?IdentityRuleQ)...}, {}] := {};
+
+CompareVertexRules[cpForm1_ -> expr1_?PossibleZeroQ,
+		   cpForm2_ -> expr2_?PossibleZeroQ,
+		   mappings_List, {}] := {cpForm1 -> 0, cpForm2 -> 0};
+
+CompareVertexRules[cpForm1_ -> expr1_?PossibleZeroQ,
+		   cpForm2_ -> expr2_,
+		   mappings_List, {}] := cpForm1 -> 0;
+
+CompareVertexRules[cpForm1_ -> expr1_, cpForm2_ -> expr2_,
+		   mappings_List, {}] := Block[{
+	mExpr1 = expr1 /. mappings,
+	factor
+    },
+    Which[NumericQ[factor = Simplify[expr2 / mExpr1]],
+	  cpForm2 -> factor (ToCp[cpForm1] /. mappings),
+	  NumericQ[factor = Simplify[expr2 / Susyno`LieGroups`conj[mExpr1]]],
+	  cpForm2 -> factor Susyno`LieGroups`conj[ToCp[cpForm1] /. mappings],
+	  True,
+	  {}]
+];
+
+CompareVertexRules[cpForm1_ -> expr1_, cpForm2_ -> expr2_,
+		   mappings_List, {lstPair_, lstPairs___}] :=
+    CompareVertexRules[cpForm1 -> expr1, cpForm2 -> expr2,
+		       Join[mappings, #], {lstPairs}]& /@
+    FieldIndexMappingRuleLists @@ lstPair;
+
+IdentityRuleQ[a_ -> a_] := True;
+
+IdentityRuleQ[_ -> _] := False;
+
+FieldIndexMappingRuleLists[indices1_List, indices2_List] :=
+    Thread[indices1 -> #]& /@ Permutations[indices2];
+
+IndexListPairsToMap[fields1_List, fields2_List] := Module[{
+	fieldListsToMap1 = FieldListsToMap[fields1],
+	fieldListsToMap2 = FieldListsToMap[fields2]
+    },
+    Flatten[FieldIndexList /@ #]& /@
+    Module[{lst = FieldHead /@ #},
+	   {#, SingleCase[fieldListsToMap2, l_ /; FieldHead /@ l === lst]}
+    ]& /@ fieldListsToMap1
+];
+
+FieldListsToMap[fields_List] :=
+    GatherBy[Select[fields, !FreeQ[#, _[_?VectorQ]]&], FieldHead];
 
 End[] (* `Private` *)
 
