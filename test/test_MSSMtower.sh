@@ -8,6 +8,7 @@ stop=100000
 steps=60
 
 TB=5
+MS=2000
 Xt=0
 
 output="MASS-25"
@@ -108,8 +109,33 @@ Block EXTPAR
   100   2                    # LambdaLoopOrder (HSSUSY)
 "
 
+tower_1l_flags="\
+Block FlexibleSUSY
+    4   1                    # pole mass loop order
+    5   1                    # EWSB loop order
+    8   1                    # Higgs 2-loop corrections O(alpha_t alpha_s)
+    9   1                    # Higgs 2-loop corrections O(alpha_b alpha_s)
+   10   1                    # Higgs 2-loop corrections O((alpha_t + alpha_b)^2)
+   11   1                    # Higgs 2-loop corrections O(alpha_tau^2)
+   20   2                    # EFT loop order for upwards matching
+   21   1                    # EFT loop order for downwards matching
+"
+
+tower_2l_flags="\
+Block FlexibleSUSY
+    4   2                    # pole mass loop order
+    5   2                    # EWSB loop order
+    8   1                    # Higgs 2-loop corrections O(alpha_t alpha_s)
+    9   0                    # Higgs 2-loop corrections O(alpha_b alpha_s)
+   10   0                    # Higgs 2-loop corrections O((alpha_t + alpha_b)^2)
+   11   0                    # Higgs 2-loop corrections O(alpha_tau^2)
+   20   1                    # EFT loop order for upwards matching
+   21   2                    # EFT loop order for downwards matching
+"
+
 run_sg() {
     local SG="$1"
+    local flags=
     local MS2=$(echo "scale=5; ${MS}^2" | bc)
     local At=$(echo "scale=10; (1./${TB} + ${Xt}) * ${MS}" | bc)
     local slha_output=
@@ -119,9 +145,13 @@ run_sg() {
     local output_block=$(echo "${output}" | cut -d'-' -f1)
     local output_entry=$(echo "${output}" | cut -d'-' -f2)
 
+    shift
+    [ "$#" -gt 0 ] && flags="$1"
+
     slha_input=$(
     { echo "$slha_tmpl" ; \
       cat <<EOF
+${flags}
 Block EXTPAR                 # Input parameters
     0   ${MS}                # MSUSY
     1   ${MS}                # M1(MSUSY)
@@ -168,28 +198,41 @@ EOF
 }
 
 scan() {
-    local start="$1"
-    local stop="$2"
-    local steps="$3"
+    local par="$1"
+    local start="$2"
+    local stop="$3"
+    local steps="$4"
+    local scaling="$5"
+    local value=
 
-    printf "# %14s %16s %16s %16s\n" "MS" "MSSMtower" "MSSMMuBMu" "HSSUSY"
+    printf "# %14s %16s %16s %16s %16s\n" "$par" "MSSMtower (1L)" "MSSMtower (2L)" "MSSMMuBMu" "HSSUSY"
 
     for i in $(seq 0 $steps); do
-        MS=$(cat <<EOF | bc -l
+        case "$scaling" in
+            linear) value=$(cat <<EOF | bc -l
+scale=10
+$start + ($stop - $start)*${i} / $steps
+EOF
+                         ) ;;
+            log) value=$(cat <<EOF | bc -l
 scale=10
 e(l($start) + (l($stop) - l($start))*${i} / $steps)
 EOF
-          )
+             ) ;;
+        esac
 
-        MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x")
+        eval "${par}=${value}"
+
+        MhMSSMtower1L=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
+        MhMSSMtower2L=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
         MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
         MhHSSUSY=$(run_sg "$MODELDIR/HSSUSY/run_HSSUSY.x")
 
-        printf "%16s %16s %16s %16s\n" "$MS" "$MhMSSMtower" "$MhMSSMMuBMu" "$MhHSSUSY"
+        printf "%16s %16s %16s %16s %16s\n" "$value" "$MhMSSMtower1L" "$MhMSSMtower2L" "$MhMSSMMuBMu" "$MhHSSUSY"
     done
 }
 
-scan "$start" "$stop" "$steps" | tee "$scan_data"
+scan MS "$start" "$stop" "$steps" log | tee "$scan_data"
 
 cat <<EOF | gnuplot
 set terminal pdf enhanced
@@ -203,45 +246,64 @@ set ylabel "M_h / GeV"
 data = "$BASEDIR/test_MSSMtower.dat"
 
 plot [0.091:] \
-     data u (\$1/1000):2 t "MSSMtower" w lines dt 1 lw 2 lc rgb '#FF0000', \
-     data u (\$1/1000):3 t "MSSMMuBMu" w lines dt 4 lw 2 lc rgb '#00FF00', \
-     data u (\$1/1000):4 t "HSSUSY"    w lines dt 2 lw 2 lc rgb '#0000FF'
+     data u (\$1/1000):2 t "MSSMtower (1L)" w lines dt 1 lw 2 lc rgb '#FF0000', \
+     data u (\$1/1000):3 t "MSSMtower (2L)" w lines dt 3 lw 2 lc rgb '#000000', \
+     data u (\$1/1000):4 t "MSSMMuBMu (2L)" w lines dt 4 lw 2 lc rgb '#00FF00', \
+     data u (\$1/1000):5 t "HSSUSY (2L)"    w lines dt 2 lw 2 lc rgb '#0000FF'
 EOF
 
 error=0
 
 # check equality of MSSMtower and MSSMuBMu for low MS
 MS=91.1876
-MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x")
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.003" || error=$(expr $error + 1)
 
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.001" || error=$(expr $error + 1)
+
 MS=173.34
-MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x")
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.002" || error=$(expr $error + 1)
 
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.001" || error=$(expr $error + 1)
+
 MS=250.0
-MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x")
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
+
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.005" || error=$(expr $error + 1)
 
 # check equality of MSSMtower and HSSUSY for high MS
 
 MS=1000
-MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x")
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.02" || error=$(expr $error + 1)
 
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
+
 MS=10000
-MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x")
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
 
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
+
 MS=100000
-MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x")
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.005" || error=$(expr $error + 1)
+
+MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
 
 if [ "x$error" != "x0" ] ; then
     echo "Test FAILED: There were $error errors."
