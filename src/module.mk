@@ -1,5 +1,6 @@
 DIR          := src
 MODNAME      := src
+WITH_$(MODNAME) := yes
 
 LIBFLEXI_MK  := \
 		$(DIR)/module.mk
@@ -20,7 +21,9 @@ LIBFLEXI_SRC := \
 		$(DIR)/linalg.cpp \
 		$(DIR)/lowe.cpp \
 		$(DIR)/sfermions.cpp \
-		$(DIR)/mssm_twoloophiggs.f \
+		$(DIR)/mssm_twoloophiggs.cpp \
+		$(DIR)/mssm_twoloophiggs_impl.f \
+		$(DIR)/nmssm_twoloophiggs.cpp \
 		$(DIR)/nmssm2loop.f \
 		$(DIR)/numerics.cpp \
 		$(DIR)/numerics2.cpp \
@@ -80,14 +83,17 @@ LIBFLEXI_HDR := \
 		$(DIR)/logger.hpp \
 		$(DIR)/lowe.h \
 		$(DIR)/matching.hpp \
+		$(DIR)/mathlink_utils.hpp \
 		$(DIR)/minimizer.hpp \
 		$(DIR)/mssm_twoloophiggs.h \
+		$(DIR)/mssm_twoloophiggs.hpp \
 		$(DIR)/mycomplex.h \
+		$(DIR)/nmssm_twoloophiggs.hpp \
 		$(DIR)/nmssm2loop.h \
-		$(DIR)/nmssm_twoloophiggs.h \
 		$(DIR)/numerics.h \
 		$(DIR)/numerics2.hpp \
 		$(DIR)/physical_input.hpp \
+		$(DIR)/parallel.hpp \
 		$(DIR)/pmns.hpp \
 		$(DIR)/problems.hpp \
 		$(DIR)/pv.hpp \
@@ -144,7 +150,7 @@ LIBFLEXI_OBJ := \
 LIBFLEXI_DEP := \
 		$(LIBFLEXI_OBJ:.o=.d)
 
-LIBFLEXI     := $(DIR)/libflexisusy$(LIBEXT)
+LIBFLEXI     := $(DIR)/libflexisusy$(MODULE_LIBEXT)
 
 LIBFLEXI_INSTALL_DIR := $(INSTALL_DIR)/$(DIR)
 
@@ -188,12 +194,12 @@ ifneq (,$(findstring yes,$(ENABLE_LOOPTOOLS)$(ENABLE_FFLITE)))
 $(LIBFLEXI_DEP) $(LIBFLEXI_OBJ): CPPFLAGS += $(LOOPFUNCFLAGS)
 endif
 
-ifeq ($(ENABLE_STATIC_LIBS),yes)
+ifeq ($(ENABLE_SHARED_LIBS),yes)
 $(LIBFLEXI): $(LIBFLEXI_OBJ)
-		$(MAKELIB) $@ $^
+		$(MODULE_MAKE_LIB_CMD) $@ $^ $(BOOSTTHREADLIBS) $(GSLLIBS) $(LAPACKLIBS) $(BLASLIBS) $(FLIBS) $(SQLITELIBS) $(TSILLIBS) $(THREADLIBS)
 else
 $(LIBFLEXI): $(LIBFLEXI_OBJ)
-		$(MAKELIB) $@ $^ $(BOOSTTHREADLIBS) $(THREADLIBS) $(GSLLIBS) $(LAPACKLIBS) $(BLASLIBS) $(FLIBS) $(SQLITELIBS) $(TSILLIBS)
+		$(MODULE_MAKE_LIB_CMD) $@ $^
 endif
 
 ALLDEP += $(LIBFLEXI_DEP)

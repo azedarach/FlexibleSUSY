@@ -85,7 +85,7 @@ Block MODSEL                 # Select model
     6   0                    # flavour violation
 Block FlexibleSUSY
     0   1.000000000e-05      # precision goal
-    1   1000                 # max. iterations (0 = automatic)
+    1   10000                # max. iterations (0 = automatic)
     2   0                    # algorithm (0 = two_scale, 1 = lattice)
     3   1                    # calculate SM pole masses
     4   2                    # pole mass loop order
@@ -102,6 +102,7 @@ Block FlexibleSUSY
    15   0                    # calculate observables (a_muon, ...)
    20   2                    # EFT loop order for upwards matching
    21   1                    # EFT loop order for downwards matching
+   22   0                    # EFT index of SM-like Higgs in the BSM model
 ${sminputs_tmpl}
 Block MINPAR                 # Input parameters
     4   1                    # SignMu
@@ -138,6 +139,9 @@ run_sg() {
     local flags=
     local MS2=$(echo "scale=5; ${MS}^2" | bc)
     local At=$(echo "scale=10; (1./${TB} + ${Xt}) * ${MS}" | bc)
+    local Au=$(echo "scale=10; (1./${TB} + 0) * ${MS}" | bc)
+    local Ad=$(echo "scale=10; (${TB} + 0) * ${MS}" | bc)
+    local Ae="$Ad"
     local slha_output=
     local block=
     local value=
@@ -183,6 +187,18 @@ Block MSD2IN
   1  1     ${MS2}   # md2(1,1)
   2  2     ${MS2}   # md2(2,2)
   3  3     ${MS2}   # md2(3,3)
+Block AUIN
+  1  1     ${Au} # Au(1,1)
+  2  2     ${Au} # Au(2,2)
+  3  3     ${At} # Au(3,3)
+Block ADIN
+  1  1     ${Ad} # Ad(1,1)
+  2  2     ${Ad} # Ad(2,2)
+  3  3     ${Ad} # Ad(3,3)
+Block AEIN
+  1  1     ${Ae} # Ad(1,1)
+  2  2     ${Ae} # Ad(2,2)
+  3  3     ${Ae} # Ad(3,3)
 EOF
     })
 

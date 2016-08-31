@@ -1,4 +1,4 @@
-BeginPackage["FlexibleSUSY`", {"SARAH`", "AnomalousDimension`", "BetaFunction`", "TextFormatting`", "CConversion`", "TreeMasses`", "EWSB`", "Traces`", "SelfEnergies`", "Vertices`", "Phases`", "LoopMasses`", "WriteOut`", "Constraint`", "ThresholdCorrections`", "ConvergenceTester`", "Utils`", "ThreeLoopSM`", "ThreeLoopMSSM`", "Observables`", "EffectiveCouplings`", "FlexibleEFTHiggsMatching`"}];
+BeginPackage["FlexibleSUSY`", {"SARAH`", "AnomalousDimension`", "BetaFunction`", "TextFormatting`", "CConversion`", "TreeMasses`", "EWSB`", "Traces`", "SelfEnergies`", "Vertices`", "Phases`", "LoopMasses`", "WriteOut`", "Constraint`", "ThresholdCorrections`", "ConvergenceTester`", "Utils`", "ThreeLoopSM`", "ThreeLoopMSSM`", "Observables`", "EffectiveCouplings`", "FlexibleEFTHiggsMatching`", "FSMathLink`"}];
 
 $flexiblesusyMetaDir     = DirectoryName[FindFile[$Input]];
 $flexiblesusyConfigDir   = FileNameJoin[{ParentDirectory[$flexiblesusyMetaDir], "config"}];
@@ -476,32 +476,55 @@ EvaluateUserInput[] :=
 GUTNormalization[coupling_] :=
     Parameters`GetGUTNormalization[coupling];
 
+ParticleIndexRule[par_, name_String] := {
+    "@" <> name <> "@" -> ToValidCSymbolString[par],
+    "@" <> name <> "_" ~~ num___ ~~ "@" /; StringFreeQ[num, "@"] :>
+    ToValidCSymbolString[par] <> If[TreeMasses`GetDimension[par] > 1, "(" <> num <> ")", ""],
+    "@" <> name <> "(" ~~ num___ ~~ ")@" /; StringFreeQ[num, "@"] :>
+    ToValidCSymbolString[par] <> If[TreeMasses`GetDimension[par] > 1, "(" <> num <> ")", "()"]
+};
+
+GenerationIndexRule[par_, name_String] :=
+    "@Generations(" ~~ name ~~ ")@" :>
+    ToString[TreeMasses`GetDimension[par]];
+
 GeneralReplacementRules[] :=
-    { "@VectorZ@"     -> ToValidCSymbolString[SARAH`VectorZ],
-      "@VectorZ_" ~~ num_ ~~ "@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`VectorZ] <> If[TreeMasses`GetDimension[SARAH`VectorZ] > 1, "(" <> num <> ")", ""],
-      "@VectorZ(" ~~ num_ ~~ ")@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`VectorZ] <> If[TreeMasses`GetDimension[SARAH`VectorZ] > 1, "(" <> num <> ")", "()"],
-      "@VectorP@"     -> ToValidCSymbolString[SARAH`VectorP],
-      "@VectorW@"     -> ToValidCSymbolString[SARAH`VectorW],
-      "@VectorW_" ~~ num_ ~~ "@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`VectorW] <> If[TreeMasses`GetDimension[SARAH`VectorW] > 1, "(" <> num <> ")", ""],
-      "@VectorW(" ~~ num_ ~~ ")@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`VectorW] <> If[TreeMasses`GetDimension[SARAH`VectorW] > 1, "(" <> num <> ")", "()"],
-      "@VectorG@"     -> ToValidCSymbolString[SARAH`VectorG],
-      "@TopQuark@"    -> ToValidCSymbolString[SARAH`TopQuark],
-      "@BottomQuark@" -> ToValidCSymbolString[SARAH`BottomQuark],
-      "@Electron@"    -> ToValidCSymbolString[SARAH`Electron],
-      "@Neutrino@"    -> ToValidCSymbolString[SARAH`Neutrino],
-      "@HiggsBoson@"  -> ToValidCSymbolString[SARAH`HiggsBoson],
-      "@HiggsBoson_" ~~ num_ ~~ "@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`HiggsBoson] <> If[TreeMasses`GetDimension[SARAH`HiggsBoson] > 1, "(" <> num <> ")", ""],
-      "@HiggsBoson(" ~~ num_ ~~ ")@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`HiggsBoson] <> If[TreeMasses`GetDimension[SARAH`HiggsBoson] > 1, "(" <> num <> ")", "()"],
-      "@PseudoScalarBoson@" -> ToValidCSymbolString[SARAH`PseudoScalarBoson],
-      "@ChargedHiggs@"   -> ToValidCSymbolString[SARAH`ChargedHiggs],
-      "@TopSquark@"      -> ToValidCSymbolString[SARAH`TopSquark],
-      "@TopSquark_" ~~ num_ ~~ "@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`TopSquark] <> If[TreeMasses`GetDimension[SARAH`TopSquark] > 1, "(" <> num <> ")", ""],
-      "@BottomSquark@"   -> ToValidCSymbolString[SARAH`BottomSquark],
-      "@BottomSquark_" ~~ num_ ~~ "@" /; IntegerQ[ToExpression[num]] :> ToValidCSymbolString[SARAH`BottomSquark] <> If[TreeMasses`GetDimension[SARAH`BottomSquark] > 1, "(" <> num <> ")", ""],
-      "@Sneutrino@"      -> ToValidCSymbolString[SARAH`Sneutrino],
-      "@Selectron@"      -> ToValidCSymbolString[SARAH`Selectron],
-      "@Gluino@"         -> ToValidCSymbolString[SARAH`Gluino],
-      "@UpYukawa@"       -> ToValidCSymbolString[SARAH`UpYukawa],
+    Join[
+    ParticleIndexRule[SARAH`VectorZ, "VectorZ"],
+    ParticleIndexRule[SARAH`VectorW, "VectorW"],
+    ParticleIndexRule[SARAH`VectorP, "VectorP"],
+    ParticleIndexRule[SARAH`VectorG, "VectorG"],
+    ParticleIndexRule[SARAH`TopQuark, "TopQuark"],
+    ParticleIndexRule[SARAH`BottomQuark, "BottomQuark"],
+    ParticleIndexRule[SARAH`Electron, "Electron"],
+    ParticleIndexRule[SARAH`Neutrino, "Neutrino"],
+    ParticleIndexRule[SARAH`HiggsBoson, "HiggsBoson"],
+    ParticleIndexRule[SARAH`PseudoScalarBoson, "PseudoScalarBoson"],
+    ParticleIndexRule[SARAH`ChargedHiggs, "ChargedHiggs"],
+    ParticleIndexRule[SARAH`TopSquark, "TopSquark"],
+    ParticleIndexRule[SARAH`BottomSquark, "BottomSquark"],
+    ParticleIndexRule[SARAH`Sneutrino, "Sneutrino"],
+    ParticleIndexRule[SARAH`Selectron, "Selectron"],
+    ParticleIndexRule[SARAH`Gluino, "Gluino"],
+    {
+        GenerationIndexRule[SARAH`VectorZ, "VectorZ"],
+        GenerationIndexRule[SARAH`VectorW, "VectorW"],
+        GenerationIndexRule[SARAH`VectorP, "VectorP"],
+        GenerationIndexRule[SARAH`VectorG, "VectorG"],
+        GenerationIndexRule[SARAH`TopQuark, "TopQuark"],
+        GenerationIndexRule[SARAH`BottomQuark, "BottomQuark"],
+        GenerationIndexRule[SARAH`Electron, "Electron"],
+        GenerationIndexRule[SARAH`Neutrino, "Neutrino"],
+        GenerationIndexRule[SARAH`HiggsBoson, "HiggsBoson"],
+        GenerationIndexRule[SARAH`PseudoScalarBoson, "PseudoScalarBoson"],
+        GenerationIndexRule[SARAH`ChargedHiggs, "ChargedHiggs"],
+        GenerationIndexRule[SARAH`TopSquark, "TopSquark"],
+        GenerationIndexRule[SARAH`BottomSquark, "BottomSquark"],
+        GenerationIndexRule[SARAH`Sneutrino, "Sneutrino"],
+        GenerationIndexRule[SARAH`Selectron, "Selectron"],
+        GenerationIndexRule[SARAH`Gluino, "Gluino"]
+    },
+    { "@UpYukawa@"       -> ToValidCSymbolString[SARAH`UpYukawa],
       "@DownYukawa@"     -> ToValidCSymbolString[SARAH`DownYukawa],
       "@ElectronYukawa@" -> ToValidCSymbolString[SARAH`ElectronYukawa],
       "@LeftUpMixingMatrix@"   -> ToValidCSymbolString[SARAH`UpMatrixL],
@@ -538,9 +561,9 @@ GeneralReplacementRules[] :=
       "@DateAndTime@"         -> DateString[],
       "@SARAHVersion@"        -> SA`Version,
       "@FlexibleSUSYVersion@" -> FS`Version,
-      "@HiggsGen@" -> ToValidCSymbolString[GetDimension[SARAH`HiggsBoson]],
       "@FlexibleSUSYGitCommit@" -> FS`GitCommit
-    };
+    }
+    ];
 
 
 WriteRGEClass[betaFun_List, anomDim_List, files_List,
@@ -975,6 +998,8 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
             getEWSBParametersFromGSLVector = "",
             setEWSBParametersFromLocalCopies = "",
             ewsbParametersInitializationList = "",
+            ewsbParametersInitializationComma = "",
+            ewsbParametersInitialization = "",
             setEWSBParametersFromGSLVector = "",
             convertMixingsToSLHAConvention = "",
             convertMixingsToHKConvention = "",
@@ -1037,12 +1062,12 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
            If[SARAH`UseHiggs2LoopMSSM === True,
               {twoLoopTadpolePrototypes, twoLoopTadpoleFunctions} = SelfEnergies`CreateTwoLoopTadpolesMSSM[SARAH`HiggsBoson];
               {twoLoopSelfEnergyPrototypes, twoLoopSelfEnergyFunctions} = SelfEnergies`CreateTwoLoopSelfEnergiesMSSM[{SARAH`HiggsBoson, SARAH`PseudoScalar}];
-              twoLoopHiggsHeaders = "#include \"sfermions.hpp\"\n#include \"mssm_twoloophiggs.h\"\n";
+              twoLoopHiggsHeaders = "#include \"sfermions.hpp\"\n#include \"mssm_twoloophiggs.hpp\"\n";
              ];
            If[FlexibleSUSY`UseHiggs2LoopNMSSM === True,
               {twoLoopTadpolePrototypes, twoLoopTadpoleFunctions} = SelfEnergies`CreateTwoLoopTadpolesNMSSM[SARAH`HiggsBoson];
               {twoLoopSelfEnergyPrototypes, twoLoopSelfEnergyFunctions} = SelfEnergies`CreateTwoLoopSelfEnergiesNMSSM[{SARAH`HiggsBoson, SARAH`PseudoScalar}];
-              twoLoopHiggsHeaders = "#include \"sfermions.hpp\"\n#include \"nmssm_twoloophiggs.h\"\n";
+              twoLoopHiggsHeaders = "#include \"sfermions.hpp\"\n#include \"mssm_twoloophiggs.hpp\"\n#include \"nmssm_twoloophiggs.hpp\"\n";
              ];
            setEWSBParametersFromGSLVector = EWSB`SetEWSBParametersFromGSLVector[parametersFixedByEWSB, freePhases, "x"];
            calculateTreeLevelTadpoles   = EWSB`FillArrayWithEWSBEqs[SARAH`HiggsBoson, "tadpole"];
@@ -1113,6 +1138,11 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
            getEWSBParametersFromGSLVector = EWSB`GetEWSBParametersFromGSLVector[parametersFixedByEWSB, freePhases, "x"];
            setEWSBParametersFromLocalCopies = EWSB`SetEWSBParametersFromLocalCopies[parametersFixedByEWSB, "model"];
            ewsbParametersInitializationList = EWSB`CreateEWSBParametersInitializationList[parametersFixedByEWSB];
+           ewsbParametersInitializationComma = EWSB`CreateEWSBParametersInitializationComma[parametersFixedByEWSB];
+           If[Length[parametersFixedByEWSB] > 0,
+              ewsbParametersInitialization = IndentText[
+                 EWSB`CreateEWSBParametersInitialization[parametersFixedByEWSB, "ewsb_parameters"]];
+             ];
            reorderDRbarMasses           = TreeMasses`ReorderGoldstoneBosons[""];
            reorderPoleMasses            = TreeMasses`ReorderGoldstoneBosons["PHYSICAL"];
            checkPoleMassesForTachyons   = TreeMasses`CheckPoleMassesForTachyons["PHYSICAL"];
@@ -1185,12 +1215,14 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
                             "@solveTreeLevelEWSBviaSoftHiggsMasses@" -> IndentText[WrapLines[solveTreeLevelEWSBviaSoftHiggsMasses]],
                             "@solveEWSBTemporarily@"         -> IndentText[solveEWSBTemporarily],
                             "@EWSBSolvers@"                  -> IndentText[IndentText[EWSBSolvers]],
-                            "@fillArrayWithEWSBParameters@"  -> IndentText[IndentText[fillArrayWithEWSBParameters]],
+                            "@fillArrayWithEWSBParameters@"  -> IndentText[fillArrayWithEWSBParameters],
                             "@solveEwsbWithTadpoles@"        -> IndentText[WrapLines[solveEwsbWithTadpoles]],
                             "@getEWSBParametersFromGSLVector@" -> IndentText[getEWSBParametersFromGSLVector],
                             "@setEWSBParametersFromLocalCopies@" -> IndentText[setEWSBParametersFromLocalCopies],
                             "@setEWSBParametersFromGSLVector@"   -> IndentText[setEWSBParametersFromGSLVector],
                             "@ewsbParametersInitializationList@" -> ewsbParametersInitializationList,
+                            "@ewsbParametersInitializationComma@" -> ewsbParametersInitializationComma,
+                            "@ewsbParametersInitialization@" -> ewsbParametersInitialization,
                             "@setEWSBSolution@"              -> IndentText[setEWSBSolution],
                             "@convertMixingsToSLHAConvention@" -> IndentText[convertMixingsToSLHAConvention],
                             "@convertMixingsToHKConvention@"   -> IndentText[convertMixingsToHKConvention],
@@ -1278,25 +1310,65 @@ WriteObservables[extraSLHAOutputBlocks_, files_List] :=
            ];
 
 WriteUserExample[inputParameters_List, files_List] :=
-    Module[{parseCmdLineOptions, printCommandLineOptions, inputPars, spectrumGen,
+    Module[{parseCmdLineOptions, printCommandLineOptions, inputPars,
             fillSMFermionPoleMasses = ""},
            inputPars = {First[#], #[[3]]}& /@ inputParameters;
            parseCmdLineOptions = WriteOut`ParseCmdLineOptions[inputPars];
            printCommandLineOptions = WriteOut`PrintCmdLineOptions[inputPars];
-           spectrumGen = If[FlexibleEFTHiggs === True,
-                            CConversion`ToValidCSymbolString[FlexibleSUSY`FSModelName] <> "_standard_model",
-                            CConversion`ToValidCSymbolString[FlexibleSUSY`FSModelName]
-                           ];
            fillSMFermionPoleMasses = FlexibleEFTHiggsMatching`FillSMFermionPoleMasses[];
            WriteOut`ReplaceInFiles[files,
                           { "@parseCmdLineOptions@" -> IndentText[IndentText[parseCmdLineOptions]],
                             "@printCommandLineOptions@" -> IndentText[IndentText[printCommandLineOptions]],
-                            "@SpectrumGenerator@" -> spectrumGen,
                             "@fillSMFermionPoleMasses@" -> IndentText[IndentText[IndentText[fillSMFermionPoleMasses]]],
                             Sequence @@ GeneralReplacementRules[]
                           } ];
           ];
 
+WriteMathLink[inputParameters_List, extraSLHAOutputBlocks_List, files_List] :=
+    Module[{numberOfInputParameters, numberOfInputParameterRules,
+            putInputParameters,
+            setInputParameterDefaultArguments,
+            setInputParameterArguments,
+            numberOfSpectrumEntries, putSpectrum, setInputParameters,
+            numberOfObservables, putObservables,
+            listOfInputParameters, listOfModelParameters, listOfOutputParameters,
+            inputPars, outPars, requestedObservables},
+           inputPars = {#[[1]], #[[3]]}& /@ inputParameters;
+           numberOfInputParameters = Total[CConversion`CountNumberOfEntries[#[[2]]]& /@ inputPars];
+           numberOfInputParameterRules = FSMathLink`GetNumberOfInputParameterRules[inputPars];
+           putInputParameters = FSMathLink`PutInputParameters[inputPars, "link"];
+           setInputParameters = FSMathLink`SetInputParametersFromArguments[inputPars];
+           setInputParameterDefaultArguments = FSMathLink`SetInputParameterDefaultArguments[inputPars];
+           setInputParameterArguments = FSMathLink`SetInputParameterArguments[inputPars];
+           outPars = Parameters`GetOutputParameters[] /. FlexibleSUSY`M[p_List] :> Sequence @@ (FlexibleSUSY`M /@ p);
+           outPars = Join[outPars, FlexibleSUSY`Pole /@ outPars, Parameters`GetModelParameters[], {FlexibleSUSY`SCALE}];
+           listOfInputParameters = ToString[First /@ inputParameters];
+           listOfOutputParameters = ToString[outPars];
+           listOfModelParameters = ToString[Parameters`GetModelParameters[]];
+           numberOfSpectrumEntries = FSMathLink`GetNumberOfSpectrumEntries[outPars];
+           putSpectrum = FSMathLink`PutSpectrum[outPars, "link"];
+           (* get observables *)
+           requestedObservables = Observables`GetRequestedObservables[extraSLHAOutputBlocks];
+           numberOfObservables = Length[requestedObservables];
+           putObservables = FSMathLink`PutObservables[requestedObservables, "link"];
+           WriteOut`ReplaceInFiles[files,
+                          { "@numberOfInputParameters@" -> ToString[numberOfInputParameters],
+                            "@numberOfInputParameterRules@" -> ToString[numberOfInputParameterRules],
+                            "@putInputParameters@" -> IndentText[putInputParameters],
+                            "@setInputParameters@" -> IndentText[setInputParameters],
+                            "@setInputParameterArguments@" -> IndentText[setInputParameterArguments, 12],
+                            "@setInputParameterDefaultArguments@" -> IndentText[setInputParameterDefaultArguments],
+                            "@setDefaultInputParameters@" -> IndentText[setInputParameterDefaultArguments,8],
+                            "@numberOfSpectrumEntries@" -> ToString[numberOfSpectrumEntries],
+                            "@putSpectrum@" -> IndentText[putSpectrum],
+                            "@numberOfObservables@" -> ToString[numberOfObservables],
+                            "@putObservables@" -> IndentText[putObservables],
+                            "@listOfInputParameters@" -> listOfInputParameters,
+                            "@listOfModelParameters@" -> listOfModelParameters,
+                            "@listOfOutputParameters@" -> listOfOutputParameters,
+                            Sequence @@ GeneralReplacementRules[]
+                          } ];
+          ];
 
 WritePlotScripts[files_List] :=
     Module[{},
@@ -2501,11 +2573,12 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
            spectrumGeneratorInputFile = "high_scale_spectrum_generator.hpp.in";
            If[FlexibleSUSY`OnlyLowEnergyFlexibleSUSY,
               spectrumGeneratorInputFile = "low_scale_spectrum_generator.hpp.in";];
+           If[FlexibleSUSY`FlexibleEFTHiggs === True,
+              spectrumGeneratorInputFile = "standard_model_" <> spectrumGeneratorInputFile;
+             ];
            WriteUserExample[inputParameters,
                             {{FileNameJoin[{$flexiblesusyTemplateDir, spectrumGeneratorInputFile}],
                               FileNameJoin[{FSOutputDir, FlexibleSUSY`FSModelName <> "_spectrum_generator.hpp"}]},
-                             {FileNameJoin[{$flexiblesusyTemplateDir, "standard_model_" <> spectrumGeneratorInputFile}],
-                              FileNameJoin[{FSOutputDir, FlexibleSUSY`FSModelName <> "_standard_model_spectrum_generator.hpp"}]},
                              {FileNameJoin[{$flexiblesusyTemplateDir, "spectrum_generator_interface.hpp.in"}],
                               FileNameJoin[{FSOutputDir, FlexibleSUSY`FSModelName <> "_spectrum_generator_interface.hpp"}]},
                              {FileNameJoin[{$flexiblesusyTemplateDir, "run.cpp.in"}],
@@ -2515,6 +2588,16 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
                              {FileNameJoin[{$flexiblesusyTemplateDir, "scan.cpp.in"}],
                               FileNameJoin[{FSOutputDir, "scan_" <> FlexibleSUSY`FSModelName <> ".cpp"}]}
                             }];
+
+           Print["Creating LibraryLink ", FileNameJoin[{FSOutputDir, FlexibleSUSY`FSModelName <> ".mx"}], " ..."];
+           WriteMathLink[inputParameters, extraSLHAOutputBlocks,
+                         {{FileNameJoin[{$flexiblesusyTemplateDir, "librarylink.cpp.in"}],
+                           FileNameJoin[{FSOutputDir, FlexibleSUSY`FSModelName <> "_librarylink.cpp"}]},
+                          {FileNameJoin[{$flexiblesusyTemplateDir, "librarylink.m.in"}],
+                           FileNameJoin[{FSOutputDir, FlexibleSUSY`FSModelName <> "_librarylink.m"}]},
+                          {FileNameJoin[{$flexiblesusyTemplateDir, "run.m.in"}],
+                           FileNameJoin[{FSOutputDir, "run_" <> FlexibleSUSY`FSModelName <> ".m"}]}
+                         }];
 
            PrintHeadline["FlexibleSUSY has finished"];
           ];
