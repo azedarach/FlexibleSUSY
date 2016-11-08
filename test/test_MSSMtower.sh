@@ -121,6 +121,8 @@ Block FlexibleSUSY
    11   1                    # Higgs 2-loop corrections O(alpha_tau^2)
    20   2                    # EFT loop order for upwards matching
    21   1                    # EFT loop order for downwards matching
+   22   0                    # EFT index of SM-like Higgs in the BSM model
+   23   0                    # calculate BSM pole masses
 "
 
 tower_2l_flags="\
@@ -128,11 +130,13 @@ Block FlexibleSUSY
     4   2                    # pole mass loop order
     5   2                    # EWSB loop order
     8   1                    # Higgs 2-loop corrections O(alpha_t alpha_s)
-    9   0                    # Higgs 2-loop corrections O(alpha_b alpha_s)
-   10   0                    # Higgs 2-loop corrections O((alpha_t + alpha_b)^2)
-   11   0                    # Higgs 2-loop corrections O(alpha_tau^2)
-   20   1                    # EFT loop order for upwards matching
+    9   1                    # Higgs 2-loop corrections O(alpha_b alpha_s)
+   10   1                    # Higgs 2-loop corrections O((alpha_t + alpha_b)^2)
+   11   1                    # Higgs 2-loop corrections O(alpha_tau^2)
+   20   2                    # EFT loop order for upwards matching
    21   2                    # EFT loop order for downwards matching
+   22   0                    # EFT index of SM-like Higgs in the BSM model
+   23   0                    # calculate BSM pole masses
 "
 
 run_sg() {
@@ -283,7 +287,7 @@ CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.001" || error=$(expr $erro
 MS=173.34
 MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
-CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.002" || error=$(expr $error + 1)
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.005" || error=$(expr $error + 1)
 
 MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.001" || error=$(expr $error + 1)
@@ -304,23 +308,32 @@ MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.02" || error=$(expr $error + 1)
 
 MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
-CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.02" || error=$(expr $error + 1)
+
+MhHSSUSY=$(run_sg "$MODELDIR/HSSUSY/run_HSSUSY.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhHSSUSY" "0.001" || error=$(expr $error + 1)
 
 MS=10000
 MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
-CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.02" || error=$(expr $error + 1)
 
 MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
-CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.02" || error=$(expr $error + 1)
+
+MhHSSUSY=$(run_sg "$MODELDIR/HSSUSY/run_HSSUSY.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhHSSUSY" "0.002" || error=$(expr $error + 1)
 
 MS=100000
 MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_1l_flags}")
 MhMSSMMuBMu=$(run_sg "$MODELDIR/MSSMMuBMu/run_MSSMMuBMu.x")
-CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.005" || error=$(expr $error + 1)
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.02" || error=$(expr $error + 1)
 
 MhMSSMtower=$(run_sg "$MODELDIR/MSSMtower/run_MSSMtower.x" "${tower_2l_flags}")
 CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhMSSMMuBMu" "0.01" || error=$(expr $error + 1)
+
+MhHSSUSY=$(run_sg "$MODELDIR/HSSUSY/run_HSSUSY.x" "${tower_2l_flags}")
+CHECK_EQUAL_FRACTION "$MhMSSMtower" "$MhHSSUSY" "0.002" || error=$(expr $error + 1)
 
 # Check limit of small electroweak gauge couplings
 
