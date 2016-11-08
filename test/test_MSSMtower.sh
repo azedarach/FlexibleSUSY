@@ -133,7 +133,7 @@ Block FlexibleSUSY
     9   1                    # Higgs 2-loop corrections O(alpha_b alpha_s)
    10   1                    # Higgs 2-loop corrections O((alpha_t + alpha_b)^2)
    11   1                    # Higgs 2-loop corrections O(alpha_tau^2)
-   20   2                    # EFT loop order for upwards matching
+   20   1                    # EFT loop order for upwards matching
    21   2                    # EFT loop order for downwards matching
    22   0                    # EFT index of SM-like Higgs in the BSM model
    23   0                    # calculate BSM pole masses
