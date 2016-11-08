@@ -26,6 +26,7 @@
 #include "eigen_utils.hpp"
 #include "wrappers.hpp"
 #include "linalg2.hpp"
+#include "lowe.h"
 #include "numerics2.hpp"
 #include "logger.hpp"
 #include "error.hpp"
@@ -163,7 +164,6 @@ Standard_model::Standard_model()
    , physical()
    , problems(standard_model_info::particle_names)
    , two_loop_corrections()
-   , qedqcd()
    , input()
    , g1(0), g2(0), g3(0), Lambdax(0), Yu(Eigen::Matrix<double,3,3>::Zero()), Yd
    (Eigen::Matrix<double,3,3>::Zero()), Ye(Eigen::Matrix<double,3,3>::Zero())
@@ -198,7 +198,6 @@ Standard_model::Standard_model(double scale_, double loops_, double thresholds_
    , physical()
    , problems(standard_model_info::particle_names)
    , two_loop_corrections()
-   , qedqcd()
    , input()
    , g1(g1_), g2(g2_), g3(g3_), Lambdax(Lambdax_), Yu(Yu_), Yd(Yd_), Ye(Ye_)
    , mu2(mu2_), v(v_)
@@ -394,7 +393,7 @@ int Standard_model::solve_ewsb_iteratively()
    EWSB_args params = {this, ewsb_loop_order};
 
    std::unique_ptr<EWSB_solver> solvers[] = {
-      std::unique_ptr<EWSB_solver>(new Fixed_point_iterator<number_of_ewsb_equations, fixed_point_iterator::Convergence_tester_relative>(Standard_model::ewsb_step, &params, number_of_ewsb_iterations, ewsb_iteration_precision)),
+      std::unique_ptr<EWSB_solver>(new Fixed_point_iterator<number_of_ewsb_equations, fixed_point_iterator::Convergence_tester_relative>(Standard_model::ewsb_step, &params, number_of_ewsb_iterations, fixed_point_iterator::Convergence_tester_relative(ewsb_iteration_precision))),
       std::unique_ptr<EWSB_solver>(new Root_finder<number_of_ewsb_equations>(Standard_model::tadpole_equations, &params, number_of_ewsb_iterations, ewsb_iteration_precision, gsl_multiroot_fsolver_hybrids)),
       std::unique_ptr<EWSB_solver>(new Root_finder<number_of_ewsb_equations>(Standard_model::tadpole_equations, &params, number_of_ewsb_iterations, ewsb_iteration_precision, gsl_multiroot_fsolver_broyden))
    };
@@ -726,18 +725,15 @@ void Standard_model::calculate_DRbar_parameters()
 void Standard_model::calculate_pole_masses()
 {
 #ifdef ENABLE_THREADS
-   typedef void (Standard_model::*Mem_fun_t)();
-   typedef Standard_model* Obj_ptr_t;
-
-   auto fut_MVG = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MVG_pole, this);
-   auto fut_MFv = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MFv_pole, this);
-   auto fut_Mhh = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_Mhh_pole, this);
-   auto fut_MVP = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MVP_pole, this);
-   auto fut_MVZ = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MVZ_pole, this);
-   auto fut_MFd = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MFd_pole, this);
-   auto fut_MFu = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MFu_pole, this);
-   auto fut_MFe = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MFe_pole, this);
-   auto fut_MVWp = run_async<Mem_fun_t, Obj_ptr_t>(&Standard_model::calculate_MVWp_pole, this);
+   auto fut_MVG = run_async([this] () { calculate_MVG_pole(); });
+   auto fut_MFv = run_async([this] () { calculate_MFv_pole(); });
+   auto fut_Mhh = run_async([this] () { calculate_Mhh_pole(); });
+   auto fut_MVP = run_async([this] () { calculate_MVP_pole(); });
+   auto fut_MVZ = run_async([this] () { calculate_MVZ_pole(); });
+   auto fut_MFd = run_async([this] () { calculate_MFd_pole(); });
+   auto fut_MFu = run_async([this] () { calculate_MFu_pole(); });
+   auto fut_MFe = run_async([this] () { calculate_MFe_pole(); });
+   auto fut_MVWp = run_async([this] () { calculate_MVWp_pole(); });
    fut_MVG.get();
    fut_MFv.get();
    fut_Mhh.get();
@@ -872,13 +868,14 @@ std::string Standard_model::name() const
    return "Standard model";
 }
 
-void Standard_model::initialise_from_input()
+void Standard_model::initialise_from_input(const softsusy::QedQcd& qedqcd_)
 {
    const double scale = get_scale();
+   auto qedqcd = qedqcd_;
 
    // initial guess
    qedqcd.to(qedqcd.displayPoleMZ());
-   initial_guess_for_parameters();
+   initial_guess_for_parameters(qedqcd);
    run_to(qedqcd.displayPoleMZ());
 
    // determine Standard model parameters iteratively
@@ -910,7 +907,7 @@ void Standard_model::initialise_from_input()
       const double alpha_em_drbar = alpha_em / (1.0 - delta_alpha_em);
       const double alpha_s_drbar  = alpha_s / (1.0 - delta_alpha_s);
       const double e_drbar        = Sqrt(4.0 * Pi * alpha_em_drbar);
-      double theta_w_drbar        = calculate_theta_w(alpha_em_drbar);
+      double theta_w_drbar        = calculate_theta_w(qedqcd, alpha_em_drbar);
 
       if (IsFinite(theta_w_drbar)) {
          problems.unflag_non_perturbative_parameter(
@@ -923,9 +920,9 @@ void Standard_model::initialise_from_input()
 
       v = Re((2 * mz_run) / Sqrt(0.6 * Sqr(g1) + Sqr(g2)));
 
-      calculate_Yu_DRbar();
-      calculate_Yd_DRbar();
-      calculate_Ye_DRbar();
+      calculate_Yu_DRbar(qedqcd);
+      calculate_Yd_DRbar(qedqcd);
+      calculate_Ye_DRbar(qedqcd);
       calculate_Lambdax_DRbar();
 
       solve_ewsb();
@@ -934,7 +931,8 @@ void Standard_model::initialise_from_input()
       g2 = e_drbar * Csc(theta_w_drbar);
       g3 = 3.5449077018110318 * Sqrt(alpha_s_drbar);
 
-      recalculate_mw_pole();
+      if (get_thresholds())
+         qedqcd.setPoleMW(recalculate_mw_pole(qedqcd.displayPoleMW()));
 
       converged = check_convergence(old);
       old = *this;
@@ -945,7 +943,7 @@ void Standard_model::initialise_from_input()
       run_to(scale);
 }
 
-void Standard_model::initial_guess_for_parameters()
+void Standard_model::initial_guess_for_parameters(const softsusy::QedQcd& qedqcd)
 {
    const double MZ = qedqcd.displayPoleMZ();
    const double MW = qedqcd.displayPoleMW();
@@ -1020,7 +1018,7 @@ double Standard_model::calculate_delta_alpha_s(double alphaS) const
 
 }
 
-double Standard_model::calculate_theta_w(double alpha_em_drbar)
+double Standard_model::calculate_theta_w(const softsusy::QedQcd& qedqcd, double alpha_em_drbar)
 {
    double theta_w = 0.;
 
@@ -1096,7 +1094,7 @@ double Standard_model::calculate_theta_w(double alpha_em_drbar)
    return theta_w;
 }
 
-void Standard_model::calculate_Yu_DRbar()
+void Standard_model::calculate_Yu_DRbar(const softsusy::QedQcd& qedqcd)
 {
    Eigen::Matrix<double,3,3> upQuarksDRbar(Eigen::Matrix<double,3,3>::Zero());
    upQuarksDRbar(0,0)      = qedqcd.displayMass(softsusy::mUp);
@@ -1110,7 +1108,7 @@ void Standard_model::calculate_Yu_DRbar()
    Yu = -((1.4142135623730951*upQuarksDRbar)/v).transpose();
 }
 
-void Standard_model::calculate_Yd_DRbar()
+void Standard_model::calculate_Yd_DRbar(const softsusy::QedQcd& qedqcd)
 {
    Eigen::Matrix<double,3,3> downQuarksDRbar(Eigen::Matrix<double,3,3>::Zero());
    downQuarksDRbar(0,0)   = qedqcd.displayMass(softsusy::mDown);
@@ -1124,7 +1122,7 @@ void Standard_model::calculate_Yd_DRbar()
    Yd = ((1.4142135623730951*downQuarksDRbar)/v).transpose();
 }
 
-void Standard_model::calculate_Ye_DRbar()
+void Standard_model::calculate_Ye_DRbar(const softsusy::QedQcd& qedqcd)
 {
    Eigen::Matrix<double,3,3> downLeptonsDRbar(Eigen::Matrix<double,3,3>::Zero());
    downLeptonsDRbar(0,0) = qedqcd.displayPoleMel();
@@ -1151,25 +1149,20 @@ void Standard_model::calculate_Lambdax_DRbar()
    Lambdax = Sqr(higgsDRbar) / Sqr(v);
 }
 
-void Standard_model::recalculate_mw_pole()
+double Standard_model::recalculate_mw_pole(double mw_pole)
 {
-   if (!get_thresholds())
-      return;
-
    calculate_MVWp();
 
    const double mw_drbar    = MVWp;
-   const double mw_pole_sqr = Sqr(mw_drbar) - Re(self_energy_VWp(qedqcd.displayPoleMW()));
+   const double mw_pole_sqr = Sqr(mw_drbar) - Re(self_energy_VWp(mw_pole));
 
    if (mw_pole_sqr < 0.)
       problems.flag_tachyon(standard_model_info::VWp);
 
-   const double mw_pole = AbsSqrt(mw_pole_sqr);
-
-   qedqcd.setPoleMW(mw_pole);
+   return AbsSqrt(mw_pole_sqr);
 }
 
-bool Standard_model::check_convergence(const Standard_model& old) const
+double Standard_model::max_rel_diff(const Standard_model& old) const
 {
    double diff[12] = { 0 };
 
@@ -1182,9 +1175,12 @@ bool Standard_model::check_convergence(const Standard_model& old) const
    }
    diff[11] = MaxRelDiff(old.MVWp, MVWp);
 
-   const double max_diff = *std::max_element(diff, diff + 12);
+   return *std::max_element(diff, diff + 12);
+}
 
-   return max_diff < precision;
+bool Standard_model::check_convergence(const Standard_model& old) const
+{
+   return max_rel_diff(old) < precision;
 }
 
 Eigen::ArrayXd Standard_model::get() const
@@ -6120,8 +6116,8 @@ void Standard_model::calculate_MFu_pole()
 
    if (pole_mass_loop_order > 1 && TOP_POLE_QCD_CORRECTION > 0) {
       const double currentScale = get_scale();
-      qcd_2l = -0.006995771808874528*Power(g3,4) -
-         0.004518101565212638*Power(g3,4)*Log(Sqr(currentScale)/Sqr(MFu(2))) -
+      qcd_2l = -0.005284774766427138*Power(g3,4) -
+         0.0032348537833770956*Power(g3,4)*Log(Sqr(currentScale)/Sqr(MFu(2))) -
          0.0008822328500119351*Power(g3,4)*Sqr(Log(Power(currentScale,2)/Sqr(
          MFu(2))));
    }
@@ -6130,10 +6126,10 @@ void Standard_model::calculate_MFu_pole()
 
    if (pole_mass_loop_order > 2 && TOP_POLE_QCD_CORRECTION > 1) {
       const double currentScale = get_scale();
-      qcd_3l = Power(g3,6)*(-0.0017408026847411467 -
-         0.000984413176263005*Log(Sqr(currentScale)/Sqr(MFu(2))) -
-         0.00003352082872926087*Power(Log(Sqr(currentScale)/Sqr(MFu(2))),3) -
-         0.00029813221915266867*Sqr(Log(Power(currentScale,2)/Sqr(MFu(2)))));
+      qcd_3l = -0.00003352082872926087*Power(g3,6)*(35.702577217116016
+         + 15.387410814884797*Log(Sqr(currentScale)/Sqr(MFu(2))) + 1.*Power(
+         Log(Sqr(currentScale)/Sqr(MFu(2))),3) + 5.378787878787879*Sqr(Log(
+         Power(currentScale,2)/Sqr(MFu(2)))));
    }
 
    Eigen::Matrix<double,3,3> self_energy_1;
@@ -6310,18 +6306,20 @@ double Standard_model::calculate_MFu_DRbar(double m_pole, int idx) const
    double qcd_2l = 0., qcd_3l = 0.;
 
    if (get_thresholds() > 1) {
-      qcd_2l = -0.005855107113909601*Power(g3,4) -
-         0.0028071045227652486*Power(g3,4)*Log(Sqr(currentScale)/Sqr(MFu(idx)))
+      qcd_2l = -0.0041441100714622115*Power(g3,4) -
+         0.0015238567409297061*Power(g3,4)*Log(Sqr(currentScale)/Sqr(MFu(idx)))
          - 0.00024060895909416413*Power(g3,4)*Sqr(Log(Power(currentScale,2)
          /Sqr(MFu(idx))));
    }
 
    if (get_thresholds() > 2) {
-      qcd_3l = -0.0013067805969741943*Power(g3,6) -
+      qcd_3l = -0.0008783313853540776*Power(g3,6) -
          0.0004114970933517977*Power(g3,6)*Log(Sqr(currentScale)/Sqr(MFu(idx)))
          - 5.078913443827405e-6*Power(g3,6)*Power(Log(Sqr(currentScale)/Sqr(
-         MFu(idx))),3) - 0.00007466002762426286*Power(g3,6)*Sqr(Log(Power(
-         currentScale,2)/Sqr(MFu(idx))));
+         MFu(idx))),3) - 0.0002952541682011665*Power(g3,6)*Log(Sqr(MFu(idx))
+         /Sqr(currentScale)) + 0.00005282069981580501*Power(g3,6)*Sqr(Log(Power
+         (MFu(idx),2)/Sqr(currentScale))) - 0.00007466002762426286*Power(g3,6)*
+         Sqr(Log(Power(currentScale,2)/Sqr(MFu(idx))));
    }
 
    const double m_susy_drbar = m_pole + self_energy_1 + m_pole * (

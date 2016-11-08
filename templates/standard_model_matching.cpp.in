@@ -21,6 +21,7 @@
 #include "@ModelName@_standard_model_matching.hpp"
 #include "wrappers.hpp"
 #include "two_scale_matching.hpp"
+#include "two_loop_corrections.hpp"
 #include "standard_model.hpp"
 #include "@ModelName@_mass_eigenstates.hpp"
 #include "@ModelName@_info.hpp"
@@ -46,18 +47,27 @@ public:
    {
       model_pole_mass_order = model.get_pole_mass_loop_order();
       model_ewsb_order = model.get_ewsb_loop_order();
+      tlc = model.get_two_loop_corrections();
+
+      // set top quark QCD corrections to given loop order
+      Two_loop_corrections tlc_new = tlc;
+      tlc_new.top_qcd = loop_order_ ? loop_order_ - 1 : 0;
+
       model.set_pole_mass_loop_order(loop_order);
       model.set_ewsb_loop_order(loop_order);
+      model.set_two_loop_corrections(tlc_new);
    }
 
    ~Loop_order_setter() {
       model.set_pole_mass_loop_order(model_pole_mass_order);
       model.set_ewsb_loop_order(model_ewsb_order);
+      model.set_two_loop_corrections(tlc);
       model.calculate_DRbar_masses();
       model.solve_ewsb();
    }
 private:
    T& model;
+   Two_loop_corrections tlc;       ///< 2-loop corrections
    unsigned loop_order;            ///< temporary loop order
    unsigned model_pole_mass_order; ///< old model pole mass loop order
    unsigned model_ewsb_order;      ///< old model EWSB loop order
@@ -144,9 +154,9 @@ void @ModelName@_standard_model_matching::match_low_to_high_scale_model_tree_lev
    @ModelName@_mass_eigenstates& model, Standard_model& sm)
 {
    sm.calculate_DRbar_masses();
-   model.set_@hyperchargeCoupling@(sm.get_g1()*standard_model_info::normalization_g1/@ModelName@_info::normalization_g1);
-   model.set_@leftCoupling@(sm.get_g2()*standard_model_info::normalization_g2/@ModelName@_info::normalization_g2);
-   model.set_@strongCoupling@(sm.get_g3()*standard_model_info::normalization_g3/@ModelName@_info::normalization_g3);
+   model.set_@hyperchargeCoupling@(sm.get_g1()*standard_model_info::normalization_g1/@ModelName@_info::normalization_@hyperchargeCoupling@);
+   model.set_@leftCoupling@(sm.get_g2()*standard_model_info::normalization_g2/@ModelName@_info::normalization_@leftCoupling@);
+   model.set_@strongCoupling@(sm.get_g3()*standard_model_info::normalization_g3/@ModelName@_info::normalization_@strongCoupling@);
 
    {
       @ModelName@_mass_eigenstates* MODEL = &model;
@@ -173,25 +183,19 @@ void @ModelName@_standard_model_matching::match_low_to_high_scale_model_tree_lev
 static void calculate_SM_pole_masses(@ModelName@_mass_eigenstates& model, Standard_model& sm)
 {
 #ifdef ENABLE_THREADS
-#define CLASSNAME @ModelName@_mass_eigenstates
-   typedef void (Standard_model::*SMMem_fun_t)();
-   typedef Standard_model* SMObj_ptr_t;
-   typedef void (CLASSNAME::*Mem_fun_t)();
-   typedef CLASSNAME* Obj_ptr_t;
+   @ModelName@_mass_eigenstates* obj_ptr = &model;
 
-   auto fut_Standard_model_MFu = run_async<SMMem_fun_t, SMObj_ptr_t>(&Standard_model::calculate_MFu_pole, &sm);
-   auto fut_Standard_model_MFd = run_async<SMMem_fun_t, SMObj_ptr_t>(&Standard_model::calculate_MFd_pole, &sm);
-   auto fut_Standard_model_MFe = run_async<SMMem_fun_t, SMObj_ptr_t>(&Standard_model::calculate_MFe_pole, &sm);
-   auto fut_Standard_model_MVW = run_async<SMMem_fun_t, SMObj_ptr_t>(&Standard_model::calculate_MVWp_pole, &sm);
-   auto fut_Standard_model_MVZ = run_async<SMMem_fun_t, SMObj_ptr_t>(&Standard_model::calculate_MVZ_pole, &sm);
+   auto fut_Standard_model_MFu = run_async([&sm] () { sm.calculate_MFu_pole(); });
+   auto fut_Standard_model_MFd = run_async([&sm] () { sm.calculate_MFd_pole(); });
+   auto fut_Standard_model_MFe = run_async([&sm] () { sm.calculate_MFe_pole(); });
+   auto fut_Standard_model_MVW = run_async([&sm] () { sm.calculate_MVWp_pole(); });
+   auto fut_Standard_model_MVZ = run_async([&sm] () { sm.calculate_MVZ_pole(); });
 @callAllSMPoleMassFunctionsThreads@
    fut_Standard_model_MFu.get();
    fut_Standard_model_MFd.get();
    fut_Standard_model_MFe.get();
    fut_Standard_model_MVW.get();
    fut_Standard_model_MVZ.get();
-
-#undef CLASSNAME
 #else
 @callAllSMPoleMassFunctions@
    sm.calculate_MFu_pole();
@@ -272,9 +276,9 @@ void @ModelName@_standard_model_matching::match_low_to_high_scale_model(
 @setRunningFermionMasses@
 
    // define and apply 1L-matched gauge parameters
-   const double g1_1L = AbsSqrt(4. * Pi * alpha_em * (1. + delta_alpha_em) * mZ2_1L / mW2_1L) / @ModelName@_info::normalization_g1;
-   const double g2_1L = AbsSqrt(4. * Pi * alpha_em * (1. + delta_alpha_em) / (1. - mW2_1L/mZ2_1L)) / @ModelName@_info::normalization_g2;
-   const double g3_1L = AbsSqrt(4. * Pi * alpha_s * (1. + delta_alpha_s)) / @ModelName@_info::normalization_g3;
+   const double g1_1L = AbsSqrt(4. * Pi * alpha_em * (1. + delta_alpha_em) * mZ2_1L / mW2_1L) / @ModelName@_info::normalization_@hyperchargeCoupling@;
+   const double g2_1L = AbsSqrt(4. * Pi * alpha_em * (1. + delta_alpha_em) / (1. - mW2_1L/mZ2_1L)) / @ModelName@_info::normalization_@leftCoupling@;
+   const double g3_1L = AbsSqrt(4. * Pi * alpha_s * (1. + delta_alpha_s)) / @ModelName@_info::normalization_@strongCoupling@;
 
    model.set_@hyperchargeCoupling@(g1_1L);
    model.set_@leftCoupling@(g2_1L);
@@ -282,7 +286,7 @@ void @ModelName@_standard_model_matching::match_low_to_high_scale_model(
 
    {
       @ModelName@_mass_eigenstates* MODEL = &model;
-      const double VEV = 2. * AbsSqrt(mZ2_1L/(Sqr(g1_1L*@ModelName@_info::normalization_g1) + Sqr(g2_1L*@ModelName@_info::normalization_g2)));
+      const double VEV = 2. * AbsSqrt(mZ2_1L/(Sqr(g1_1L*@ModelName@_info::normalization_@hyperchargeCoupling@) + Sqr(g2_1L*@ModelName@_info::normalization_@leftCoupling@)));
 
 @applyUserMatching@
    }

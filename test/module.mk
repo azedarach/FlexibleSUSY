@@ -29,6 +29,7 @@ TEST_SRC := \
 		$(DIR)/test_goldstones.cpp \
 		$(DIR)/test_linalg2.cpp \
 		$(DIR)/test_minimizer.cpp \
+		$(DIR)/test_MSSM_2L_limits.cpp \
 		$(DIR)/test_namespace_collisions.cpp \
 		$(DIR)/test_numerics.cpp \
 		$(DIR)/test_problems.cpp \
@@ -197,7 +198,9 @@ ifeq ($(WITH_CMSSM),yes)
 TEST_SH += \
 		$(DIR)/test_CMSSM_slha_doubled_blocks.sh \
 		$(DIR)/test_CMSSM_memory_leaks.sh \
-		$(DIR)/test_CMSSM_profile.sh
+		$(DIR)/test_CMSSM_profile.sh \
+		$(DIR)/test_CMSSM_QedQcd_exception.sh \
+		$(DIR)/test_CMSSM_QedQcd_no_convergence.sh
 TEST_SRC += \
 		$(DIR)/test_CMSSM_database.cpp \
 		$(DIR)/test_CMSSM_slha.cpp \
@@ -286,9 +289,9 @@ TEST_SH += \
 		$(DIR)/test_HSSUSY_SUSYHD.sh
 endif
 
-ifeq ($(WITH_CMSSMMuBMutower) $(WITH_CMSSMMuBMu),yes yes)
+ifeq ($(WITH_NUHMSSMalttower) $(WITH_NUHMSSMalt),yes yes)
 TEST_SH += \
-		$(DIR)/test_CMSSMMuBMutower.sh
+		$(DIR)/test_NUHMSSMalttower.sh
 endif
 
 ifeq ($(WITH_HSSUSY) $(WITH_MSSMtower) $(WITH_MSSMMuBMu),yes yes yes)
@@ -316,6 +319,11 @@ TEST_SH += \
 		$(DIR)/test_SMtower.sh
 endif
 
+ifeq ($(WITH_SM),yes)
+TEST_SH += \
+		$(DIR)/test_flexiblesusy-config.sh
+endif
+
 ifeq ($(WITH_THDMIIMSSMBC) $(WITH_THDMIIMSSMBCApprox) $(WITH_HGTHDMIIMSSMBC) $(WITH_HGTHDMIIMSSMBCApprox),yes yes yes yes)
 
 TEST_SH += \
@@ -323,12 +331,21 @@ TEST_SH += \
 endif
 
 
+ifeq ($(shell $(FSCONFIG) --with-HGTHDMIIMSSMBC --with-MSSM),yes yes)
+TEST_META += \
+		$(DIR)/test_HGTHDM_threshold_corrections_scale_invariance.m
+endif
+
+ifeq ($(shell $(FSCONFIG) --with-THDMIIMSSMBC --with-MSSM),yes yes)
+TEST_META += \
+		$(DIR)/test_THDM_threshold_corrections_scale_invariance.m
+endif
+
 TEST_META := \
 		$(DIR)/test_BetaFunction.m \
 		$(DIR)/test_CConversion.m \
 		$(DIR)/test_Constraint.m \
 		$(DIR)/test_EWSB.m \
-		$(DIR)/test_HGTHDM_threshold_corrections_scale_invariance.m \
 		$(DIR)/test_HSSUSY_thresholds.m \
 		$(DIR)/test_LoopFunctions.m \
 		$(DIR)/test_MSSM_2L_analytic.m \
@@ -339,7 +356,6 @@ TEST_META := \
 		$(DIR)/test_TextFormatting.m \
 		$(DIR)/test_THDM_threshold_corrections.m \
 		$(DIR)/test_THDM_threshold_corrections_gauge.m \
-		$(DIR)/test_THDM_threshold_corrections_scale_invariance.m \
 		$(DIR)/test_ThreeLoopQCD.m \
 		$(DIR)/test_ThresholdCorrections.m \
 		$(DIR)/test_TreeMasses.m \
@@ -461,7 +477,7 @@ $(DIR)/%.sh.log: $(DIR)/%.sh
 		@echo "**************************************************" >> $@;
 		@echo "* executing test: $< " >> $@;
 		@echo "**************************************************" >> $@;
-		@MATH_CMD="$$MATH" $< >> $@ 2>&1; \
+		@MATH_CMD="$(MATH)" $< >> $@ 2>&1; \
 		if [ $$? = 0 ]; then echo "$<: OK"; else echo "$<: FAILED"; fi
 
 $(DIR)/test_lowMSSM.sh.log: $(RUN_CMSSM_EXE) $(RUN_lowMSSM_EXE)
@@ -494,6 +510,9 @@ $(DIR)/test_goldstones.x: $(DIR)/test_goldstones.o $(LIBFLEXI) $(LIBLEGACY) $(fi
 
 $(DIR)/test_linalg2.x: $(DIR)/test_linalg2.o
 		$(CXX) -o $@ $(call abspathx,$^) $(BOOSTTESTLIBS) $(LAPACKLIBS) $(BLASLIBS) $(FLIBS)
+
+$(DIR)/test_MSSM_2L_limits.x: $(DIR)/test_MSSM_2L_limits.o $(LIBFLEXI) $(LIBLEGACY) $(filter-out -%,$(LOOPFUNCLIBS))
+		$(CXX) -o $@ $(call abspathx,$^) $(filter -%,$(LOOPFUNCLIBS)) $(BOOSTTESTLIBS) $(GSLLIBS) $(FLIBS)
 
 $(DIR)/test_minimizer.x: $(DIR)/test_minimizer.o $(LIBFLEXI) $(LIBLEGACY) $(filter-out -%,$(LOOPFUNCLIBS))
 		$(CXX) -o $@ $(call abspathx,$^) $(filter -%,$(LOOPFUNCLIBS)) $(BOOSTTESTLIBS) $(GSLLIBS) $(FLIBS)

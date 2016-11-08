@@ -39,8 +39,8 @@ following setup:
 
    $ cd ~/.Mathematica/Applications/
    $ wget https://www.hepforge.org/archive/sarah/SARAH-4.7.0.tar.gz
-   $ tar -xf SARAH-4.7.0.tar.gz
-   $ ln -s $PWD/SARAH-4.7.0/ SARAH
+   $ tar -xf SARAH-4.9.1.tar.gz
+   $ ln -s $PWD/SARAH-4.9.1/ SARAH
 
    $ cd ~/.Mathematica/Kernel/
    $ echo "AppendTo[\$Path, \"$HOME/.Mathematica/Applications/SARAH/\"];" \
@@ -267,7 +267,7 @@ Example:
    $ ./configure --with-models=CMSSM \
      --enable-static \
      --with-static-ldflags="-static" \
-     --with-static-ldlibs="-ldl"
+     --with-static-ldlibs="-lquadmath -ldl"
 
 In case of dynamic linking, the options
 
@@ -447,11 +447,11 @@ remove model-specific files:
 
    $ make clean-<model>     # deletes .d .o .a .x files
 
-   $ make distclean-<model> # same as `make clean-<model>'
+   $ make distclean-<model> # same as `make clean-<model> clean-<model>-src'
 
    $ make clean-<model>-dep # deletes .d files
 
-   $ make clean-<model>-lib # deletes library
+   $ make clean-<model>-lib # deletes model library
 
    $ make clean-<model>-obj # deletes .o files
 
