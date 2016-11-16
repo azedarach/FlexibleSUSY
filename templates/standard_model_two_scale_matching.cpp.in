@@ -45,10 +45,10 @@ CLASSNAME::@ModelName@_standard_model_Matching(
    , eft(low_)
    , constraint(constraint_)
    , scale(0.)
+   , loop_order_up(loop_order_up_)
+   , loop_order_down(loop_order_down_)
    , higgs_idx(higgs_idx_)
 {
-   set_loop_order_up(loop_order_up_);
-   set_loop_order_down(loop_order_down_);
 }
 
 CLASSNAME::~@ModelName@_standard_model_Matching()
