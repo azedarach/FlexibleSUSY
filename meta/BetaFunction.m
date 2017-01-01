@@ -122,8 +122,11 @@ FactorOutLoopFactor[expr_] :=
            expr
           ];
 
+TimeConstrainedSimplify[expr_] :=
+    TimeConstrained[Simplify[expr], FlexibleSUSY`FSSimplifyBetaFunctionsTimeConstraint, expr];
+
 CollectMatMul[expr_] :=
-    TimeConstrained[Collect[expr, SARAH`MatMul[___]],
+    TimeConstrained[Collect[expr, SARAH`MatMul[___], TimeConstrainedSimplify],
                     FlexibleSUSY`FSSimplifyBetaFunctionsTimeConstraint,
                     expr];
 
@@ -236,7 +239,7 @@ CreateBetaFunctionCall[betaFunction_BetaFunction] :=
             Return[{localDecl, beta1L, beta2L, beta3L}];
           ];
 
-CreateBetaFunction[betaFunctions_List, sarahTraces_List] :=
+CreateBetaFunction[betaFunctions_List] :=
     Module[{def = "",
             localDecl = "", beta1L = "", beta2L = "", beta3L = "",
             allDecl = "", allBeta = "",
@@ -291,7 +294,7 @@ ConvertSarahRGEs[betaFunctions_List] :=
                    (* protect tensor products *)
                    expr = CConversion`ProtectTensorProducts[#, name]& /@ expr;
                    (* simplify expressions *)
-                   expr = TimeConstrained[Simplify[#], FlexibleSUSY`FSSimplifyBetaFunctionsTimeConstraint, #]& /@ expr;
+                   expr = TimeConstrainedSimplify /@ expr;
                    AppendTo[lst, BetaFunction[name, type, expr]];
                   ];
               ];
