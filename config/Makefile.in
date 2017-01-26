@@ -220,6 +220,9 @@ depend:  $(ALLDEP)
 %.d: %.F | $(DEPGEN)
 	$(DEPGEN) $(CPPFLAGS) -MM -o '$@' -MT '$*.o' $^
 
+%.o: %.f90
+	$(FC) $(FFLAGS) -c -o $@ $^
+
 distclean::
 	-rm -f Makefile
 	-rm -f $(FSCONFIG)
