@@ -16,6 +16,78 @@ Complex(dp), Parameter :: ZeroC=(0._dp,0._dp)
 
 Contains
 
+!!!!!!!!!!! TADPOLE FUNCTIONS (subroutine wrappers to interface with C/C++)
+
+Subroutine CTfSS(out,x,y,z,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,q2
+real(dp) :: out
+out = TfSS(x,y,z,Q2)
+End Subroutine CTfSS
+
+Subroutine CTfSSS(out,x,y,z,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,q2
+real(dp) :: out
+out = TfSSS(x,y,z,Q2)
+End Subroutine CTfSSS
+
+Subroutine CTfSSSS(out,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,u,q2
+real(dp) :: out
+out = TfSSSS(x,y,z,u,Q2)
+End Subroutine CTfSSSS
+
+Subroutine CTfSSFF(out,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,u,q2
+real(dp) :: out
+out = TfSSFF(x,y,z,u,Q2)
+End Subroutine CTfSSFF
+
+Subroutine CTfSSFbFb(out,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,u,q2
+real(dp) :: out
+out = TfSSFbFb(x,y,z,u,Q2)
+End Subroutine CTfSSFbFb
+
+Subroutine CTfFFFbS(out,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,u,q2
+real(dp) :: out
+out = TfFFFbS(x,y,z,u,Q2)
+End Subroutine CTfFFFbS
+
+Subroutine CTfFFbFS(out,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,u,q2
+real(dp) :: out
+out = TfFFbFS(x,y,z,u,Q2)
+End Subroutine CTfFFbFS
+
+Subroutine CTfFbFbFbS(out,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: x,y,z,u,q2
+real(dp) :: out
+out = TfFbFbFbS(x,y,z,u,Q2)
+End Subroutine CTfFbFbFbS
+
+Subroutine CTfSV(out,x,Q2)
+Implicit None
+real(dp), intent(in):: x,q2
+real(dp) :: out
+out = TfSV(x,Q2)
+End Subroutine CTfSV
+
+Subroutine CTfFV(out,x,Q2)
+Implicit None
+real(dp), intent(in):: x,q2
+real(dp) :: out
+out = TfFV(x,Q2)
+End Subroutine CTfFV
+
 !!!!!!!!!!! TADPOLE FUNCTIONS
 
 

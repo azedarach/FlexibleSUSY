@@ -20,16 +20,16 @@
 
 extern "C" {
 // tadpole functions
-extern double __pole2lfunctions_MOD_tfss(const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tfsss(const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tfssss(const double&, const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tfssff(const double&, const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tfssfbfb(const double&, const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tffffbs(const double&, const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tfffbfs(const double&, const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tffbfbfbs(const double&, const double&, const double&, const double&, const double&);
-extern double __pole2lfunctions_MOD_tfsv(const double&, const double&);
-extern double __pole2lfunctions_MOD_tffv(const double&, const double&);
+extern void __pole2lfunctions_MOD_ctfss(double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctfsss(double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctfssss(double&, const double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctfssff(double&, const double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctfssfbfb(double&, const double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctffffbs(double&, const double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctfffbfs(double&, const double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctffbfbfbs(double&, const double&, const double&, const double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctfsv(double&, const double&, const double&);
+extern void __pole2lfunctions_MOD_ctffv(double&, const double&, const double&);
 }
 
 namespace flexiblesusy {
@@ -37,52 +37,72 @@ namespace two_loop_functions {
 
 double TfSS(double x, double y, double z, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tfss(x, y, z, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctfss(out, x, y, z, scl2);
+   return out;
 }
 
 double TfSSS(double x, double y, double z, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tfsss(x, y, z, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctfsss(out, x, y, z, scl2);
+   return out;
 }
 
 double TfSSSS(double x, double y, double z, double u, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tfssss(x, y, z, u, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctfssss(out, x, y, z, u, scl2);
+   return out;
 }
 
 double TfSSFF(double x, double y, double z, double u, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tfssff(x, y, z, u, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctfssff(out, x, y, z, u, scl2);
+   return out;
 }
 
 double TfSSFbFb(double x, double y, double z, double u, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tfssfbfb(x, y, z, u, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctfssfbfb(out, x, y, z, u, scl2);
+   return out;
 }
 
 double TfFFFbS(double x, double y, double z, double u, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tffffbs(x, y, z, u, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctffffbs(out, x, y, z, u, scl2);
+   return out;
 }
 
 double TfFFbFS(double x, double y, double z, double u, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tfffbfs(x, y, z, u, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctfffbfs(out, x, y, z, u, scl2);
+   return out;
 }
 
 double TfFbFbFbS(double x, double y, double z, double u, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tffbfbfbs(x, y, z, u, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctffbfbfbs(out, x, y, z, u, scl2);
+   return out;
 }
 
 double TfSV(double x, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tfsv(x, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctfsv(out, x, scl2);
+   return out;
 }
 
 double TfFV(double x, double scl2) noexcept
 {
-   return __pole2lfunctions_MOD_tffv(x, scl2);
+   double out = 0.;
+   __pole2lfunctions_MOD_ctffv(out, x, scl2);
+   return out;
 }
 
 } // namespace two_loop_functions

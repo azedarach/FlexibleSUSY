@@ -41,6 +41,7 @@ TEST_SRC := \
 		$(DIR)/test_sum.cpp \
 		$(DIR)/test_thread_pool.cpp \
 		$(DIR)/test_threshold_loop_functions.cpp \
+		$(DIR)/test_two_loop_functions.cpp \
 		$(DIR)/test_which.cpp \
 
 TEST_SH := \
@@ -569,6 +570,9 @@ $(DIR)/test_thread_pool.x: $(DIR)/test_thread_pool.o $(LIBFLEXI) $(filter-out -%
 		$(CXX) -o $@ $(call abspathx,$^) $(filter -%,$(LOOPFUNCLIBS)) $(BOOSTTESTLIBS) $(BOOSTTHREADLIBS) $(THREADLIBS) $(FLIBS) $(LIBTEST)
 
 $(DIR)/test_threshold_loop_functions.x: $(DIR)/test_threshold_loop_functions.o $(LIBFLEXI) $(filter-out -%,$(LOOPFUNCLIBS)) $(LIBTEST)
+		$(CXX) -o $@ $(call abspathx,$^) $(filter -%,$(LOOPFUNCLIBS)) $(BOOSTTESTLIBS) $(BOOSTTHREADLIBS) $(FLIBS) $(LIBTEST)
+
+$(DIR)/test_two_loop_functions.x: $(DIR)/test_two_loop_functions.o $(LIBFLEXI) $(filter-out -%,$(LOOPFUNCLIBS)) $(LIBTEST)
 		$(CXX) -o $@ $(call abspathx,$^) $(filter -%,$(LOOPFUNCLIBS)) $(BOOSTTESTLIBS) $(BOOSTTHREADLIBS) $(FLIBS) $(LIBTEST)
 
 $(DIR)/test_wrappers.x: $(DIR)/test_wrappers.o $(LIBSoftsusyMSSM) $(LIBFLEXI) $(filter-out -%,$(LOOPFUNCLIBS)) $(LIBTEST)
