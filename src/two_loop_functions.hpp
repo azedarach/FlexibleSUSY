@@ -28,8 +28,18 @@
 namespace flexiblesusy {
 namespace two_loop_functions {
 
+// tadpole functions
+
 double TfSS(double, double, double, double) PVATTR;
 double TfSSS(double, double, double, double) PVATTR;
+double TfSSSS(double, double, double, double, double) PVATTR;
+double TfSSFF(double, double, double, double, double) PVATTR;
+double TfSSFbFb(double, double, double, double, double) PVATTR;
+double TfFFFbS(double, double, double, double, double) PVATTR;
+double TfFFbFS(double, double, double, double, double) PVATTR;
+double TfFbFbFbS(double, double, double, double, double) PVATTR;
+double TfSV(double, double) PVATTR;
+double TfFV(double, double) PVATTR;
 
 } // namespace two_loop_functions
 } // namespace flexiblesusy
