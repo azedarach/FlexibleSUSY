@@ -6,6 +6,7 @@ LIBFLEXI_MK  := \
 		$(DIR)/module.mk
 
 LIBFLEXI_SRC := \
+		$(DIR)/2LPoleFunctions.f90 \
 		$(DIR)/betafunction.cpp \
 		$(DIR)/build_info.cpp \
 		$(DIR)/ckm.cpp \
@@ -145,7 +146,8 @@ endif
 LIBFLEXI_OBJ := \
 		$(patsubst %.cpp, %.o, $(filter %.cpp, $(LIBFLEXI_SRC))) \
 		$(patsubst %.c, %.o, $(filter %.c, $(LIBFLEXI_SRC))) \
-		$(patsubst %.f, %.o, $(filter %.f, $(LIBFLEXI_SRC)))
+		$(patsubst %.f, %.o, $(filter %.f, $(LIBFLEXI_SRC))) \
+		$(patsubst %.f90, %.o, $(filter %.f90, $(LIBFLEXI_SRC)))
 
 LIBFLEXI_DEP := \
 		$(LIBFLEXI_OBJ:.o=.d)

@@ -214,6 +214,9 @@ depend:  $(ALLDEP)
 %.d: %.f | $(DEPGEN)
 	$(DEPGEN) $(CPPFLAGS) -MM -o '$@' -MT '$*.o' $^
 
+%.d: %.f90 | $(DEPGEN)
+	$(DEPGEN) $(CPPFLAGS) -MM -o '$@' -MT '$*.o' $^
+
 %.d: %.F | $(DEPGEN)
 	$(DEPGEN) $(CPPFLAGS) -MM -o '$@' -MT '$*.o' $^
 
