@@ -40,7 +40,7 @@ LowScaleInput = {
     {Yv, LHInput[Yv]},
     {Yx, LHInput[Yx]},
     {vX, vXinput},
-    {vH, 2 MZDRbar / Sqrt[GUTNormalization[g1]^2 g1^2 + g2^2]},
+    {vH, 2 MZMSbar / Sqrt[GUTNormalization[g1]^2 g1^2 + g2^2]},
     {Ye, Automatic},
     {Yd, Automatic},
     {Yu, Automatic}
@@ -68,7 +68,5 @@ ExtraSLHAOutputBlocks = {
             {2, Hold[LowScale]} } },
    {EFFHIGGSCOUPLINGS, NoScale,
            {{1, FlexibleSUSYObservable`CpHiggsPhotonPhoton},
-            {2, FlexibleSUSYObservable`CpHiggsGluonGluon},
-            {3, FlexibleSUSYObservable`CpPseudoScalarPhotonPhoton},
-            {4, FlexibleSUSYObservable`CpPseudoScalarGluonGluon} } }
+            {2, FlexibleSUSYObservable`CpHiggsGluonGluon} } }
 };

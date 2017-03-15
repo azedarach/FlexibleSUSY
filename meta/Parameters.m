@@ -1026,7 +1026,9 @@ SaveParameterLocally[parameter_] :=
 RemoveProtectedHeads[expr_] :=
     expr /. { FlexibleSUSY`LowEnergyConstant[__] -> FlexibleSUSY`LowEnergyConstant[],
               FlexibleSUSY`Pole[__]  -> FlexibleSUSY`Pole[],
-              FlexibleSUSY`BETA[__] -> FlexibleSUSY`BETA[]};
+              FlexibleSUSY`BETA[__] -> FlexibleSUSY`BETA[],
+              SARAH`Mass  -> FlexibleSUSY`M,
+              SARAH`Mass2 -> FlexibleSUSY`M };
 
 DefineLocalConstCopy[parameter_, macro_String, prefix_String:""] :=
     "const auto " <> prefix <> ToValidCSymbolString[parameter] <> " = " <>
@@ -1137,12 +1139,11 @@ IncreaseIndexLiterals[expr_, num_Integer] :=
                                           allModelParameters, allOutputParameters]];
 
 IncreaseIndexLiterals[expr_, num_Integer, heads_List] :=
-    Module[{indexedSymbols, rules, decrExpr, allHeads},
+    Module[{indexedSymbols, rules, allHeads},
            allHeads = Join[heads /. FlexibleSUSY`M -> Identity, {SARAH`Delta, SARAH`ThetaStep}];
-           indexedSymbols = Cases[{expr}, s_[__] /; MemberQ[allHeads, s], Infinity];
+           indexedSymbols = Extract[{expr}, Position[{expr}, s_[__] /; MemberQ[allHeads, s], Infinity]];
            rules = Rule[#, IncreaseIndices[#,num]] & /@ indexedSymbols;
-           decrExpr = expr /. rules;
-           Return[decrExpr]
+           expr /. rules
           ];
 
 DecreaseIndexLiterals[expr_] :=

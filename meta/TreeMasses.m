@@ -1,5 +1,5 @@
 
-BeginPackage["TreeMasses`", {"SARAH`", "TextFormatting`", "CConversion`", "Parameters`", "WeinbergAngle`", "LatticeUtils`", "Utils`"}];
+BeginPackage["TreeMasses`", {"SARAH`", "TextFormatting`", "CConversion`", "Parameters`", "Utils`"}];
 
 FSMassMatrix::usage="Head of a mass matrix";
 
@@ -90,6 +90,9 @@ GetDimensionStartSkippingSMGoldstones::usage="return first index,
 GetParticleIndices::usage = "returns list of particle indices with
  names";
 
+ParticleQ::usage = "returns True if argument is a particle, False
+ otherwise."
+
 FindMixingMatrixSymbolFor::usage="returns the mixing matrix symbol for
 a given field";
 
@@ -152,6 +155,7 @@ IsSMUpQuark::usage="";
 IsSMDownQuark::usage="";
 IsSMQuark::usage="";
 IsSMParticle::usage="";
+IsElectricallyCharged::usage="";
 ContainsGoldstone::usage="";
 
 GetSMChargedLeptons::usage="";
@@ -169,6 +173,8 @@ GetUpLepton::usage="";
 GetDownLepton::usage="";
 
 GetMass::usage="wraps M[] head around particle";
+
+GetElectricCharge::usage="Returns electric charge";
 
 StripGenerators::usage="removes all generators Lam, Sig, fSU2, fSU3
 and removes Delta with the given indices";
@@ -221,10 +227,13 @@ GetParticles[states_:FlexibleSUSY`FSEigenstates] :=
           ];
 
 GetSusyParticles[states_:FlexibleSUSY`FSEigenstates] :=
-    Select[GetParticles[states], (!SARAH`SMQ[#] && !IsGhost[#])&];
+    Select[GetParticles[states], (!IsSMParticle[#] && !IsGhost[#])&];
 
 GetSMParticles[states_:FlexibleSUSY`FSEigenstates] :=
-    Select[GetParticles[states], (SARAH`SMQ[#])&];
+    Select[GetParticles[states], IsSMParticle];
+
+ParticleQ[p_, states_:FlexibleSUSY`FSEigenstates] :=
+    MemberQ[GetParticles[states], p];
 
 IsOfType[sym_Symbol, type_Symbol, states_:FlexibleSUSY`FSEigenstates] :=
     SARAH`getType[sym, False, states] === type;
@@ -266,7 +275,7 @@ IsGoldstone[sym_] := MemberQ[
 IsGoldstone[sym_List] := And @@ (IsGoldstone /@ sym);
 
 GetSMGoldstones[] :=
-    Cases[SARAH`GoldstoneGhost /. a_[{idx__}] :> a[idx], {v_?SARAH`SMQ, goldstone_} :> goldstone];
+    Cases[SARAH`GoldstoneGhost /. a_[{idx__}] :> a[idx], {v_?IsSMParticle, goldstone_} :> goldstone];
 
 IsSMGoldstone[Susyno`LieGroups`conj[sym_]] := IsSMGoldstone[sym];
 IsSMGoldstone[SARAH`bar[sym_]] := IsSMGoldstone[sym];
@@ -277,6 +286,8 @@ IsChargino[Susyno`LieGroups`conj[p_]] := IsChargino[p];
 IsChargino[SARAH`bar[p_]] := IsChargino[p];
 IsChargino[p_] :=
     p === Parameters`GetParticleFromDescription["Charginos"];
+
+IsElectricallyCharged[par_] := GetElectricCharge[par] != 0;
 
 ContainsGoldstone[sym_] := MemberQ[GetGoldstoneBosons[] /. a_[{idx__}] :> a, sym];
 
@@ -346,7 +357,7 @@ IsLepton[Susyno`LieGroups`conj[sym_]] := IsLepton[sym];
 IsLepton[SARAH`bar[sym_]] := IsLepton[sym];
 IsLepton[sym_[___]] := IsLepton[sym];
 IsLepton[sym_Symbol] :=
-    MemberQ[Complement[GetParticles[], GetColoredParticles[]], sym] && IsFermion[sym] && SARAH`SMQ[sym];
+    MemberQ[Complement[GetParticles[], GetColoredParticles[]], sym] && IsFermion[sym] && IsSMParticle[sym];
 
 IsSMChargedLepton[Susyno`LieGroups`conj[sym_]] := IsSMChargedLepton[sym];
 IsSMChargedLepton[SARAH`bar[sym_]] := IsSMChargedLepton[sym];
@@ -435,6 +446,8 @@ GetDownLepton[gen_, cConvention_:False] :=
 GetMass[particle_[idx__]] := GetMass[particle][idx];
 GetMass[particle_Symbol] := FlexibleSUSY`M[particle];
 
+GetElectricCharge[par_] := SARAH`getElectricCharge[par];
+
 (* Returns list of pairs {p,v}, where p is the given golstone
    boson and v is the corresponding vector boson.
 
@@ -459,10 +472,13 @@ GetGoldstoneBosons[] :=
     Transpose[SARAH`GoldstoneGhost][[2]];
 
 GetSMGoldstoneBosons[] :=
-    Cases[SARAH`GoldstoneGhost, {vector_?SARAH`SMQ, goldstone_} :> goldstone];
+    Cases[SARAH`GoldstoneGhost, {vector_?IsSMParticle, goldstone_} :> goldstone];
 
 GetDimension[sym_List, states_:FlexibleSUSY`FSEigenstates] :=
     Plus @@ (GetDimension[#, states]& /@ sym);
+
+GetDimension[(SARAH`bar|Susyno`LieGroups`conj)[sym_], states_:FlexibleSUSY`FSEigenstates] :=
+    GetDimension[sym, states];
 
 GetDimension[sym_[__], states_:FlexibleSUSY`FSEigenstates] := GetDimension[sym, states];
 
@@ -490,7 +506,7 @@ GetDimensionStartSkippingGoldstones[sym_] :=
     GetDimensionStartSkippingGoldstones[sym, SARAH`GoldstoneGhost];
 
 GetDimensionStartSkippingSMGoldstones[sym_] :=
-    GetDimensionStartSkippingGoldstones[sym, Cases[SARAH`GoldstoneGhost, {_?SARAH`SMQ, _}]];
+    GetDimensionStartSkippingGoldstones[sym, Cases[SARAH`GoldstoneGhost, {_?IsSMParticle, _}]];
 
 GetDimensionWithoutGoldstones[sym_[__], states_:FlexibleSUSY`FSEigenstates] :=
     GetDimensionWithoutGoldstones[sym, states];
@@ -1319,16 +1335,11 @@ CreateHiggsMassGetters[particle_, macro_String] :=
            typeGoldstone = CreateCType[CConversion`ArrayType[CConversion`realScalarCType, dimGoldstone]];
            prototype = typeHiggs <> " get_M" <> name <> "() const;\n";
            body =
-               typeHiggs     <> " " <> particleHiggsStr <> ";\n" <>
                typeGoldstone <> " " <> particleGoldstoneStr <> ";\n" <>
-               "\n" <>
                FillGoldstoneMassVector[particleGoldstoneStr, vectorList] <>
                "\n" <>
-               "remove_if_equal(" <> particleStr <> ", " <>
-                                particleGoldstoneStr <> ", " <>
-                                particleHiggsStr <> ");\n" <>
-               "\n" <>
-               "return " <> particleHiggsStr <> ";\n";
+               "return remove_if_equal(" <> particleStr <> ", " <>
+                                       particleGoldstoneStr <> ");\n";
            def = typeHiggs <> " CLASSNAME::get_M" <> name <> "() const\n{\n" <>
                IndentText[body] <>
                "}\n";
