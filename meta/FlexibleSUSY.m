@@ -331,6 +331,9 @@ CheckSARAHVersion[] :=
                     " or higher"];
               Quit[1];
              ];
+           (* @todo check SARAH version *)
+           Print["Applying SARAH 2-loop Higgs mass patch ..."];
+           Get[FileNameJoin[{$flexiblesusyMetaDir, "SARAH-Higgs_2L_patch.m"}]];
           ];
 
 CheckFermiConstantInputRequirements[requiredSymbols_List, printout_:True] :=
@@ -2015,6 +2018,7 @@ FSCheckLoopCorrections[eigenstates_] :=
                                               ];
            If[needToCalculateLoopCorrections,
               SARAH`CalcLoopCorrections[eigenstates];
+              SARAH`Calc2LoopCorrections[eigenstates];
              ];
           ];
 
