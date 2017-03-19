@@ -7,7 +7,7 @@ Begin["`Private`"];
 
 AppendIndex[p_, idx_, 1] := p;
 AppendIndex[p_, idx_, range_] := AppendIndex[p, idx];
-AppendIndex[bar[p_], idx_] := bar[AppendIndex[p, idx]];
+AppendIndex[SARAH`bar[p_], idx_] := SARAH`bar[AppendIndex[p, idx]];
 AppendIndex[Susyno`LieGroups`conj[p_], idx_] := Susyno`LieGroups`conj[AppendIndex[p, idx]];
 AppendIndex[p_, idx_] := p[{idx}];
 
@@ -35,7 +35,7 @@ MultiplyLoopFunction[loopfuncs_List, particles_List, expr_] :=
 IsAmbiguousContraction[indices_List] := 
     Or @@ ((#[[2]] > 2) & /@
            Tally[First /@ (DeleteCases[indices, {_, gE1 | gE2}] /.
-                           bar -> Identity /. Susyno`LieGroups`conj -> Identity)]);
+                           SARAH`bar -> Identity /. Susyno`LieGroups`conj -> Identity)]);
 
 (* one or more fields with indices appear more once *)
 
@@ -71,7 +71,7 @@ SumTadpoleType[{type_, diags_}] := Total[CreateTadpoleDiag /@ diags];
 
 ConvertSarah2LDiagramList[tad_List, head_:Total] :=
     head[SumTadpoleType /@ tad] //. {
-        (m : (SARAH`Mass | SARAH`Mass2))[(bar | Susyno`LieGroups`conj)[p_], idx___] :> m[p, idx],
+        (m : (SARAH`Mass | SARAH`Mass2))[(SARAH`bar | Susyno`LieGroups`conj)[p_], idx___] :> m[p, idx],
         (m : (SARAH`Mass | SARAH`Mass2))[p_, idx__] :> m[p[{idx}]],
         C[p__] :> Cp[p]
     };
