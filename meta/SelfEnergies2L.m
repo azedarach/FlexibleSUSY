@@ -34,7 +34,7 @@ MultiplyLoopFunction[loopfuncs_List, particles_List, expr_] :=
 (* check for ambiguous contraction of indices *)
 IsAmbiguousContraction[indices_List] := 
     Or @@ ((#[[2]] > 2) & /@
-           Tally[First /@ (DeleteCases[indices, {_, gE1 | gE2}] /.
+           Tally[First /@ (DeleteCases[indices, {_, SARAH`gE1 | SARAH`gE2}] /.
                            SARAH`bar -> Identity /. Susyno`LieGroups`conj -> Identity)]);
 
 (* one or more fields with indices appear more once *)
