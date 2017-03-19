@@ -69,10 +69,10 @@ CreateTadpoleDiag[{particles_List, loopFuncs_List, couplings_List}] :=
 
 SumTadpoleType[{type_, diags_}] := Total[CreateTadpoleDiag /@ diags];
 
-ConvertSarah2LDiagramList[tad_List] := 
-    Total[SumTadpoleType /@ tad] //. {
-        (m : (Mass | SARAH`Mass2))[(bar | Susyno`LieGroups`conj)[p_], idx___] :> m[p, idx],
-        (m : (Mass | SARAH`Mass2))[p_, idx__] :> m[p[{idx}]],
+ConvertSarah2LDiagramList[tad_List, head_:Total] :=
+    head[SumTadpoleType /@ tad] //. {
+        (m : (SARAH`Mass | SARAH`Mass2))[(bar | Susyno`LieGroups`conj)[p_], idx___] :> m[p, idx],
+        (m : (SARAH`Mass | SARAH`Mass2))[p_, idx__] :> m[p[{idx}]],
         C[p__] :> Cp[p]
     };
 
