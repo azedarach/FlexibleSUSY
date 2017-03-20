@@ -211,6 +211,195 @@ end if
 TfFV=res
 end function tffv
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!! MASS FUNCTIONS (subroutine wrappers to interface with C/C++)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+real(dp) Function CWfSSSS (out,p2,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: p2,x,y,z,u,q2
+real(dp) :: out
+out = WfSSSS(p2,x,y,z,u,Q2)
+end function CWfSSSS
+
+real(dp) Function CXfSSS(out,p2,x,y,z,Q2)
+Implicit None
+real(dp), intent(in):: p2,x,y,z,q2
+real(dp) :: out
+out = XfSSS(p2,x,y,z,Q2)
+end function CXfSSS
+
+real(dp) Function CYfSSSS(out,p2,x,y,z,u,Q2)
+real(dp), intent(in):: p2,x,y,z,u,q2
+real(dp) :: out
+out = YfSSSS(p2,x,y,z,u,Q2)
+end Function CYfSSSS
+
+real(dp) Function CZfSSSS(out,p2,x,y,z,u,Q2)
+real(dp), intent(in):: p2,x,y,z,u,q2
+real(dp) :: out
+out = ZfSSSS(p2,x,y,z,u,Q2)
+end function CZfSSSS
+
+real(dp) Function CSfSSS(out,p2,x,y,z,Q2)
+real(dp), intent(in):: p2,x,y,z,q2
+real(dp) :: out
+out = SfSSS(p2,x,y,z,Q2)
+end function CSfSSS
+
+real(dp) Function CUfSSSS(out,p2,x,y,z,u,Q2)
+real(dp), intent(in):: p2,x,y,z,u,q2
+real(dp) :: out
+out = UfSSSS(p2,x,y,z,u,Q2)
+end function CUfSSSS
+
+real(dp) Function CVfSSSSS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfSSSSS(p2,x,y,z,u,v,Q2)
+end function CVfSSSSS
+
+real(dp) Function CMfSSSSS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfSSSSS(p2,x,y,z,u,v,Q2)
+end function CMfSSSSS
+
+real(dp) Function CWfSSSV(out,p2,x,Q2)
+real(dp), intent(in):: p2,x,q2
+real(dp) :: out
+out = WfSSSV(p2,x,Q2)
+end function CWfSSSV
+
+real(dp) Function CMfSSSSV(out,p2,x,y,Q2)
+real(dp), intent(in):: p2,x,y,q2
+real(dp) :: out
+out = MfSSSSV(p2,x,y,Q2)
+end function CMfSSSSV
+
+real(dp) Function CWfSSFF (out,p2,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: p2,x,y,z,u,q2
+real(dp) :: out
+out = WfSSFF(p2,x,y,z,u,Q2)
+end function CWfSSFF
+
+real(dp) Function CWfSSFbFb (out,p2,x,y,z,u,Q2)
+Implicit None
+real(dp), intent(in):: p2,x,y,z,u,q2
+real(dp) :: out
+out = WfSSFbFb(p2,x,y,z,u,Q2)
+end function CWfSSFbFb
+
+real(dp) Function CMfFbFbFbFbS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfFbFbFbFbS(p2,x,y,z,u,v,Q2)
+end function CMfFbFbFbFbS
+
+real(dp) Function CMfFFbFbFS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfFFbFbFS(p2,x,y,z,u,v,Q2)
+end function CMfFFbFbFS
+
+real(dp) Function CMfFFbFFbS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfFFbFFbS(p2,x,y,z,u,v,Q2)
+end function CMfFFbFFbS
+
+real(dp) Function CMfFFFbFbS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfFFFbFbS(p2,x,y,z,u,v,Q2)
+end function CMfFFFbFbS
+
+real(dp) Function CMfFFFFS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfFFFFS(p2,x,y,z,u,v,Q2)
+end function CMfFFFFS
+
+real(dp) Function CMfSFbSFbFb(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfSFbSFbFb(p2,x,y,z,u,v,Q2)
+end function CMfSFbSFbFb
+
+real(dp) Function CMfSFSFbF(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfSFSFbF(p2,x,y,z,u,v,Q2)
+end function CMfSFSFbF
+
+real(dp) Function CMfSFSFFb(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = MfSFSFFb(p2,x,y,z,u,v,Q2)
+end function CMfSFSFFb
+
+real(dp) Function CVfSSSFbFb(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfSSSFbFb(p2,x,y,z,u,v,Q2)
+end function CVfSSSFbFb
+
+real(dp) Function CVfSSSFF(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfSSSFF(p2,x,y,z,u,v,Q2)
+end function CVfSSSFF
+
+real(dp) Function CVfFbFbFbFbS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfFbFbFbFbS(p2,x,y,z,u,v,Q2)
+end function CVfFbFbFbFbS
+
+real(dp) Function CVfFbFFbFS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfFbFFbFS(p2,x,y,z,u,v,Q2)
+end function CVfFbFFbFS
+
+real(dp) Function CVfFbFFFbS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfFbFFFbS(p2,x,y,z,u,v,Q2)
+end function CVfFbFFFbS
+
+real(dp) Function CVfFFbFbFS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfFFbFbFS(p2,x,y,z,u,v,Q2)
+end function CVfFFbFbFS
+
+real(dp) Function CVfFFFbFbS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfFFFbFbS(p2,x,y,z,u,v,Q2)
+end function CVfFFFbFbS
+
+real(dp) Function CVfFFFFS(out,p2,x,y,z,u,v,Q2)
+real(dp), intent(in):: p2,x,y,z,u,v,q2
+real(dp) :: out
+out = VfFFFFS(p2,x,y,z,u,v,Q2)
+end function CVfFFFFS
+
+real(dp) Function CGfFFV(out,p2,x,y,Q2)
+real(dp), intent(in) :: p2,x,y,q2
+real(dp) :: out
+out = GfFFV(p2,x,y,Q2)
+end function CGfFFV
+
+real(dp) Function CGfFbFbV(out,p2,x,y,Q2)
+real(dp), intent(in) :: p2,x,y,q2
+real(dp) :: out
+out = GfFbFbV(p2,x,y,Q2)
+end function CGfFbFbV
+
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MASS FUNCTIONS
 

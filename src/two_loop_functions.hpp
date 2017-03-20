@@ -41,6 +41,39 @@ double TfFbFbFbS(double, double, double, double, double) PVATTR;
 double TfSV(double, double) PVATTR;
 double TfFV(double, double) PVATTR;
 
+// self-energy functions
+
+double WfSSSS(double, double, double, double, double, double) PVATTR;
+double XfSSS(double, double, double, double, double) PVATTR;
+double YfSSSS(double, double, double, double, double, double) PVATTR;
+double ZfSSSS(double, double, double, double, double, double) PVATTR;
+double SfSSS(double, double, double, double, double) PVATTR;
+double UfSSSS(double, double, double, double, double, double) PVATTR;
+double VfSSSSS(double, double, double, double, double, double, double) PVATTR;
+double MfSSSSS(double, double, double, double, double, double, double) PVATTR;
+double WfSSSV(double, double, double) PVATTR;
+double MfSSSSV(double, double, double, double) PVATTR;
+double WfSSFF(double, double, double, double, double, double) PVATTR;
+double WfSSFbFb(double, double, double, double, double, double) PVATTR;
+double MfFbFbFbFbS(double, double, double, double, double, double, double) PVATTR;
+double MfFFbFbFS(double, double, double, double, double, double, double) PVATTR;
+double MfFFbFFbS(double, double, double, double, double, double, double) PVATTR;
+double MfFFFbFbS(double, double, double, double, double, double, double) PVATTR;
+double MfFFFFS(double, double, double, double, double, double, double) PVATTR;
+double MfSFbSFbFb(double, double, double, double, double, double, double) PVATTR;
+double MfSFSFbF(double, double, double, double, double, double, double) PVATTR;
+double MfSFSFFb(double, double, double, double, double, double, double) PVATTR;
+double VfSSSFbFb(double, double, double, double, double, double, double) PVATTR;
+double VfSSSFF(double, double, double, double, double, double, double) PVATTR;
+double VfFbFbFbFbS(double, double, double, double, double, double, double) PVATTR;
+double VfFbFFbFS(double, double, double, double, double, double, double) PVATTR;
+double VfFbFFFbS(double, double, double, double, double, double, double) PVATTR;
+double VfFFbFbFS(double, double, double, double, double, double, double) PVATTR;
+double VfFFFbFbS(double, double, double, double, double, double, double) PVATTR;
+double VfFFFFS(double, double, double, double, double, double, double) PVATTR;
+double GfFFV(double, double, double, double) PVATTR;
+double GfFbFbV(double, double, double, double) PVATTR;
+
 } // namespace two_loop_functions
 } // namespace flexiblesusy
 
