@@ -215,189 +215,215 @@ end function tffv
 !!!!!!!! MASS FUNCTIONS (subroutine wrappers to interface with C/C++)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-real(dp) Function CWfSSSS (out,p2,x,y,z,u,Q2)
+Subroutine CWfSSSS (out,p2,x,y,z,u,Q2)
 Implicit None
 real(dp), intent(in):: p2,x,y,z,u,q2
 real(dp) :: out
 out = WfSSSS(p2,x,y,z,u,Q2)
-end function CWfSSSS
+end Subroutine CWfSSSS
 
-real(dp) Function CXfSSS(out,p2,x,y,z,Q2)
+Subroutine CXfSSS(out,p2,x,y,z,Q2)
 Implicit None
 real(dp), intent(in):: p2,x,y,z,q2
 real(dp) :: out
 out = XfSSS(p2,x,y,z,Q2)
-end function CXfSSS
+end Subroutine CXfSSS
 
-real(dp) Function CYfSSSS(out,p2,x,y,z,u,Q2)
+Subroutine CYfSSSS(out,p2,x,y,z,u,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,q2
 real(dp) :: out
 out = YfSSSS(p2,x,y,z,u,Q2)
-end Function CYfSSSS
+end Subroutine CYfSSSS
 
-real(dp) Function CZfSSSS(out,p2,x,y,z,u,Q2)
+Subroutine CZfSSSS(out,p2,x,y,z,u,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,q2
 real(dp) :: out
 out = ZfSSSS(p2,x,y,z,u,Q2)
-end function CZfSSSS
+end Subroutine CZfSSSS
 
-real(dp) Function CSfSSS(out,p2,x,y,z,Q2)
+Subroutine CSfSSS(out,p2,x,y,z,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,q2
 real(dp) :: out
 out = SfSSS(p2,x,y,z,Q2)
-end function CSfSSS
+end Subroutine CSfSSS
 
-real(dp) Function CUfSSSS(out,p2,x,y,z,u,Q2)
+Subroutine CUfSSSS(out,p2,x,y,z,u,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,q2
 real(dp) :: out
 out = UfSSSS(p2,x,y,z,u,Q2)
-end function CUfSSSS
+end Subroutine CUfSSSS
 
-real(dp) Function CVfSSSSS(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfSSSSS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfSSSSS(p2,x,y,z,u,v,Q2)
-end function CVfSSSSS
+end Subroutine CVfSSSSS
 
-real(dp) Function CMfSSSSS(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfSSSSS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfSSSSS(p2,x,y,z,u,v,Q2)
-end function CMfSSSSS
+end Subroutine CMfSSSSS
 
-real(dp) Function CWfSSSV(out,p2,x,Q2)
+Subroutine CWfSSSV(out,p2,x,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,q2
 real(dp) :: out
 out = WfSSSV(p2,x,Q2)
-end function CWfSSSV
+end Subroutine CWfSSSV
 
-real(dp) Function CMfSSSSV(out,p2,x,y,Q2)
+Subroutine CMfSSSSV(out,p2,x,y,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,q2
 real(dp) :: out
 out = MfSSSSV(p2,x,y,Q2)
-end function CMfSSSSV
+end Subroutine CMfSSSSV
 
-real(dp) Function CWfSSFF (out,p2,x,y,z,u,Q2)
+Subroutine CWfSSFF (out,p2,x,y,z,u,Q2)
 Implicit None
 real(dp), intent(in):: p2,x,y,z,u,q2
 real(dp) :: out
 out = WfSSFF(p2,x,y,z,u,Q2)
-end function CWfSSFF
+end Subroutine CWfSSFF
 
-real(dp) Function CWfSSFbFb (out,p2,x,y,z,u,Q2)
+Subroutine CWfSSFbFb (out,p2,x,y,z,u,Q2)
 Implicit None
 real(dp), intent(in):: p2,x,y,z,u,q2
 real(dp) :: out
 out = WfSSFbFb(p2,x,y,z,u,Q2)
-end function CWfSSFbFb
+end Subroutine CWfSSFbFb
 
-real(dp) Function CMfFbFbFbFbS(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfFbFbFbFbS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfFbFbFbFbS(p2,x,y,z,u,v,Q2)
-end function CMfFbFbFbFbS
+end Subroutine CMfFbFbFbFbS
 
-real(dp) Function CMfFFbFbFS(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfFFbFbFS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfFFbFbFS(p2,x,y,z,u,v,Q2)
-end function CMfFFbFbFS
+end Subroutine CMfFFbFbFS
 
-real(dp) Function CMfFFbFFbS(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfFFbFFbS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfFFbFFbS(p2,x,y,z,u,v,Q2)
-end function CMfFFbFFbS
+end Subroutine CMfFFbFFbS
 
-real(dp) Function CMfFFFbFbS(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfFFFbFbS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfFFFbFbS(p2,x,y,z,u,v,Q2)
-end function CMfFFFbFbS
+end Subroutine CMfFFFbFbS
 
-real(dp) Function CMfFFFFS(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfFFFFS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfFFFFS(p2,x,y,z,u,v,Q2)
-end function CMfFFFFS
+end Subroutine CMfFFFFS
 
-real(dp) Function CMfSFbSFbFb(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfSFbSFbFb(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfSFbSFbFb(p2,x,y,z,u,v,Q2)
-end function CMfSFbSFbFb
+end Subroutine CMfSFbSFbFb
 
-real(dp) Function CMfSFSFbF(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfSFSFbF(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfSFSFbF(p2,x,y,z,u,v,Q2)
-end function CMfSFSFbF
+end Subroutine CMfSFSFbF
 
-real(dp) Function CMfSFSFFb(out,p2,x,y,z,u,v,Q2)
+Subroutine CMfSFSFFb(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = MfSFSFFb(p2,x,y,z,u,v,Q2)
-end function CMfSFSFFb
+end Subroutine CMfSFSFFb
 
-real(dp) Function CVfSSSFbFb(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfSSSFbFb(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfSSSFbFb(p2,x,y,z,u,v,Q2)
-end function CVfSSSFbFb
+end Subroutine CVfSSSFbFb
 
-real(dp) Function CVfSSSFF(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfSSSFF(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfSSSFF(p2,x,y,z,u,v,Q2)
-end function CVfSSSFF
+end Subroutine CVfSSSFF
 
-real(dp) Function CVfFbFbFbFbS(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfFbFbFbFbS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfFbFbFbFbS(p2,x,y,z,u,v,Q2)
-end function CVfFbFbFbFbS
+end Subroutine CVfFbFbFbFbS
 
-real(dp) Function CVfFbFFbFS(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfFbFFbFS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfFbFFbFS(p2,x,y,z,u,v,Q2)
-end function CVfFbFFbFS
+end Subroutine CVfFbFFbFS
 
-real(dp) Function CVfFbFFFbS(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfFbFFFbS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfFbFFFbS(p2,x,y,z,u,v,Q2)
-end function CVfFbFFFbS
+end Subroutine CVfFbFFFbS
 
-real(dp) Function CVfFFbFbFS(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfFFbFbFS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfFFbFbFS(p2,x,y,z,u,v,Q2)
-end function CVfFFbFbFS
+end Subroutine CVfFFbFbFS
 
-real(dp) Function CVfFFFbFbS(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfFFFbFbS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfFFFbFbS(p2,x,y,z,u,v,Q2)
-end function CVfFFFbFbS
+end Subroutine CVfFFFbFbS
 
-real(dp) Function CVfFFFFS(out,p2,x,y,z,u,v,Q2)
+Subroutine CVfFFFFS(out,p2,x,y,z,u,v,Q2)
+Implicit None
 real(dp), intent(in):: p2,x,y,z,u,v,q2
 real(dp) :: out
 out = VfFFFFS(p2,x,y,z,u,v,Q2)
-end function CVfFFFFS
+end Subroutine CVfFFFFS
 
-real(dp) Function CGfFFV(out,p2,x,y,Q2)
+Subroutine CGfFFV(out,p2,x,y,Q2)
+Implicit None
 real(dp), intent(in) :: p2,x,y,q2
 real(dp) :: out
 out = GfFFV(p2,x,y,Q2)
-end function CGfFFV
+end Subroutine CGfFFV
 
-real(dp) Function CGfFbFbV(out,p2,x,y,Q2)
+Subroutine CGfFbFbV(out,p2,x,y,Q2)
+Implicit None
 real(dp), intent(in) :: p2,x,y,q2
 real(dp) :: out
 out = GfFbFbV(p2,x,y,Q2)
-end function CGfFbFbV
+end Subroutine CGfFbFbV
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
