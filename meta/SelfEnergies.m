@@ -54,17 +54,17 @@ SelfEnergyIsSymmetric::usage = "";
 
 Begin["`Private`"];
 
-GetExpression[selfEnergy_SelfEnergies`FSSelfEnergy] :=
-    selfEnergy[[2]];
+GetExpression[selfEnergy_SelfEnergies`FSSelfEnergy, loops_:1] :=
+    selfEnergy[[1 + loops]];
 
-GetExpression[selfEnergy_SelfEnergies`FSHeavySelfEnergy] :=
-    selfEnergy[[2]];
+GetExpression[selfEnergy_SelfEnergies`FSHeavySelfEnergy, loops_:1] :=
+    selfEnergy[[1 + loops]];
 
-GetExpression[selfEnergy_SelfEnergies`FSHeavyRotatedSelfEnergy] :=
-    selfEnergy[[2]];
+GetExpression[selfEnergy_SelfEnergies`FSHeavyRotatedSelfEnergy, loops_:1] :=
+    selfEnergy[[1 + loops]];
 
-GetExpression[tadpole_SelfEnergies`Tadpole] :=
-    tadpole[[2]];
+GetExpression[tadpole_SelfEnergies`Tadpole, loops_:1] :=
+    tadpole[[1 + loops]];
 
 GetField[selfEnergy_SelfEnergies`FSSelfEnergy] :=
     selfEnergy[[1]];
