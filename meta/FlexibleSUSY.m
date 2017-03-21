@@ -9,6 +9,7 @@ BeginPackage["FlexibleSUSY`",
               "EWSB`",
               "Traces`",
               "SelfEnergies`",
+              "SelfEnergies2L`",
               "Vertices`",
               "Phases`",
               "LatticeUtils`",
@@ -1829,6 +1830,8 @@ WriteUtilitiesClass[massMatrices_List, betaFun_List, inputParameters_List,
 FilesExist[fileNames_List] :=
     And @@ (FileExistsQ /@ fileNames);
 
+FilesExist[fileName_] := FilesExist[{fileName}];
+
 LatestModificationTimeInSeconds[file_String] :=
     If[FileExistsQ[file],
        AbsoluteTime[FileDate[file, "Modification"]], 0];
@@ -1860,9 +1863,31 @@ GetRGEFileNames[outputDir_String] :=
            FileNameJoin[{rgeDir, #}]& /@ fileNames
           ];
 
+Get1LSelfEnergyFileName[outputDir_String, eigenstates_] :=
+    FileNameJoin[{outputDir, ToString[eigenstates], "One-Loop", "SelfEnergy.m"}];
+
+Get2LDiagramFileName[outputDir_String, eigenstates_, field_String] :=
+    FileNameJoin[{outputDir, ToString[eigenstates], "Two-Loop", field <> ".m"}];
+
+Get2LSelfEnergyFileNames[outputDir_String, eigenstates_] :=
+    If[True || SARAH`SupersymmetricModel,
+       {
+           Get2LDiagramFileName[outputDir, eigenstates, "hh"],
+           Get2LDiagramFileName[outputDir, eigenstates, "Ah"]
+       },
+       {}
+      ];
+
+Get2LTadpoleFileNames[outputDir_String, eigenstates_] :=
+    If[True || SARAH`SupersymmetricModel,
+       { Get2LDiagramFileName[outputDir, eigenstates, "tadpoles"] },
+       {}
+      ];
+
 GetSelfEnergyFileNames[outputDir_String, eigenstates_] :=
-    FileNameJoin[{outputDir, ToString[eigenstates],
-                  "One-Loop", "SelfEnergy.m"}];
+    Join[{ Get1LSelfEnergyFileName[outputDir, eigenstates] },
+         Get2LSelfEnergyFileNames[outputDir, eigenstates]
+        ];
 
 NeedToCalculateSelfEnergies[eigenstates_] :=
     NeedToUpdateTarget[
@@ -1963,28 +1988,77 @@ FSCheckLoopCorrections[eigenstates_] :=
              ];
           ];
 
+Get2LSelfEnergy[eigenstates_] :=
+    Module[{files},
+           files = Get2LSelfEnergyFileNames[$sarahCurrentOutputMainDir, eigenstates];
+           If[files === {}, {},
+              Print["Reading 2-loop self-energies from ", files, " ..."];
+              SARAH`twoloophiggsmassdiags = {0, 0};
+              Get /@ files;
+              {
+                  {SARAH`HiggsBoson  , SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twoloophiggsmassdiags[[1]]]},
+                  {SARAH`PseudoScalar, SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twoloophiggsmassdiags[[2]]]}
+              }
+             ]
+          ];
+
+Get2LTadpole[eigenstates_] :=
+    Module[{files},
+           files = Get2LTadpoleFileNames[$sarahCurrentOutputMainDir, eigenstates];
+           If[files === {}, {},
+              Print["Reading 2-loop tadpole from ", files, " ..."];
+              SARAH`twolooptadpolediags = { 0 };
+              Get /@ files;
+              {
+                  {SARAH`HiggsBoson, SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twolooptadpolediags]}
+              }
+             ]
+          ];
+
+Append2LNPointFunctions[{hh | SARAH`HiggsBoson, se1_}, se2L_] :=
+    Module[{se2 = Cases[se2L, {SARAH`HiggsBoson, ex_} :> ex]},
+           If[se2 === {},
+              {SARAH`HiggsBoson, se1},
+              {SARAH`HiggsBoson, se1, First[se2]}
+             ]
+          ];
+
+Append2LNPointFunctions[{Ah | SARAH`PseudoScalar, se1_}, se2L_List] :=
+    Module[{se2 = Cases[se2L, {SARAH`PseudoScalar, ex_} :> ex]},
+           If[se2 === {},
+              {SARAH`PseudoScalar, se1},
+              {SARAH`PseudoScalar, se1, First[se2]}
+             ]
+          ];
+
+Append2LNPointFunctions[p:{_, _}, _] := p;
+
 PrepareSelfEnergies[eigenstates_] :=
-    Module[{selfEnergies = {}, selfEnergiesFile},
-           selfEnergiesFile = GetSelfEnergyFileNames[$sarahCurrentOutputMainDir, eigenstates];
+    Module[{selfEnergies, selfEnergies2L, selfEnergiesFile},
+           selfEnergiesFile = Get1LSelfEnergyFileName[$sarahCurrentOutputMainDir, eigenstates];
            If[!FileExistsQ[selfEnergiesFile],
-              Print["Error: self-energy files not found: ", selfEnergiesFile];
+              Print["Error: 1-loop self-energy file not found: ", selfEnergiesFile];
               Quit[1];
              ];
-           Print["Reading self-energies from file ", selfEnergiesFile, " ..."];
+           Print["Reading 1-loop self-energies from file ", selfEnergiesFile, " ..."];
            selfEnergies = Get[selfEnergiesFile];
+           selfEnergies2L = Get2LSelfEnergy[eigenstates];
+           selfEnergies = Append2LNPointFunctions[#, selfEnergies2L]& /@ selfEnergies;
            Print["Converting self-energies ..."];
            ConvertSarahSelfEnergies[selfEnergies]
           ];
 
 PrepareTadpoles[eigenstates_] :=
-    Module[{tadpoles = {}, tadpolesFile},
+    Module[{tadpoles, tadpoles2L, tadpolesFile},
            tadpolesFile = GetTadpoleFileName[$sarahCurrentOutputMainDir, eigenstates];
            If[!FilesExist[tadpolesFile],
-              Print["Error: tadpole file not found: ", tadpolesFile];
+              Print["Error: 1-loop tadpole file not found: ", tadpolesFile];
               Quit[1];
              ];
-           Print["Reading tadpoles from file ", tadpolesFile, " ..."];
+           Print["Reading 1-loop tadpoles from file ", tadpolesFile, " ..."];
            tadpoles = Get[tadpolesFile];
+           tadpoles2L = Get2LTadpole[eigenstates];
+           tadpoles = Append2LNPointFunctions[#, tadpoles2L]& /@ tadpoles;
            Print["Converting tadpoles ..."];
            ConvertSarahTadpoles[tadpoles]
           ];
