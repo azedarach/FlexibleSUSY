@@ -445,9 +445,9 @@ ExpressionToStringSequentially[expr_Plus, heads_, result_String] :=
 ExpressionToStringSequentially[expr_, heads_, result_String] :=
     result <> " = " <> ExpressionToString[expr, heads] <> ";\n";
 
-CreateNPointFunction[nPointFunction_, vertexRules_List] :=
+CreateNPointFunction[nPointFunction_, vertexRules_List, loops_] :=
     Module[{decl, expr, prototype, body, functionName},
-           expr = GetExpression[nPointFunction];
+           expr = GetExpression[nPointFunction, 1];
            functionName = CreateFunctionPrototype[nPointFunction];
            type = CConversion`CreateCType[CConversion`ScalarType[CConversion`complexScalarCType]];
            prototype = type <> " " <> functionName <> ";\n";
@@ -459,13 +459,13 @@ CreateNPointFunction[nPointFunction_, vertexRules_List] :=
                                      ReplaceGhosts[FlexibleSUSY`FSEigenstates] /.
                                      C -> 1,
                                      TreeMasses`GetParticles[], "result"]  <>
-                  "\nreturn result * oneOver16PiSqr;";
+                  "\nreturn result * " <> CConversion`RValueToCFormString[CConversion`oneOver16PiSqr^loops] <> ";";
            body = IndentText[WrapLines[body]];
            decl = decl <> body <> "\n}\n";
            Return[{prototype, decl}];
           ];
 
-CreateNPointFunctionMatrix[_SelfEnergies`Tadpole] := { "", "" };
+CreateNPointFunctionMatrix[_SelfEnergies`Tadpole, _] := { "", "" };
 
 FillHermitianSelfEnergyMatrix[nPointFunction_, sym_String] :=
     Module[{field = GetField[nPointFunction], dim, name},
@@ -500,7 +500,7 @@ FillSelfEnergyMatrix[nPointFunction_, sym_String] :=
                 ]
           ];
 
-CreateNPointFunctionMatrix[nPointFunction_] :=
+CreateNPointFunctionMatrix[nPointFunction_, loops_] :=
     Module[{dim, functionName, type, prototype, def},
            dim = GetDimension[GetField[nPointFunction]];
            If[dim == 1, Return[{ "", "" }]];
@@ -532,10 +532,10 @@ CreateNPointFunctions[nPointFunctions_List, vertexRules_List] :=
            Utils`StartProgressBar[Dynamic[k], Length[nPointFunctions]];
            For[k = 1, k <= Length[nPointFunctions], k++,
                Utils`UpdateProgressBar[k, Length[nPointFunctions]];
-               {p,d} = CreateNPointFunction[nPointFunctions[[k]], vertexFunctionNames];
+               {p,d} = CreateNPointFunction[nPointFunctions[[k]], vertexFunctionNames, 1];
                prototypes = prototypes <> p;
                defs = defs <> d;
-               {p,d} = CreateNPointFunctionMatrix[nPointFunctions[[k]]];
+               {p,d} = CreateNPointFunctionMatrix[nPointFunctions[[k]], 1];
                prototypes = prototypes <> p;
                defs = defs <> d;
               ];
