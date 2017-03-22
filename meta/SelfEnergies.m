@@ -54,6 +54,14 @@ SelfEnergyIsSymmetric::usage = "";
 
 Begin["`Private`"];
 
+NPointFunctionQ[_SelfEnergies`Tadpole]                  := True;
+NPointFunctionQ[_SelfEnergies`FSSelfEnergy]             := True;
+NPointFunctionQ[_SelfEnergies`FSHeavySelfEnergy]        := True;
+NPointFunctionQ[_SelfEnergies`FSHeavyRotatedSelfEnergy] := True;
+NPointFunctionQ[_]                                      := False;
+
+NumberOfLoops[(_[_, expr___])?NPointFunctionQ] := Length[{expr}];
+
 GetExpression[selfEnergy_SelfEnergies`FSSelfEnergy, loops_:1] :=
     selfEnergy[[1 + loops]];
 
