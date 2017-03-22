@@ -529,7 +529,7 @@ CreateNPointFunctionMatrix[nPointFunction_, loops_] :=
           ];
 
 CreateNPointFunctions[nPointFunctions_List, vertexRules_List] :=
-    Module[{prototypes = "", defs = "", vertexFunctionNames = {}, p, d,
+    Module[{prototypes = "", defs = "", vertexFunctionNames = {}, p, d, l,
             relevantVertexRules},
            (* create coupling functions for all vertices in the list *)
            Print["Converting vertex functions ..."];
@@ -540,13 +540,15 @@ CreateNPointFunctions[nPointFunctions_List, vertexRules_List] :=
            Print["Converting self energies ..."];
            Utils`StartProgressBar[Dynamic[k], Length[nPointFunctions]];
            For[k = 1, k <= Length[nPointFunctions], k++,
-               Utils`UpdateProgressBar[k, Length[nPointFunctions]];
-               {p,d} = CreateNPointFunction[nPointFunctions[[k]], vertexFunctionNames, 1];
-               prototypes = prototypes <> p;
-               defs = defs <> d;
-               {p,d} = CreateNPointFunctionMatrix[nPointFunctions[[k]], 1];
-               prototypes = prototypes <> p;
-               defs = defs <> d;
+               For[loops = 1, loops <= NumberOfLoops[nPointFunctions[[k]]], loops++,
+                   Utils`UpdateProgressBar[k, Length[nPointFunctions]];
+                   {p,d} = CreateNPointFunction[nPointFunctions[[k]], vertexFunctionNames, loops];
+                   prototypes = prototypes <> p;
+                   defs = defs <> d;
+                   {p,d} = CreateNPointFunctionMatrix[nPointFunctions[[k]], loops];
+                   prototypes = prototypes <> p;
+                   defs = defs <> d;
+                  ];
               ];
            Utils`StopProgressBar[Length[nPointFunctions]];
            {prototypes, defs}

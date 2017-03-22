@@ -1175,6 +1175,9 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
               calculateTwoLoopTadpoles  = SelfEnergies`FillArrayWithTwoLoopTadpoles[SARAH`HiggsBoson, "tadpole", "-"];
               calculateTwoLoopTadpolesNoStruct = SelfEnergies`FillArrayWithTwoLoopTadpoles[SARAH`HiggsBoson, "tadpole", "+"];
               {thirdGenerationHelperPrototypes, thirdGenerationHelperFunctions} = TreeMasses`CreateThirdGenerationHelpers[];
+              ,
+              calculateTwoLoopTadpoles     = SelfEnergies`FillArrayWithLoopTadpoles[2, higgsToEWSBEqAssociation, "tadpole", "-"];
+              calculateTwoLoopTadpolesNoStruct = SelfEnergies`FillArrayWithLoopTadpoles[2, higgsToEWSBEqAssociation, "tadpole", "+"];
              ];
            If[FlexibleSUSY`UseHiggs2LoopSM === True,
               {twoLoopSelfEnergyPrototypes, twoLoopSelfEnergyFunctions} = SelfEnergies`CreateTwoLoopSelfEnergiesSM[{SARAH`HiggsBoson}];
