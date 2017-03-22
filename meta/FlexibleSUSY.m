@@ -1103,7 +1103,7 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
             printMasses = "", printMixingMatrices = "",
             getPhysical = "", setPhysical = "",
             getMasses = "", setMasses = "",
-            masses, mixingMatrices, oneLoopTadpoles,
+            masses, mixingMatrices,
             dependencePrototypes, dependenceFunctions,
             clearOutputParameters = "", solveEwsbTreeLevel = "",
             clearPhases = "", clearExtraParameters = "",
@@ -1167,7 +1167,6 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
                     " parameters: ", parametersFixedByEWSB];
              ];
            higgsToEWSBEqAssociation     = CreateHiggsToEWSBEqAssociation[];
-           oneLoopTadpoles              = Cases[nPointFunctions, SelfEnergies`Tadpole[___]];
            calculateOneLoopTadpoles     = SelfEnergies`FillArrayWithLoopTadpoles[1, higgsToEWSBEqAssociation, "tadpole", "-"];
            calculateOneLoopTadpolesNoStruct = SelfEnergies`FillArrayWithLoopTadpoles[1, higgsToEWSBEqAssociation, "tadpole", "+"];
            divideTadpoleByVEV           = SelfEnergies`DivideTadpoleByVEV[Parameters`DecreaseIndexLiterals @ CreateVEVToTadpoleAssociation[], "tadpole"];
@@ -1217,7 +1216,7 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
              ];
            loopMassesPrototypes         = LoopMasses`CreateOneLoopPoleMassPrototypes[];
            (* If you want to add tadpoles, call the following routine like this:
-              CreateOneLoopPoleMassFunctions[diagonalizationPrecision, oneLoopTadpoles, vevs];
+              CreateOneLoopPoleMassFunctions[diagonalizationPrecision, Cases[nPointFunctions, SelfEnergies`Tadpole[___]], vevs];
               *)
            loopMassesFunctions          = LoopMasses`CreateOneLoopPoleMassFunctions[diagonalizationPrecision, {}, {}];
            runningDRbarMassesPrototypes = LoopMasses`CreateRunningDRbarMassPrototypes[];
@@ -1296,10 +1295,10 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
                             "@tadpoleEqFunctions@"   -> tadpoleEqFunctions,
                             "@numberOfEWSBEquations@"-> ToString[TreeMasses`GetDimension[SARAH`HiggsBoson]],
                             "@calculateTreeLevelTadpoles@" -> IndentText[calculateTreeLevelTadpoles],
-                            "@calculateOneLoopTadpoles@"   -> IndentText[calculateOneLoopTadpoles],
-                            "@calculateTwoLoopTadpoles@"   -> IndentText[calculateTwoLoopTadpoles],
-                            "@calculateOneLoopTadpolesNoStruct@" -> IndentText[calculateOneLoopTadpolesNoStruct],
-                            "@calculateTwoLoopTadpolesNoStruct@" -> IndentText[calculateTwoLoopTadpolesNoStruct],
+                            "@calculateOneLoopTadpoles@"   -> IndentText @ IndentText[calculateOneLoopTadpoles],
+                            "@calculateTwoLoopTadpoles@"   -> IndentText @ IndentText @ IndentText[calculateTwoLoopTadpoles],
+                            "@calculateOneLoopTadpolesNoStruct@" -> IndentText @ IndentText[calculateOneLoopTadpolesNoStruct],
+                            "@calculateTwoLoopTadpolesNoStruct@" -> IndentText @ IndentText @ IndentText[calculateTwoLoopTadpolesNoStruct],
                             "@divideTadpoleByVEV@"     -> IndentText[divideTadpoleByVEV],
                             "@clearOutputParameters@"  -> IndentText[clearOutputParameters],
                             "@clearPhases@"            -> IndentText[clearPhases],
