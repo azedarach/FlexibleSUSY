@@ -448,8 +448,8 @@ ExpressionToStringSequentially[expr_, heads_, result_String] :=
 
 CreateNPointFunction[nPointFunction_, vertexRules_List, loops_] :=
     Module[{decl, expr, prototype, body, functionName},
-           expr = GetExpression[nPointFunction, 1];
-           functionName = CreateFunctionPrototype[nPointFunction, 1];
+           expr = GetExpression[nPointFunction, loops];
+           functionName = CreateFunctionPrototype[nPointFunction, loops];
            type = CConversion`CreateCType[CConversion`ScalarType[CConversion`complexScalarCType]];
            prototype = type <> " " <> functionName <> ";\n";
            decl = "\n" <> type <> " CLASSNAME::" <> functionName <> "\n{\n";
@@ -468,10 +468,10 @@ CreateNPointFunction[nPointFunction_, vertexRules_List, loops_] :=
 
 CreateNPointFunctionMatrix[_SelfEnergies`Tadpole, _] := { "", "" };
 
-FillHermitianSelfEnergyMatrix[nPointFunction_, sym_String] :=
+FillHermitianSelfEnergyMatrix[nPointFunction_, sym_String, loops_] :=
     Module[{field = GetField[nPointFunction], dim, name},
            dim = GetDimension[field];
-           name = CreateSelfEnergyFunctionName[field, 1];
+           name = CreateSelfEnergyFunctionName[field, loops];
            "\
 for (int i = 0; i < " <> ToString[dim] <> "; i++)
    for (int k = i; k < " <> ToString[dim] <> "; k++)
@@ -481,10 +481,10 @@ Hermitianize(" <> sym <> ");
 "
           ];
 
-FillGeneralSelfEnergyFunction[nPointFunction_, sym_String] :=
+FillGeneralSelfEnergyFunction[nPointFunction_, sym_String, loops_] :=
     Module[{field = GetField[nPointFunction], dim, name},
            dim = GetDimension[field];
-           name = CreateSelfEnergyFunctionName[field, 1];
+           name = CreateSelfEnergyFunctionName[field, loops];
            "\
 for (int i = 0; i < " <> ToString[dim] <> "; i++)
    for (int k = 0; k < " <> ToString[dim] <> "; k++)
@@ -492,12 +492,12 @@ for (int i = 0; i < " <> ToString[dim] <> "; i++)
 "
           ];
 
-FillSelfEnergyMatrix[nPointFunction_, sym_String] :=
+FillSelfEnergyMatrix[nPointFunction_, sym_String, loops_] :=
     Module[{particle = GetField[nPointFunction]},
            Which[(IsScalar[particle] || IsVector[particle]) && SelfEnergyIsSymmetric[particle],
-                 FillHermitianSelfEnergyMatrix[nPointFunction, sym],
+                 FillHermitianSelfEnergyMatrix[nPointFunction, sym, loops],
                  True,
-                 FillGeneralSelfEnergyFunction[nPointFunction, sym]
+                 FillGeneralSelfEnergyFunction[nPointFunction, sym, loops]
                 ]
           ];
 
@@ -505,7 +505,7 @@ CreateNPointFunctionMatrix[nPointFunction_, loops_] :=
     Module[{dim, functionName, type, prototype, def},
            dim = GetDimension[GetField[nPointFunction]];
            If[dim == 1, Return[{ "", "" }]];
-           functionName = CreateFunctionPrototypeMatrix[nPointFunction, 1];
+           functionName = CreateFunctionPrototypeMatrix[nPointFunction, loops];
            type = CConversion`CreateCType[CConversion`MatrixType[CConversion`complexScalarCType, dim, dim]];
            prototype = type <> " " <> functionName <> ";\n";
            def = "
@@ -513,7 +513,7 @@ CreateNPointFunctionMatrix[nPointFunction_, loops_] :=
 {
    " <> type <> " self_energy;
 
-" <> IndentText[FillSelfEnergyMatrix[nPointFunction, "self_energy"]] <> "
+" <> IndentText[FillSelfEnergyMatrix[nPointFunction, "self_energy", loops]] <> "
    return self_energy;
 }
 ";
