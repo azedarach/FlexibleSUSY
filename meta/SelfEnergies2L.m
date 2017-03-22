@@ -74,6 +74,11 @@ ConvertSarah2LDiagramList[tad_List, head_:Total] :=
         (m : (SARAH`Mass | SARAH`Mass2))[(SARAH`bar | Susyno`LieGroups`conj)[p_], idx___] :> m[p, idx],
         (m : (SARAH`Mass | SARAH`Mass2))[p_, idx__] :> m[p[{idx}]],
         C[p__] :> Cp[p]
+        (* unrotate to interaction basis *)
+        (* SARAH`HiggsBoson[{SARAH`gE1}]   -> Symbol["U" <> ToString[SARAH`HiggsBoson]][{SARAH`gO1}], *)
+        (* SARAH`HiggsBoson[{SARAH`gE2}]   -> Symbol["U" <> ToString[SARAH`HiggsBoson]][{SARAH`gO2}], *)
+        (* SARAH`PseudoScalar[{SARAH`gE1}] -> Symbol["U" <> ToString[SARAH`PseudoScalar]][{SARAH`gO1}], *)
+        (* SARAH`PseudoScalar[{SARAH`gE2}] -> Symbol["U" <> ToString[SARAH`PseudoScalar]][{SARAH`gO2}] *)
     };
 
 End[];
