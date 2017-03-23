@@ -1998,8 +1998,8 @@ Get2LSelfEnergy[eigenstates_] :=
               SARAH`twoloophiggsmassdiags = {0, 0};
               Get /@ files;
               {
-                  {SARAH`HiggsBoson  , SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twoloophiggsmassdiags[[1]]]},
-                  {SARAH`PseudoScalar, SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twoloophiggsmassdiags[[2]]]}
+                  {SARAH`HiggsBoson  , Null, SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twoloophiggsmassdiags[[1]]]},
+                  {SARAH`PseudoScalar, Null, SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twoloophiggsmassdiags[[2]]]}
               }
              ]
           ];
@@ -2012,28 +2012,44 @@ Get2LTadpole[eigenstates_] :=
               SARAH`twolooptadpolediags = { 0 };
               Get /@ files;
               {
-                  {SARAH`HiggsBoson, SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twolooptadpolediags]}
+                  {SARAH`HiggsBoson, Null, SelfEnergies2L`ConvertSarah2LDiagramList[SARAH`twolooptadpolediags]}
               }
              ]
           ];
 
 Append2LNPointFunctions[{hh | SARAH`HiggsBoson, se1_}, se2L_] :=
-    Module[{se2 = Cases[se2L, {SARAH`HiggsBoson, ex_} :> ex]},
+    Module[{se2 = Cases[se2L, {SARAH`HiggsBoson, _, ex_} :> ex]},
            If[se2 === {},
               {SARAH`HiggsBoson, se1},
-              {SARAH`HiggsBoson, se1, First[se2]}
+              If[GetDimension[SARAH`HiggsBoson] > 1,
+                 {SARAH`HiggsBoson, se1}, (* do not append since mass eigenstates != gauge eigenstates *)
+                 {SARAH`HiggsBoson, se1, First[se2]} (* mass eigenstates == gauge eigenstates*)
+                ]
              ]
           ];
 
 Append2LNPointFunctions[{Ah | SARAH`PseudoScalar, se1_}, se2L_List] :=
-    Module[{se2 = Cases[se2L, {SARAH`PseudoScalar, ex_} :> ex]},
+    Module[{se2 = Cases[se2L, {SARAH`PseudoScalar, _, ex_} :> ex]},
            If[se2 === {},
               {SARAH`PseudoScalar, se1},
-              {SARAH`PseudoScalar, se1, First[se2]}
+              If[GetDimension[SARAH`PseudoScalar] > 1,
+                 {SARAH`PseudoScalar, se1}, (* do not append since mass eigenstates != gauge eigenstates *)
+                 {SARAH`PseudoScalar, se1, First[se2]} (* mass eigenstates == gauge eigenstates*)
+                ]
              ]
           ];
 
 Append2LNPointFunctions[p:{_, _}, _] := p;
+
+RemoveDim1Fields[lst_List] := Select[lst, (GetDimension[First[#]] > 1)&];
+
+(* assumes that se1L is in gauge eigenstates and se2L is in mass
+   eigenstates.  Returns a two-component list, where the 1st entry is
+   a list of self-energies in gauge eigenstates and the 2nd entry is a
+   list of self-energies in mass eigenstates.
+ *)
+MergeNPointFunctions[se1L_List, se2L_List] :=
+    { Append2LNPointFunctions[#, se2L]& /@ se1L, RemoveDim1Fields[se2L] };
 
 PrepareSelfEnergies[eigenstates_] :=
     Module[{selfEnergies, selfEnergies2L, selfEnergiesFile},
@@ -2045,9 +2061,8 @@ PrepareSelfEnergies[eigenstates_] :=
            Print["Reading 1-loop self-energies from file ", selfEnergiesFile, " ..."];
            selfEnergies = Get[selfEnergiesFile];
            selfEnergies2L = Get2LSelfEnergy[eigenstates];
-           selfEnergies = Append2LNPointFunctions[#, selfEnergies2L]& /@ selfEnergies;
            Print["Converting self-energies ..."];
-           ConvertSarahSelfEnergies[selfEnergies]
+           ConvertSarahSelfEnergies[Sequence @@ MergeNPointFunctions[selfEnergies, selfEnergies2L]]
           ];
 
 PrepareTadpoles[eigenstates_] :=
@@ -2060,9 +2075,8 @@ PrepareTadpoles[eigenstates_] :=
            Print["Reading 1-loop tadpoles from file ", tadpolesFile, " ..."];
            tadpoles = Get[tadpolesFile];
            tadpoles2L = Get2LTadpole[eigenstates];
-           tadpoles = Append2LNPointFunctions[#, tadpoles2L]& /@ tadpoles;
            Print["Converting tadpoles ..."];
-           ConvertSarahTadpoles[tadpoles]
+           ConvertSarahTadpoles[Sequence @@ MergeNPointFunctions[tadpoles, tadpoles2L]]
           ];
 
 (* Get all nPointFunctions that GMM2 needs *)
