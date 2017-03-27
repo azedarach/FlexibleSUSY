@@ -115,6 +115,7 @@ GetMassOfUnmixedParticle::usage="returns mass of unmixed particle";
 GetMassType::usage="returns mass array type of particle";
 GetMassMatrixType::usage="returns mass matrix type of particle";
 GetMixingMatrixType::usage="returns mixing matrix type of particle";
+GetTadpoleType::usage="returns tadpole type of given Higgs particle";
 
 ReplaceDependencies::usage="returs expression with dependencies
 (ThetaW etc.) replaced by the user-defined expressions (";
@@ -595,6 +596,14 @@ GetMixingMatrixType[massMatrix_TreeMasses`FSMassMatrix] :=
                  type = CConversion`complexScalarCType;
                 ];
            Return[CConversion`MatrixType[type, dim, dim]];
+          ];
+
+GetTadpoleType[particle_] :=
+    Module[{dim = GetDimension[particle]},
+           If[dim == 1,
+              CConversion`ScalarType[CConversion`complexScalarCType],
+              CConversion`VectorType[CConversion`complexScalarCType, dim]
+             ]
           ];
 
 (* Removes generators and Delta with the given indices.
