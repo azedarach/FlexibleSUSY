@@ -37,6 +37,8 @@ AbsSqr::usage="";
 AbsSqrt::usage="";
 FSKroneckerDelta::usage="";
 TensorProd::usage="";
+UV::usage="unit vector";
+Eval::usage="calls .eval()";
 
 HaveSameDimension::usage = "Checks if given types have same
 dimension";

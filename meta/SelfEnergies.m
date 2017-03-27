@@ -446,6 +446,56 @@ ExpressionToStringSequentially[expr_Plus, heads_, result_String] :=
 ExpressionToStringSequentially[expr_, heads_, result_String] :=
     result <> " = " <> ExpressionToString[expr, heads] <> ";\n";
 
+PrepareExpr[expr_, vertexRules_] :=
+    expr /.
+    vertexRules /.
+    a_[List[i__]] :> a[i] /.
+    ReplaceGhosts[FlexibleSUSY`FSEigenstates] /.
+    C -> 1;
+
+RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @ SumToSumOver @
+		       expr;
+
+RecordSumCosts[expr_] := expr //.
+    SumOver[idx_, a_, b_] x_ :> SumOver[idx, a, b, IndexCost[idx, x]] x
+
+SumToSumOver[expr_] := expr //.
+    SARAH`sum[idx_, a_, b_, x_] :> SumOver[idx, a, b] x
+
+SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
+	lst = List @@ prod,
+	sumOverToConvert,
+	idx, a, b, summand
+    },
+    sumOverToConvert = First @ SortBy[Cases[lst, SumOver[_,_,_,_]], Last];
+    {idx, a, b} = Take[List @@ sumOverToConvert, 3];
+    summand = Select[DeleteCases[lst, sumOverToConvert],
+		     !FreeQ[#, idx]&];
+    SumOverToSum[SARAH`sum[idx, a, b, Eval[SumOverToSum[Times @@ summand]]]
+		 Times @@ Complement[lst, {sumOverToConvert}, summand]]
+]
+
+SumOverToSum[x_Plus] := SumOverToSum /@ x;
+
+SumOverToSum[x_] := x;
+
+IndexCost[idx_, x:_[__]] /;
+    ValueQ[FunctionCost[x]] && !FreeQ[x, idx] := FunctionCost[x];
+
+IndexCost[idx_, x:_[__]] := Plus @@ (IndexCost[idx, #]& /@ List @@ x);
+
+IndexCost[idx_, _] := 0;
+
+(* cost function *)
+FunctionCost[SARAH`A0[_]]  := 1;
+FunctionCost[SARAH`B0[__]] := 2;
+FunctionCost[SARAH`B1[__]] := 2;
+FunctionCost[SARAH`B00[__]] := 2;
+FunctionCost[SARAH`B22[__]] := 2;
+FunctionCost[SARAH`F0[__]] := 2;
+FunctionCost[SARAH`G0[__]] := 2;
+FunctionCost[SARAH`H0[__]] := 2;
+
 CreateNPointFunction[nPointFunction_, vertexRules_List] :=
     Module[{decl, expr, prototype, body, functionName},
            expr = GetExpression[nPointFunction];
@@ -454,11 +504,8 @@ CreateNPointFunction[nPointFunction_, vertexRules_List] :=
            prototype = type <> " " <> functionName <> ";\n";
            decl = "\n" <> type <> " CLASSNAME::" <> functionName <> "\n{\n";
            body = type <> " result;\n\n" <>
-                  ExpressionToStringSequentially[expr /.
-                                     vertexRules /.
-                                     a_[List[i__]] :> a[i] /.
-                                     ReplaceGhosts[FlexibleSUSY`FSEigenstates] /.
-                                     C -> 1,
+                  ExpressionToStringSequentially[
+                                     PrepareExpr[expr, vertexRules],
                                      TreeMasses`GetParticles[], "result"]  <>
                   "\nreturn result * oneOver16PiSqr;";
            body = IndentText[WrapLines[body]];
@@ -466,7 +513,27 @@ CreateNPointFunction[nPointFunction_, vertexRules_List] :=
            Return[{prototype, decl}];
           ];
 
-CreateNPointFunctionMatrix[_SelfEnergies`Tadpole] := { "", "" };
+CreateNPointFunctionMatrix[tadpole_SelfEnergies`Tadpole, vertexRules_List] :=
+    Module[{dim = GetDimension[GetField[tadpole]],
+            field = GetField[tadpole],
+            expr = GetExpression[tadpole],
+            type = CConversion`CreateCType[GetTadpoleType[GetField[tadpole]]],
+            functionName = CreateTadpoleFunctionName[GetField[tadpole], 1] <> "() const",
+            prototype, decl
+           },
+           If[dim == 1, Return[{ "", "" }]];
+           prototype = type <> " " <> functionName <> ";\n";
+           expr = RefactorSums[SARAH`sum[SARAH`gO1, 1, dim, UV[dim,SARAH`gO1] expr]];
+           decl = "\n" <> type <> " CLASSNAME::" <> functionName <> "\n{\n" <>
+              IndentText[type <> " result;\n\n" <>
+                         ExpressionToStringSequentially[
+                             PrepareExpr[expr, vertexRules],
+                             TreeMasses`GetParticles[], "result"]  <>
+                         "\nreturn result * oneOver16PiSqr;"
+                        ] <>
+           "\n}\n";
+           {prototype, decl}
+          ];
 
 FillHermitianSelfEnergyMatrix[nPointFunction_, sym_String] :=
     Module[{field = GetField[nPointFunction], dim, name},
@@ -501,7 +568,7 @@ FillSelfEnergyMatrix[nPointFunction_, sym_String] :=
                 ]
           ];
 
-CreateNPointFunctionMatrix[nPointFunction_] :=
+CreateNPointFunctionMatrix[nPointFunction_, vertexRules_List] :=
     Module[{dim, functionName, type, prototype, def},
            dim = GetDimension[GetField[nPointFunction]];
            If[dim == 1, Return[{ "", "" }]];
@@ -536,7 +603,7 @@ CreateNPointFunctions[nPointFunctions_List, vertexRules_List] :=
                {p,d} = CreateNPointFunction[nPointFunctions[[k]], vertexFunctionNames];
                prototypes = prototypes <> p;
                defs = defs <> d;
-               {p,d} = CreateNPointFunctionMatrix[nPointFunctions[[k]]];
+               {p,d} = CreateNPointFunctionMatrix[nPointFunctions[[k]], vertexFunctionNames];
                prototypes = prototypes <> p;
                defs = defs <> d;
               ];
