@@ -65,7 +65,8 @@ namespace flexiblesusy {
 #define MODELPARAMETER(parameter) model.get_##parameter()
 #define EXTRAPARAMETER(parameter) model.get_##parameter()
 #define Eval(expr) (expr).eval()
-#define UV(N,i) Eigen::Matrix<std::complex<double>,N,1>::Unit(i)
+#define UVec(N,i) Eigen::Matrix<std::complex<double>,N,1>::Unit(i)
+#define UMat(M,N,i,k) Eigen::Matrix<std::complex<double>,M,N>::Unit(i,k)
 
 #define HIGGS_2LOOP_CORRECTION_AT_AS     two_loop_corrections.higgs_at_as
 #define HIGGS_2LOOP_CORRECTION_AB_AS     two_loop_corrections.higgs_ab_as

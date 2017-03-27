@@ -379,18 +379,6 @@ ReplaceGhosts[states_:FlexibleSUSY`FSEigenstates] :=
            Return[ghosts];
           ];
 
-DeclareFieldIndices[field_Symbol] := "";
-
-DeclareFieldIndices[field_[ind1_, ind2_]] :=
-    ", int " <> ToValidCSymbolString[ind1] <>
-    ", int " <> ToValidCSymbolString[ind2];
-
-DeclareFieldIndices[field_[PL]] := DeclareFieldIndices[field];
-DeclareFieldIndices[field_[PR]] := DeclareFieldIndices[field];
-DeclareFieldIndices[field_[1]]  := DeclareFieldIndices[field];
-DeclareFieldIndices[field_[ind_]] :=
-    "int " <> ToValidCSymbolString[ind];
-
 ExtractChiraility[field_[idx1_,idx2_]] := ExtractChiraility[field];
 ExtractChiraility[field_[PL]]          := "_PL";
 ExtractChiraility[field_[PR]]          := "_PR";
@@ -428,17 +416,6 @@ CreateFunctionName[selfEnergy_SelfEnergies`FSHeavyRotatedSelfEnergy, loops_] :=
 
 CreateFunctionName[tadpole_SelfEnergies`Tadpole, loops_] :=
     CreateTadpoleFunctionName[GetField[tadpole], loops];
-
-CreateFunctionPrototype[tadpole_SelfEnergies`Tadpole, loops_] :=
-    CreateFunctionName[tadpole, loops] <>
-    "(" <> DeclareFieldIndices[GetField[tadpole]] <> ") const";
-
-CreateFunctionPrototype[selfEnergy_, loops_] :=
-    CreateFunctionName[selfEnergy, loops] <>
-    "(" <> CreateCType[CConversion`ScalarType[CConversion`realScalarCType]] <> " p " <> DeclareFieldIndices[GetField[selfEnergy]] <> ") const";
-
-CreateFunctionPrototypeMatrix[s_, loops_] :=
-    CreateFunctionName[s, loops] <> "(double p) const";
 
 ExpressionToStringSequentially[expr_Plus, heads_, result_String] :=
     StringJoin[(result <> " += " <> ExpressionToString[#,heads] <> ";\n")& /@ (List @@ expr)];
@@ -496,36 +473,68 @@ FunctionCost[SARAH`F0[__]] := 2;
 FunctionCost[SARAH`G0[__]] := 2;
 FunctionCost[SARAH`H0[__]] := 2;
 
-CreateNPointFunction[nPointFunction_, vertexRules_List] :=
-    Module[{decl, expr, prototype, body, functionName},
-           expr = GetExpression[nPointFunction];
-           functionName = CreateFunctionPrototype[nPointFunction, 1];
-           type = CConversion`CreateCType[CConversion`ScalarType[CConversion`complexScalarCType]];
-           prototype = type <> " " <> functionName <> ";\n";
-           decl = "\n" <> type <> " CLASSNAME::" <> functionName <> "\n{\n";
-           body = type <> " result;\n\n" <>
-                  ExpressionToStringSequentially[
-                                     PrepareExpr[expr, vertexRules],
-                                     TreeMasses`GetParticles[], "result"]  <>
-                  "\nreturn result * oneOver16PiSqr;";
-           body = IndentText[WrapLines[body]];
-           decl = decl <> body <> "\n}\n";
-           Return[{prototype, decl}];
+GetNPointFunctionType[n_SelfEnergies`Tadpole] := TreeMasses`GetTadpoleType[GetField[n]];
+GetNPointFunctionType[n_]                     := TreeMasses`GetSelfEnergyType[GetField[n]];
+
+DeclareMomentum[_SelfEnergies`Tadpole] := "";
+DeclareMomentum[_] := CreateCType[CConversion`ScalarType[CConversion`realScalarCType]] <> " p";
+
+DeclareFieldIndices[field_, _CConversion`ScalarType] := DeclareFieldIndices[field];
+DeclareFieldIndices[field_, _] := "";
+
+DeclareFieldIndices[field_Symbol] := "";
+DeclareFieldIndices[field_[ind1_, ind2_]] :=
+    ", int " <> ToValidCSymbolString[ind1] <>
+    ", int " <> ToValidCSymbolString[ind2];
+DeclareFieldIndices[field_[PL]] := DeclareFieldIndices[field];
+DeclareFieldIndices[field_[PR]] := DeclareFieldIndices[field];
+DeclareFieldIndices[field_[1]]  := DeclareFieldIndices[field];
+DeclareFieldIndices[field_[ind_]] :=
+    "int " <> ToValidCSymbolString[ind];
+
+CreateFunctionPrototype[n_, type_, loops_] :=
+    CreateFunctionName[n, loops] <> "(" <> DeclareMomentum[n] <> DeclareFieldIndices[GetField[n], type] <> ") const";
+
+(* sum over external gauge index *)
+SumOverExternalIndices[t:SelfEnergies`Tadpole[f_, ex__]] :=
+    Module[{dim = GetDimension[f]},
+           SelfEnergies`Tadpole[f, Sequence @@ (RefactorSums[
+               SARAH`sum[SARAH`gO1, 1, dim, UVec[dim,SARAH`gO1] #]
+           ]& /@ {ex})]
           ];
 
-CreateNPointFunctionMatrix[tadpole_SelfEnergies`Tadpole, vertexRules_List] :=
-    Module[{dim = GetDimension[GetField[tadpole]],
-            field = GetField[tadpole],
-            expr = GetExpression[tadpole],
-            type = CConversion`CreateCType[GetTadpoleType[GetField[tadpole]]],
-            functionName = CreateTadpoleFunctionName[GetField[tadpole], 1] <> "() const",
-            prototype, decl
+(* sum over external gauge indices *)
+SumOverExternalIndices[s_[f_, ex__]] :=
+    Module[{dim = GetDimension[f]},
+           s[f, Sequence @@ (RefactorSums[
+               SARAH`sum[SARAH`gO1, 1, dim,
+                         SARAH`sum[SARAH`gO2, 1, dim, UMat[dim,dim,SARAH`gO1,SARAH`gO2] #]
+                        ]
+           ]& /@ {ex})]
+          ];
+
+CreateNPointFunction[nPointFunction_, vertexRules_List] :=
+    Module[{dim = GetDimension[GetField[nPointFunction]],
+            type = GetNPointFunctionType[nPointFunction],
+            expr = GetExpression[nPointFunction],
+            prototype, decl, p, d
            },
-           If[dim == 1, Return[{ "", "" }]];
-           prototype = type <> " " <> functionName <> ";\n";
-           expr = RefactorSums[SARAH`sum[SARAH`gO1, 1, dim, UV[dim,SARAH`gO1] expr]];
-           decl = "\n" <> type <> " CLASSNAME::" <> functionName <> "\n{\n" <>
-              IndentText[type <> " result;\n\n" <>
+           {prototype, decl} = CreateNPointFunction[nPointFunction, vertexRules, GetScalarElementType[type], expr];
+           If[dim > 1,
+              {p, d} = CreateNPointFunction[nPointFunction, vertexRules, type, GetExpression @ SumOverExternalIndices[nPointFunction]];
+              prototype = prototype <> p;
+              decl = decl <> d;
+             ];
+           {prototype, decl}
+          ];
+
+CreateNPointFunction[nPointFunction_, vertexRules_List, type_, expr_] :=
+    Module[{functionName = CreateFunctionPrototype[nPointFunction, type, 1],
+            ctype = CConversion`CreateCType[type], 
+            prototype, decl},
+           prototype = ctype <> " " <> functionName <> ";\n";
+           decl = "\n" <> ctype <> " CLASSNAME::" <> functionName <> "\n{\n" <>
+              IndentText[ctype <> " result;\n\n" <>
                          ExpressionToStringSequentially[
                              PrepareExpr[expr, vertexRules],
                              TreeMasses`GetParticles[], "result"]  <>
@@ -533,58 +542,6 @@ CreateNPointFunctionMatrix[tadpole_SelfEnergies`Tadpole, vertexRules_List] :=
                         ] <>
            "\n}\n";
            {prototype, decl}
-          ];
-
-FillHermitianSelfEnergyMatrix[nPointFunction_, sym_String] :=
-    Module[{field = GetField[nPointFunction], dim, name},
-           dim = GetDimension[field];
-           name = CreateSelfEnergyFunctionName[field, 1];
-           "\
-for (int i = 0; i < " <> ToString[dim] <> "; i++)
-   for (int k = i; k < " <> ToString[dim] <> "; k++)
-      " <> sym <> "(i, k) = " <> name <> "(p, i, k);
-
-Hermitianize(" <> sym <> ");
-"
-          ];
-
-FillGeneralSelfEnergyFunction[nPointFunction_, sym_String] :=
-    Module[{field = GetField[nPointFunction], dim, name},
-           dim = GetDimension[field];
-           name = CreateSelfEnergyFunctionName[field, 1];
-           "\
-for (int i = 0; i < " <> ToString[dim] <> "; i++)
-   for (int k = 0; k < " <> ToString[dim] <> "; k++)
-      " <> sym <> "(i, k) = " <> name <> "(p, i, k);
-"
-          ];
-
-FillSelfEnergyMatrix[nPointFunction_, sym_String] :=
-    Module[{particle = GetField[nPointFunction]},
-           Which[(IsScalar[particle] || IsVector[particle]) && SelfEnergyIsSymmetric[particle],
-                 FillHermitianSelfEnergyMatrix[nPointFunction, sym],
-                 True,
-                 FillGeneralSelfEnergyFunction[nPointFunction, sym]
-                ]
-          ];
-
-CreateNPointFunctionMatrix[nPointFunction_, vertexRules_List] :=
-    Module[{dim, functionName, type, prototype, def},
-           dim = GetDimension[GetField[nPointFunction]];
-           If[dim == 1, Return[{ "", "" }]];
-           functionName = CreateFunctionPrototypeMatrix[nPointFunction, 1];
-           type = CConversion`CreateCType[CConversion`MatrixType[CConversion`complexScalarCType, dim, dim]];
-           prototype = type <> " " <> functionName <> ";\n";
-           def = "
-" <> type <> " CLASSNAME::" <> functionName <> "
-{
-   " <> type <> " self_energy;
-
-" <> IndentText[FillSelfEnergyMatrix[nPointFunction, "self_energy"]] <> "
-   return self_energy;
-}
-";
-           { prototype, def }
           ];
 
 CreateNPointFunctions[nPointFunctions_List, vertexRules_List] :=
@@ -601,9 +558,6 @@ CreateNPointFunctions[nPointFunctions_List, vertexRules_List] :=
            For[k = 1, k <= Length[nPointFunctions], k++,
                Utils`UpdateProgressBar[k, Length[nPointFunctions]];
                {p,d} = CreateNPointFunction[nPointFunctions[[k]], vertexFunctionNames];
-               prototypes = prototypes <> p;
-               defs = defs <> d;
-               {p,d} = CreateNPointFunctionMatrix[nPointFunctions[[k]], vertexFunctionNames];
                prototypes = prototypes <> p;
                defs = defs <> d;
               ];
