@@ -534,31 +534,35 @@ CreateNPointFunctions[nPointFunctions_List, vertexRules_List] :=
            {prototypes, defs}
           ];
 
-FillArrayWithLoopTadpoles[loopLevel_, higgsAndIdx_List, arrayName_String, sign_String:"-", struct_String:""] :=
-    Module[{body = "", v, field, idx, head, functionName},
+FillArrayWithLoopTadpoles[loopLevel_, higgsAndIdx_List, arrayName_String, sign_String:"-"] :=
+    Module[{body = "", v, field, idx, head, vectorName, CreateVectorName},
+           CreateVectorName[field_, loops_] := "t_" <> ExtractFieldName[field] <> "_" <> ToString[loops] <> "loop" <> ExtractChiraility[field];
+           body = StringJoin[("const auto " <> CreateVectorName[#, loopLevel] <> " = " <>
+                              CreateTadpoleFunctionName[#, loopLevel] <> "();\n")& /@
+                             DeleteDuplicates[First /@ higgsAndIdx]] <> "\n";
            For[v = 1, v <= Length[higgsAndIdx], v++,
                field = higgsAndIdx[[v,1]];
                idx = higgsAndIdx[[v,2]];
                head = CConversion`ToValidCSymbolString[higgsAndIdx[[v,3]]];
-               functionName = CreateTadpoleFunctionName[field, loopLevel];
+               vectorName = CreateVectorName[field, loopLevel];
                If[TreeMasses`GetDimension[field] == 1,
                   body = body <> arrayName <> "[" <> ToString[v-1] <> "] " <> sign <> "= " <>
-                         head <> "(" <> struct <> functionName <> "());\n";
+                         head <> "(" <> vectorName <> ");\n";
                   ,
                   body = body <> arrayName <> "[" <> ToString[v-1] <> "] " <> sign <> "= " <>
-                         head <> "(" <> struct <> functionName <>
-                         "(" <> ToString[idx - 1] <> "));\n";
+                         head <> "(" <> vectorName <>
+                         "[" <> ToString[idx - 1] <> "]);\n";
                  ];
               ];
            body
           ];
 
-FillArrayWithTwoLoopTadpoles[higgsBoson_, arrayName_String, sign_String:"-", struct_String:""] :=
+FillArrayWithTwoLoopTadpoles[higgsBoson_, arrayName_String, sign_String:"-"] :=
     Module[{body, v, field, functionName, dim, dimStr},
            functionName = CreateTadpoleFunctionName[higgsBoson,2];
            dim = GetDimension[higgsBoson];
            dimStr = ToString[dim];
-           body = "const auto tadpole_2l(" <> struct <> functionName <> "());\n";
+           body = "const auto tadpole_2l(" <> functionName <> "());\n";
            For[v = 1, v <= dim, v++,
                body = body <> arrayName <> "[" <> ToString[v-1] <> "] " <> sign <> "= " <>
                       "tadpole_2l(" <> ToString[v-1] <> ");\n";
