@@ -207,6 +207,7 @@ SplitFermionSelfEnergies[lst_List] :=
                AppendTo[result, SelfEnergies`FSSelfEnergy[field[1]       , expr[[1]]]];
                AppendTo[result, SelfEnergies`FSSelfEnergy[field[SARAH`PR], expr[[2]]]];
                AppendTo[result, SelfEnergies`FSSelfEnergy[field[SARAH`PL], expr[[3]]]];
+               AppendTo[result, SelfEnergies`FSSelfEnergy[field          , expr]];
               ];
            result
           ];
@@ -423,7 +424,12 @@ ExpressionToStringSequentially[expr_Plus, heads_, result_String] :=
 ExpressionToStringSequentially[expr_, heads_, result_String] :=
     result <> " = " <> ExpressionToString[expr, heads] <> ";\n";
 
-PrepareExpr[expr_, vertexRules_] :=
+PrepareExpr[{S_,R_,L_}, CConversion`ChiralitySum[t_], vertexRules_] :=
+    PrepareExpr[S, t, vertexRules] PS +
+    PrepareExpr[R, t, vertexRules] PR +
+    PrepareExpr[L, t, vertexRules] PL;
+
+PrepareExpr[expr_, _, vertexRules_] :=
     expr /.
     vertexRules /.
     a_[List[i__]] :> a[i] /.
@@ -431,6 +437,7 @@ PrepareExpr[expr_, vertexRules_] :=
     C -> 1;
 
 GetNPointFunctionType[n_SelfEnergies`Tadpole] := TreeMasses`GetTadpoleType[GetField[n]];
+GetNPointFunctionType[n:(_[_, __List])]       := CConversion`ChiralitySum[TreeMasses`GetSelfEnergyType[GetField[n]]];
 GetNPointFunctionType[n_]                     := TreeMasses`GetSelfEnergyType[GetField[n]];
 
 DeclareMomentum[_SelfEnergies`Tadpole] := "";
@@ -452,7 +459,7 @@ DeclareFieldIndices[field_[ind_]] :=
 CreateFunctionPrototype[n_, type_, loops_] :=
     CreateFunctionName[n, loops] <> "(" <> DeclareMomentum[n] <> DeclareFieldIndices[GetField[n], type] <> ") const";
 
-HermitianizeLater[s_] :=
+HermitianizeLater[s_] := False &&
     GetDimension[GetField[s]] > 1 &&
     (IsScalar[GetField[s]] || IsVector[GetField[s]]) &&
     SelfEnergyIsSymmetric[GetField[s]];
@@ -465,16 +472,23 @@ SumOverExternalIndices[t:SelfEnergies`Tadpole[f_, ex__]] :=
            ]& /@ {ex})]
           ];
 
+SumOverTwoExternalFieldIndices[ex_List, self_] :=
+    SumOverTwoExternalFieldIndices[#,self]& /@ ex;
+
 (* sum over external gauge indices *)
-SumOverExternalIndices[self:(s_[f_, ex__])] :=
-    Module[{dim = GetDimension[f]},
-           s[f, Sequence @@ (CConversion`RefactorSums[
+SumOverTwoExternalFieldIndices[ex_, self_] :=
+    Module[{dim = GetDimension[GetField[self]]},
+           CConversion`RefactorSums[
                SARAH`sum[SARAH`gO1, 1, dim,
                          SARAH`sum[SARAH`gO2, If[HermitianizeLater[self], SARAH`gO1 + 1, 1],
-                                   dim, UMat[dim,dim,SARAH`gO1,SARAH`gO2] #]
+                                   dim, UMat[dim,dim,SARAH`gO1,SARAH`gO2] ex]
                         ]
-           ]& /@ {ex})]
+           ]
           ];
+
+(* sum over external gauge indices *)
+SumOverExternalIndices[self:(s_[f_, ex__])] :=
+    s[f, Sequence @@ (SumOverTwoExternalFieldIndices[#,self]& /@ {ex})];
 
 CreateNPointFunction[nPointFunction_, vertexRules_List] :=
     Module[{dim = GetDimension[GetField[nPointFunction]],
@@ -504,7 +518,7 @@ CreateNPointFunction[nPointFunction_, vertexRules_List, type_, expr_] :=
            decl = "\n" <> ctype <> " CLASSNAME::" <> functionName <> "\n{\n" <>
               IndentText[ctype <> " result;\n\n" <>
                          ExpressionToStringSequentially[
-                             PrepareExpr[expr, vertexRules],
+                             PrepareExpr[expr, type, vertexRules],
                              TreeMasses`GetParticles[], "result"]  <>
                          MakeHermitian[nPointFunction, type] <>
                          "\nreturn result * oneOver16PiSqr;"

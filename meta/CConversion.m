@@ -6,6 +6,7 @@ MatrixType::usage="";
 ArrayType::usage="";
 VectorType::usage="";
 ScalarType::usage="";
+ChiralitySum::usage="";
 
 integerScalarCType::usage="represents an integer C type";
 realScalarCType::usage="represents a real scalar C type";
@@ -40,6 +41,7 @@ TensorProd::usage="";
 UVec::usage="unit vector";
 UMat::usage="matrix projector";
 Eval::usage="calls .eval()";
+PS::usage="scalar projector";
 
 HaveSameDimension::usage = "Checks if given types have same
 dimension";
@@ -151,6 +153,9 @@ GetElementType[CConversion`VectorType[type_, __]] := type;
 GetElementType[CConversion`MatrixType[type_, __]] := type;
 GetElementType[CConversion`TensorType[type_, __]] := type;
 
+GetScalarElementType[CConversion`ChiralitySum[type_]] :=
+    CConversion`ChiralitySum[GetScalarElementType[type]];
+
 GetScalarElementType[type_] :=
     CConversion`ScalarType[GetElementType[type]];
 
@@ -210,6 +215,9 @@ CreateCType[CConversion`MatrixType[t_, dim1_, dim2_]] :=
 
 CreateCType[CConversion`TensorType[t_, dims__]] :=
     EigenTensor[CreateCType[ScalarType[t]], Sequence @@ (ToString /@ {dims})];
+
+CreateCType[CConversion`ChiralitySum[type_]] :=
+    "LRS_tensor<" <> CreateCType[type] <> ">";
 
 CastTo[expr_String, toType_ /; toType === None] := expr;
 

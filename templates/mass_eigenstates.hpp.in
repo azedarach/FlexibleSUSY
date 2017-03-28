@@ -36,6 +36,7 @@
 #include "@ModelName@_physical.hpp"
 #include "@ModelName@_info.hpp"
 #include "two_loop_corrections.hpp"
+#include "eigen_utils.hpp"
 #include "error.hpp"
 #include "problems.hpp"
 #include "config.h"
