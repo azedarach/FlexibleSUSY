@@ -459,7 +459,7 @@ DeclareFieldIndices[field_[ind_]] :=
 CreateFunctionPrototype[n_, type_, loops_] :=
     CreateFunctionName[n, loops] <> "(" <> DeclareMomentum[n] <> DeclareFieldIndices[GetField[n], type] <> ") const";
 
-HermitianizeLater[s_] := False &&
+HermitianizeLater[s_] :=
     GetDimension[GetField[s]] > 1 &&
     (IsScalar[GetField[s]] || IsVector[GetField[s]]) &&
     SelfEnergyIsSymmetric[GetField[s]];
