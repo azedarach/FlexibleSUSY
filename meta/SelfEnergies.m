@@ -456,12 +456,12 @@ SumOverToSum[x_Plus] := SumOverToSum /@ x;
 
 SumOverToSum[x_] := x;
 
-IndexCost[idx_, x:_[__]] /;
-    ValueQ[FunctionCost[x]] && !FreeQ[x, idx] := FunctionCost[x];
+IndexCost[idx_, _?AtomQ] := 0;
 
-IndexCost[idx_, x:_[__]] := Plus @@ (IndexCost[idx, #]& /@ List @@ x);
+IndexCost[idx_, x_] /; NumericQ[FunctionCost[x]] && !FreeQ[x, idx] :=
+    FunctionCost[x];
 
-IndexCost[idx_, _] := 0;
+IndexCost[idx_, x_] := Plus @@ (IndexCost[idx, #]& /@ List @@ x);
 
 (* cost function *)
 FunctionCost[SARAH`A0[_]]  := 1;
