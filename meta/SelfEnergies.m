@@ -452,6 +452,11 @@ DeclareFieldIndices[field_[ind_]] :=
 CreateFunctionPrototype[n_, type_, loops_] :=
     CreateFunctionName[n, loops] <> "(" <> DeclareMomentum[n] <> DeclareFieldIndices[GetField[n], type] <> ") const";
 
+HermitianizeLater[s_] :=
+    GetDimension[GetField[s]] > 1 &&
+    (IsScalar[GetField[s]] || IsVector[GetField[s]]) &&
+    SelfEnergyIsSymmetric[GetField[s]];
+
 (* sum over external gauge index *)
 SumOverExternalIndices[t:SelfEnergies`Tadpole[f_, ex__]] :=
     Module[{dim = GetDimension[f]},
@@ -461,11 +466,12 @@ SumOverExternalIndices[t:SelfEnergies`Tadpole[f_, ex__]] :=
           ];
 
 (* sum over external gauge indices *)
-SumOverExternalIndices[s_[f_, ex__]] :=
+SumOverExternalIndices[self:(s_[f_, ex__])] :=
     Module[{dim = GetDimension[f]},
            s[f, Sequence @@ (CConversion`RefactorSums[
                SARAH`sum[SARAH`gO1, 1, dim,
-                         SARAH`sum[SARAH`gO2, 1, dim, UMat[dim,dim,SARAH`gO1,SARAH`gO2] #]
+                         SARAH`sum[SARAH`gO2, If[HermitianizeLater[self], SARAH`gO1, 1],
+                                   dim, UMat[dim,dim,SARAH`gO1,SARAH`gO2] #]
                         ]
            ]& /@ {ex})]
           ];
@@ -485,6 +491,11 @@ CreateNPointFunction[nPointFunction_, vertexRules_List] :=
            {prototype, decl}
           ];
 
+MakeHermitian[s_?HermitianizeLater, _CConversion`MatrixType] :=
+    "\nHermitianize(result);\n";
+
+MakeHermitian[__] := "";
+
 CreateNPointFunction[nPointFunction_, vertexRules_List, type_, expr_] :=
     Module[{functionName = CreateFunctionPrototype[nPointFunction, type, 1],
             ctype = CConversion`CreateCType[type], 
@@ -495,6 +506,7 @@ CreateNPointFunction[nPointFunction_, vertexRules_List, type_, expr_] :=
                          ExpressionToStringSequentially[
                              PrepareExpr[expr, vertexRules],
                              TreeMasses`GetParticles[], "result"]  <>
+                         MakeHermitian[nPointFunction, type] <>
                          "\nreturn result * oneOver16PiSqr;"
                         ] <>
            "\n}\n";
