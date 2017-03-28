@@ -434,10 +434,10 @@ RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @ SumToSumOver @
 		       expr;
 
 RecordSumCosts[expr_] := expr //.
-    SumOver[idx_, a_, b_] x_ :> SumOver[idx, a, b, IndexCost[idx, x]] x
+    SumOver[idx_, a_, b_] x_ :> SumOver[idx, a, b, IndexCost[idx, x]] x;
 
 SumToSumOver[expr_] := expr //.
-    SARAH`sum[idx_, a_, b_, x_] :> SumOver[idx, a, b] x
+    SARAH`sum[idx_, a_, b_, x_] :> SumOver[idx, a, b] x;
 
 SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
 	lst = List @@ prod,
@@ -450,7 +450,7 @@ SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
 		     !FreeQ[#, idx]&];
     SumOverToSum[SARAH`sum[idx, a, b, Eval[SumOverToSum[Times @@ summand]]]
 		 Times @@ Complement[lst, {sumOverToConvert}, summand]]
-]
+];
 
 SumOverToSum[x_Plus] := SumOverToSum /@ x;
 
