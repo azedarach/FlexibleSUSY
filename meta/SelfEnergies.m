@@ -470,7 +470,7 @@ SumOverExternalIndices[self:(s_[f_, ex__])] :=
     Module[{dim = GetDimension[f]},
            s[f, Sequence @@ (CConversion`RefactorSums[
                SARAH`sum[SARAH`gO1, 1, dim,
-                         SARAH`sum[SARAH`gO2, If[HermitianizeLater[self], SARAH`gO1, 1],
+                         SARAH`sum[SARAH`gO2, If[HermitianizeLater[self], SARAH`gO1 + 1, 1],
                                    dim, UMat[dim,dim,SARAH`gO1,SARAH`gO2] #]
                         ]
            ]& /@ {ex})]
