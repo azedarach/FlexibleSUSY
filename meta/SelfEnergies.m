@@ -430,49 +430,6 @@ PrepareExpr[expr_, vertexRules_] :=
     ReplaceGhosts[FlexibleSUSY`FSEigenstates] /.
     C -> 1;
 
-RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @ SumToSumOver @
-		       expr;
-
-RecordSumCosts[expr_] := expr //.
-    SumOver[idx_, a_, b_] x_ :> SumOver[idx, a, b, IndexCost[idx, x]] x
-
-SumToSumOver[expr_] := expr //.
-    SARAH`sum[idx_, a_, b_, x_] :> SumOver[idx, a, b] x
-
-SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
-	lst = List @@ prod,
-	sumOverToConvert,
-	idx, a, b, summand
-    },
-    sumOverToConvert = First @ SortBy[Cases[lst, SumOver[_,_,_,_]], Last];
-    {idx, a, b} = Take[List @@ sumOverToConvert, 3];
-    summand = Select[DeleteCases[lst, sumOverToConvert],
-		     !FreeQ[#, idx]&];
-    SumOverToSum[SARAH`sum[idx, a, b, Eval[SumOverToSum[Times @@ summand]]]
-		 Times @@ Complement[lst, {sumOverToConvert}, summand]]
-]
-
-SumOverToSum[x_Plus] := SumOverToSum /@ x;
-
-SumOverToSum[x_] := x;
-
-IndexCost[idx_, _?AtomQ] := 0;
-
-IndexCost[idx_, x_] /; NumericQ[FunctionCost[x]] && !FreeQ[x, idx] :=
-    FunctionCost[x];
-
-IndexCost[idx_, x_] := Plus @@ (IndexCost[idx, #]& /@ List @@ x);
-
-(* cost function *)
-FunctionCost[SARAH`A0[_]]  := 1;
-FunctionCost[SARAH`B0[__]] := 2;
-FunctionCost[SARAH`B1[__]] := 2;
-FunctionCost[SARAH`B00[__]] := 2;
-FunctionCost[SARAH`B22[__]] := 2;
-FunctionCost[SARAH`F0[__]] := 2;
-FunctionCost[SARAH`G0[__]] := 2;
-FunctionCost[SARAH`H0[__]] := 2;
-
 GetNPointFunctionType[n_SelfEnergies`Tadpole] := TreeMasses`GetTadpoleType[GetField[n]];
 GetNPointFunctionType[n_]                     := TreeMasses`GetSelfEnergyType[GetField[n]];
 
@@ -498,7 +455,7 @@ CreateFunctionPrototype[n_, type_, loops_] :=
 (* sum over external gauge index *)
 SumOverExternalIndices[t:SelfEnergies`Tadpole[f_, ex__]] :=
     Module[{dim = GetDimension[f]},
-           SelfEnergies`Tadpole[f, Sequence @@ (RefactorSums[
+           SelfEnergies`Tadpole[f, Sequence @@ (CConversion`RefactorSums[
                SARAH`sum[SARAH`gO1, 1, dim, UVec[dim,SARAH`gO1] #]
            ]& /@ {ex})]
           ];
@@ -506,7 +463,7 @@ SumOverExternalIndices[t:SelfEnergies`Tadpole[f_, ex__]] :=
 (* sum over external gauge indices *)
 SumOverExternalIndices[s_[f_, ex__]] :=
     Module[{dim = GetDimension[f]},
-           s[f, Sequence @@ (RefactorSums[
+           s[f, Sequence @@ (CConversion`RefactorSums[
                SARAH`sum[SARAH`gO1, 1, dim,
                          SARAH`sum[SARAH`gO2, 1, dim, UMat[dim,dim,SARAH`gO1,SARAH`gO2] #]
                         ]

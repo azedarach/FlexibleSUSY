@@ -123,6 +123,12 @@ Taken from:
   https://stackoverflow.com/questions/3136604/evaluate-beyond-one-level-within-hold-in-mathematica
 ";
 
+RefactorSums::usage="Rewrite nested SARAH`sum[] such that loop
+functions are called less frequently.
+
+Note: The the cost function FunctionCost[] must be defined for the
+loop functions.";
+
 { Sqr, Cube, Quad, Power2, Power3, Power4, Power5, Power6, Power7, Power8 };
 
 Begin["`Private`"];
@@ -915,6 +921,50 @@ CountNumberOfEntries[CConversion`ArrayType[type_, n_]]  := n CountNumberOfEntrie
 CountNumberOfEntries[CConversion`VectorType[type_, n_]] := n CountNumberOfEntries[type];
 CountNumberOfEntries[CConversion`MatrixType[type_, m_, n_]] := m n CountNumberOfEntries[type];
 CountNumberOfEntries[CConversion`TensorType[type_, dims__]] := Times[dims] CountNumberOfEntries[type];
+
+(* rewrite sums (Author: Jae-hyeon Park *)
+RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @ SumToSumOver @
+		       expr;
+
+RecordSumCosts[expr_] := expr //.
+    SumOver[idx_, a_, b_] x_ :> SumOver[idx, a, b, IndexCost[idx, x]] x
+
+SumToSumOver[expr_] := expr //.
+    SARAH`sum[idx_, a_, b_, x_] :> SumOver[idx, a, b] x
+
+SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
+	lst = List @@ prod,
+	sumOverToConvert,
+	idx, a, b, summand
+    },
+    sumOverToConvert = First @ SortBy[Cases[lst, SumOver[_,_,_,_]], Last];
+    {idx, a, b} = Take[List @@ sumOverToConvert, 3];
+    summand = Select[DeleteCases[lst, sumOverToConvert],
+		     !FreeQ[#, idx]&];
+    SumOverToSum[SARAH`sum[idx, a, b, Eval[SumOverToSum[Times @@ summand]]]
+		 Times @@ Complement[lst, {sumOverToConvert}, summand]]
+]
+
+SumOverToSum[x_Plus] := SumOverToSum /@ x;
+
+SumOverToSum[x_] := x;
+
+IndexCost[idx_, _?AtomQ] := 0;
+
+IndexCost[idx_, x_] /; NumericQ[FunctionCost[x]] && !FreeQ[x, idx] :=
+    FunctionCost[x];
+
+IndexCost[idx_, x_] := Plus @@ (IndexCost[idx, #]& /@ List @@ x);
+
+(* cost functions *)
+FunctionCost[SARAH`A0[_]]  := 1;
+FunctionCost[SARAH`B0[__]] := 2;
+FunctionCost[SARAH`B1[__]] := 2;
+FunctionCost[SARAH`B00[__]] := 2;
+FunctionCost[SARAH`B22[__]] := 2;
+FunctionCost[SARAH`F0[__]] := 2;
+FunctionCost[SARAH`G0[__]] := 2;
+FunctionCost[SARAH`H0[__]] := 2;
 
 End[];
 
