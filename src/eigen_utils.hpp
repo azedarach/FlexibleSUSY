@@ -21,6 +21,7 @@
 
 #include <Eigen/Core>
 #include <cassert>
+#include <complex>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -28,7 +29,11 @@
 
 namespace flexiblesusy {
 
-template <int N, typename Scalar = double>
+/**
+ * @class LRS_tensor
+ * @brief collection of 3 NxN matrices
+ */
+template <int N, typename Scalar = std::complex<double> >
 struct LRS_tensor {
 public:
    using Matrix_t = Eigen::Matrix<Scalar,N,N>;
