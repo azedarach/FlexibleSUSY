@@ -418,7 +418,7 @@ CreateFunctionName[tadpole_SelfEnergies`Tadpole, loops_] :=
     CreateTadpoleFunctionName[GetField[tadpole], loops];
 
 ExpressionToStringSequentially[expr_Plus, heads_, result_String] :=
-    StringJoin[(result <> " += " <> ExpressionToString[#,heads] <> ";\n")& /@ (List @@ expr)];
+    StringJoin[TextFormatting`WrapLines[result <> " += " <> ExpressionToString[#,heads] <> ";\n"]& /@ (List @@ expr)];
 
 ExpressionToStringSequentially[expr_, heads_, result_String] :=
     result <> " = " <> ExpressionToString[expr, heads] <> ";\n";
