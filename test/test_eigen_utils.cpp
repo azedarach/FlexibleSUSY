@@ -150,54 +150,58 @@ BOOST_AUTO_TEST_CASE(test_Eval)
 
 BOOST_AUTO_TEST_CASE(test_LRS_tensor_sum)
 {
-   using Tensor_t = LRS_tensor<2>;
+   using Matrix_t = Eigen::Matrix<std::complex<double>,2,2>;
+   using Tensor_t = LRS_tensor<Matrix_t>;
    auto t = Tensor_t::PL() + Tensor_t::PR() + Tensor_t::PS();
-   BOOST_CHECK_EQUAL(t.L(), Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.R(), Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.S(), Tensor_t::Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.L(), Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.R(), Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.S(), Matrix_t::Ones());
 }
 
 BOOST_AUTO_TEST_CASE(test_LRS_tensor_product_int)
 {
-   using Tensor_t = LRS_tensor<2>;
+   using Matrix_t = Eigen::Matrix<std::complex<double>,2,2>;
+   using Tensor_t = LRS_tensor<Matrix_t>;
    const int i = 2;
    auto t = i*Tensor_t::PL() + Tensor_t::PR()*2*i + Tensor_t::PS();
-   BOOST_CHECK_EQUAL(t.L(), 2*Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.R(), 4*Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.S(), 1*Tensor_t::Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.L(), 2*Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.R(), 4*Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.S(), 1*Matrix_t::Ones());
 }
 
 BOOST_AUTO_TEST_CASE(test_LRS_tensor_product_double)
 {
-   using Tensor_t = LRS_tensor<2>;
+   using Matrix_t = Eigen::Matrix<std::complex<double>,2,2>;
+   using Tensor_t = LRS_tensor<Matrix_t>;
    const double d = 2.;
    auto t = d*Tensor_t::PL() + Tensor_t::PR()*2*d + Tensor_t::PS();
-   BOOST_CHECK_EQUAL(t.L(), 2*Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.R(), 4*Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.S(), 1*Tensor_t::Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.L(), 2*Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.R(), 4*Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.S(), 1*Matrix_t::Ones());
 }
 
 BOOST_AUTO_TEST_CASE(test_LRS_tensor_product_complex)
 {
-   using Tensor_t = LRS_tensor<2,std::complex<double> >;
+   using Matrix_t = Eigen::Matrix<std::complex<double>,2,2>;
+   using Tensor_t = LRS_tensor<Matrix_t>;
    const auto c = std::complex<double>(2.,2.);
    auto t = c*Tensor_t::PL() + Tensor_t::PR()*2*c + Tensor_t::PS();
-   BOOST_CHECK_EQUAL(t.L(), std::complex<double>(2.,2.)*  Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.R(), std::complex<double>(2.,2.)*2*Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.S(), Tensor_t::Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.L(), std::complex<double>(2.,2.)*  Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.R(), std::complex<double>(2.,2.)*2*Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.S(), Matrix_t::Ones());
 }
 
 BOOST_AUTO_TEST_CASE(test_LRS_tensor_product_Matrix)
 {
-   using Tensor_t = LRS_tensor<2,std::complex<double> >;
-   using Matrix_t = Tensor_t::Matrix_t;
+   using Matrix_t = Eigen::Matrix<std::complex<double>,2,2>;
+   using Tensor_t = LRS_tensor<Matrix_t>;
    const auto c = std::complex<double>(2.,2.);
    Matrix_t m;
    m << std::complex<double>(2.,0.), std::complex<double>(0.,0.),
         std::complex<double>(0.,0.), std::complex<double>(2.,0.);
 
    auto t = c*m*Tensor_t::PL() + Tensor_t::PR()*2*m + Tensor_t::PS()*m;
-   BOOST_CHECK_EQUAL(t.L(), std::complex<double>(4.,4.)*  Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.R(), std::complex<double>(2.,0.)*2*Tensor_t::Matrix_t::Ones());
-   BOOST_CHECK_EQUAL(t.S(), 2.*Tensor_t::Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.L(), std::complex<double>(4.,4.)*  Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.R(), std::complex<double>(2.,0.)*2*Matrix_t::Ones());
+   BOOST_CHECK_EQUAL(t.S(), 2.*Matrix_t::Ones());
 }

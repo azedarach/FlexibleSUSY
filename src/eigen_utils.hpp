@@ -31,12 +31,11 @@ namespace flexiblesusy {
 
 /**
  * @class LRS_tensor
- * @brief collection of 3 NxN matrices
+ * @brief collection of 3 matrices
  */
-template <int N, typename Scalar = std::complex<double> >
-struct LRS_tensor {
+template <typename Matrix_t>
+class LRS_tensor {
 public:
-   using Matrix_t = Eigen::Matrix<Scalar,N,N>;
    using Tuple_t = std::tuple<Matrix_t,Matrix_t,Matrix_t>;
 
    LRS_tensor()
