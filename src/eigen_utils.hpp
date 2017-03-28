@@ -28,6 +28,46 @@
 
 namespace flexiblesusy {
 
+template <int N, typename Scalar = double>
+struct LRS_tensor {
+public:
+   using Matrix_t = Eigen::Matrix<Scalar,N,N>;
+   using Tuple_t = std::tuple<Matrix_t,Matrix_t,Matrix_t>;
+
+   LRS_tensor()
+      : lrs(std::make_tuple(Matrix_t::Zero(),Matrix_t::Zero(),Matrix_t::Zero())) {}
+   explicit LRS_tensor(const Tuple_t& t)
+      : lrs(t) {}
+
+   Matrix_t L() const { return std::get<0>(lrs); }
+   Matrix_t R() const { return std::get<1>(lrs); }
+   Matrix_t S() const { return std::get<2>(lrs); }
+   Tuple_t tuple() const { return lrs; }
+   static LRS_tensor PL() { return LRS_tensor(std::make_tuple(Matrix_t::Ones(),Matrix_t::Zero(),Matrix_t::Zero())); }
+   static LRS_tensor PR() { return LRS_tensor(std::make_tuple(Matrix_t::Zero(),Matrix_t::Ones(),Matrix_t::Zero())); }
+   static LRS_tensor PS() { return LRS_tensor(std::make_tuple(Matrix_t::Zero(),Matrix_t::Zero(),Matrix_t::Ones())); }
+
+   LRS_tensor operator+(const LRS_tensor& rhs)
+   {
+      return LRS_tensor(std::make_tuple((L()+rhs.L()).eval(), (R()+rhs.R()).eval(), (S()+rhs.S()).eval()));
+   }
+
+   template <typename T>
+   LRS_tensor operator*(T rhs)
+   {
+      return LRS_tensor(std::make_tuple((rhs*L()).eval(), (rhs*R()).eval(), (rhs*S()).eval()));
+   }
+
+   template <typename T>
+   friend LRS_tensor operator*(T lhs, const LRS_tensor& rhs)
+   {
+      return LRS_tensor(std::make_tuple((lhs*rhs.L()).eval(), (lhs*rhs.R()).eval(), (lhs*rhs.S()).eval()));
+   }
+
+private:
+   Tuple_t lrs; ///< L, R, S components
+};
+
 template <typename Derived>
 int closest_index(double mass, const Eigen::ArrayBase<Derived>& v)
 {
