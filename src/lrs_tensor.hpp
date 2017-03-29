@@ -22,6 +22,7 @@
 #include <Eigen/Core>
 #include <complex>
 #include <tuple>
+#include "wrappers.hpp"
 
 namespace flexiblesusy {
 
@@ -132,6 +133,20 @@ public:
 private:
    Tuple_t lrs; ///< L, R, S components
 };
+
+template <typename T>
+auto Re(const LRS_tensor<T>& t) -> LRS_tensor<decltype(Re(t.L()))>
+{
+   using Result_t = LRS_tensor<decltype(Re(t.L()))>;
+   return Result_t(std::make_tuple(Re(t.L()), Re(t.R()), Re(t.S())));
+}
+
+template <typename T>
+auto Im(const LRS_tensor<T>& t) -> LRS_tensor<decltype(Im(t.L()))>
+{
+   using Result_t = LRS_tensor<decltype(Im(t.L()))>;
+   return Result_t(std::make_tuple(Im(t.L()), Im(t.R()), Im(t.S())));
+}
 
 } // namespace flexiblesusy
 
