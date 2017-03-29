@@ -206,3 +206,12 @@ BOOST_AUTO_TEST_CASE(test_LRS_tensor_product_Matrix)
    BOOST_CHECK_EQUAL(t.R(), std::complex<double>(2.,0.)*2*Matrix_t::Identity());
    BOOST_CHECK_EQUAL(t.S(), 2.*Matrix_t::Identity());
 }
+
+BOOST_AUTO_TEST_CASE(test_LRS_tensor_to_tuple)
+{
+   using Matrix_t = Eigen::Matrix<std::complex<double>,2,2>;
+   using Tensor_t = LRS_tensor<Matrix_t>;
+   using Tuple_t = Tensor_t::Tuple_t;
+
+   Tuple_t t = Tensor_t::PL();
+}

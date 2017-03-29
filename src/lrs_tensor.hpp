@@ -21,6 +21,7 @@
 
 #include <Eigen/Core>
 #include <complex>
+#include <tuple>
 
 namespace flexiblesusy {
 
@@ -87,10 +88,11 @@ public:
    T& L() { return std::get<0>(lrs); }
    T& R() { return std::get<1>(lrs); }
    T& S() { return std::get<2>(lrs); }
-   Tuple_t tuple() const { return lrs; }
    static LRS_tensor PL() { return LRS_tensor(std::make_tuple(LRS_tensor_one<T>::get(),LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get())); }
    static LRS_tensor PR() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_one<T>::get(),LRS_tensor_zero<T>::get())); }
    static LRS_tensor PS() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get(),LRS_tensor_one<T>::get())); }
+
+   operator Tuple_t() const { return lrs; }
 
    LRS_tensor operator+(const LRS_tensor& rhs) const
    {
