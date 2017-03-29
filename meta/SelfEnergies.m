@@ -381,15 +381,15 @@ ReplaceGhosts[states_:FlexibleSUSY`FSEigenstates] :=
           ];
 
 ExtractChiraility[field_[idx1_,idx2_]] := ExtractChiraility[field];
-ExtractChiraility[field_[PL]]          := "_PL";
-ExtractChiraility[field_[PR]]          := "_PR";
+ExtractChiraility[field_[SARAH`PL]]    := "_PL";
+ExtractChiraility[field_[SARAH`PR]]    := "_PR";
 ExtractChiraility[field_[1]]           := "_1";
 ExtractChiraility[field_[idx_]]        := ExtractChiraility[field];
 ExtractChiraility[field_]              := "";
 
 ExtractFieldName[field_[idx1_,idx2_]] := ExtractFieldName[field];
-ExtractFieldName[field_[PL]]          := ExtractFieldName[field];
-ExtractFieldName[field_[PR]]          := ExtractFieldName[field];
+ExtractFieldName[field_[SARAH`PL]]    := ExtractFieldName[field];
+ExtractFieldName[field_[SARAH`PR]]    := ExtractFieldName[field];
 ExtractFieldName[field_[1]]           := ExtractFieldName[field];
 ExtractFieldName[field_[idx_]]        := ExtractFieldName[field];
 ExtractFieldName[field_]              := ToValidCSymbolString[field];
@@ -425,9 +425,9 @@ ExpressionToStringSequentially[expr_, heads_, result_String] :=
     result <> " = " <> ExpressionToString[expr, heads] <> ";\n";
 
 PrepareExpr[{S_,R_,L_}, CConversion`ChiralitySum[t_], vertexRules_] :=
-    PrepareExpr[S, t, vertexRules] PS +
-    PrepareExpr[R, t, vertexRules] PR +
-    PrepareExpr[L, t, vertexRules] PL;
+    PrepareExpr[S, t, vertexRules] CConversion`PS +
+    PrepareExpr[R, t, vertexRules] SARAH`PR +
+    PrepareExpr[L, t, vertexRules] SARAH`PL;
 
 PrepareExpr[expr_, _, vertexRules_] :=
     expr /.
@@ -451,8 +451,8 @@ DeclareFieldIndices[field_Symbol] := "";
 DeclareFieldIndices[field_[ind1_, ind2_]] :=
     ", int " <> ToValidCSymbolString[ind1] <>
     ", int " <> ToValidCSymbolString[ind2];
-DeclareFieldIndices[field_[PL]] := DeclareFieldIndices[field];
-DeclareFieldIndices[field_[PR]] := DeclareFieldIndices[field];
+DeclareFieldIndices[field_[SARAH`PL]] := DeclareFieldIndices[field];
+DeclareFieldIndices[field_[SARAH`PR]] := DeclareFieldIndices[field];
 DeclareFieldIndices[field_[1]]  := DeclareFieldIndices[field];
 DeclareFieldIndices[field_[ind_]] :=
     "int " <> ToValidCSymbolString[ind];
