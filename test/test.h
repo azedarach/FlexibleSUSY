@@ -263,8 +263,8 @@ void check_relative_dev(T a, T b, const std::string& testMsg, T max_dev)
 
 } // namespace flexiblesusy
 
-#define S(x) #x
-#define S_(x) S(x)
+#define String(x) #x
+#define S_(x) String(x)
 #define S__LINE__ S_(__LINE__)
 #define TEST_EQUALITY(a, b) \
    flexiblesusy::check_equality(a, b, "line " S__LINE__ ": " #a " == " #b, max_dev)
