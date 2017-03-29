@@ -444,6 +444,7 @@ DeclareMomentum[_SelfEnergies`Tadpole] := "";
 DeclareMomentum[_] := CreateCType[CConversion`ScalarType[CConversion`realScalarCType]] <> " p";
 
 DeclareFieldIndices[field_, _CConversion`ScalarType] := DeclareFieldIndices[field];
+DeclareFieldIndices[field_, CConversion`ChiralitySum[_CConversion`ScalarType]] := DeclareFieldIndices[field];
 DeclareFieldIndices[field_, _] := "";
 
 DeclareFieldIndices[field_Symbol] := "";
