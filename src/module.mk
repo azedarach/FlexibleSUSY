@@ -82,6 +82,7 @@ LIBFLEXI_HDR := \
 		$(DIR)/linalg2.hpp \
 		$(DIR)/logger.hpp \
 		$(DIR)/lowe.h \
+		$(DIR)/lrs_tensor.hpp \
 		$(DIR)/matching.hpp \
 		$(DIR)/mathlink_utils.hpp \
 		$(DIR)/minimizer.hpp \

@@ -22,6 +22,7 @@
 #include <boost/test/unit_test.hpp>
 #include <typeinfo>
 #include "eigen_utils.hpp"
+#include "lrs_tensor.hpp"
 #include "wrappers.hpp"
 #include <complex>
 
