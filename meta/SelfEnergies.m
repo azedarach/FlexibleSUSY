@@ -511,13 +511,24 @@ MakeHermitian[s_?HermitianizeLater, _CConversion`MatrixType] :=
 
 MakeHermitian[__] := "";
 
+DeclareChiralityProjector[proj_, type_] :=
+    "const auto " <> CConversion`ToValidCSymbolString[proj] <> " = " <>
+    CreateCType[type] <> "::" <> CConversion`ToValidCSymbolString[proj] <> "();\n";
+
+DeclareChiralityProjectors[type_CConversion`ChiralitySum] :=
+    StringJoin[DeclareChiralityProjector[#,type]& /@
+               {SARAH`PL, SARAH`PR, CConversion`PS}];
+
+DeclareChiralityProjectors[_] := "";
+
 CreateNPointFunction[nPointFunction_, vertexRules_List, type_, expr_] :=
     Module[{functionName = CreateFunctionPrototype[nPointFunction, type, 1],
             ctype = CConversion`CreateCType[type], 
             prototype, decl},
            prototype = ctype <> " " <> functionName <> ";\n";
            decl = "\n" <> ctype <> " CLASSNAME::" <> functionName <> "\n{\n" <>
-              IndentText[ctype <> " result;\n\n" <>
+              IndentText[DeclareChiralityProjectors[type] <>
+                         ctype <> " result;\n\n" <>
                          ExpressionToStringSequentially[
                              PrepareExpr[expr, type, vertexRules],
                              TreeMasses`GetParticles[], "result"]  <>
