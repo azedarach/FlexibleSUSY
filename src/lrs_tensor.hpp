@@ -33,7 +33,7 @@ template <>
 template <typename Scalar, int M, int N>
 struct LRS_tensor_one<Eigen::Matrix<Scalar,M,N>> {
    using Matrix_t = Eigen::Matrix<Scalar,M,N>;
-   static Matrix_t get() { return Matrix_t::Ones(); }
+   static Matrix_t get() { return Matrix_t::Identity(); }
 };
 
 template <>

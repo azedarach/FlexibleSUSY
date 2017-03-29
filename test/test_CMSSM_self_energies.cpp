@@ -108,7 +108,6 @@ CMSSM_mass_eigenstates setup()
                                                                         \
       for (int i = 0; i < dim; i++) {                                   \
          for (int k = 0; k < dim; k++) {                                \
-            BOOST_TEST_MESSAGE("testing (" << i << "," << k << ")");    \
             BOOST_CHECK_CLOSE_FRACTION(Re(m.self_energy_ ## particle ## _1loop_1 (p,i,k)), Re(seS(i,k))   , 1e-10); \
             BOOST_CHECK_CLOSE_FRACTION(Im(m.self_energy_ ## particle ## _1loop_1 (p,i,k)), Im(seS(i,k))   , 1e-10); \
             BOOST_CHECK_CLOSE_FRACTION(Re(m.self_energy_ ## particle ## _1loop_1 (p,i,k)), Re(se.S()(i,k)), 1e-10); \
