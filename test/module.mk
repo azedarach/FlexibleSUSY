@@ -210,6 +210,7 @@ TEST_SH += \
 		$(DIR)/test_CMSSM_QedQcd_no_convergence.sh
 TEST_SRC += \
 		$(DIR)/test_CMSSM_database.cpp \
+		$(DIR)/test_CMSSM_self_energies.cpp \
 		$(DIR)/test_CMSSM_slha.cpp \
 		$(DIR)/test_CMSSM_slha_input.cpp \
 		$(DIR)/test_CMSSM_two_loop_spectrum.cpp \
@@ -640,6 +641,9 @@ $(DIR)/test_CMSSM_high_scale_constraint.x: $(LIBSoftsusyMSSM) $(LIBCMSSM) $(LIBF
 $(DIR)/test_CMSSM_low_scale_constraint.x: $(LIBSoftsusyMSSM) $(LIBCMSSM) $(LIBFLEXI) $(filter-out -%,$(LOOPFUNCLIBS))
 
 $(DIR)/test_CMSSM_susy_scale_constraint.x: $(LIBSoftsusyMSSM) $(LIBCMSSM) $(LIBFLEXI) $(filter-out -%,$(LOOPFUNCLIBS))
+
+$(DIR)/test_CMSSM_self_energies.x: $(DIR)/test_CMSSM_self_energies.o $(LIBCMSSM) $(LIBFLEXI) $(filter-out -%,$(LOOPFUNCLIBS))
+		$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $(call abspathx,$^) $(BOOSTTESTLIBS) $(BOOSTTHREADLIBS) $(GSLLIBS) $(FLIBS) $(SQLITELIBS) $(THREADLIBS)
 
 $(DIR)/test_CMSSM_slha_output.x: $(DIR)/test_CMSSM_slha_output.o $(LIBCMSSM) $(LIBSoftsusyMSSM) $(LIBFLEXI) $(filter-out -%,$(LOOPFUNCLIBS)) $(EXAMPLES_EXE) $(DIR)/test_CMSSM_slha_output.in.spc
 		$(CXX) -o $@ $(call abspathx,$< $(LIBCMSSM) $(LIBSoftsusyMSSM) $(LIBFLEXI) $(LOOPFUNCLIBS)) $(BOOSTTESTLIBS) $(BOOSTTHREADLIBS) $(GSLLIBS) $(FLIBS)
