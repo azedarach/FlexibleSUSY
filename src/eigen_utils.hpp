@@ -97,14 +97,19 @@ public:
    static LRS_tensor PR() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_one<T>::get(),LRS_tensor_zero<T>::get())); }
    static LRS_tensor PS() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get(),LRS_tensor_one<T>::get())); }
 
-   LRS_tensor operator+(const LRS_tensor& rhs)
+   LRS_tensor operator+(const LRS_tensor& rhs) const
    {
       return LRS_tensor(std::make_tuple(L()+rhs.L(), R()+rhs.R(), S()+rhs.S()));
    }
 
-   LRS_tensor operator-(const LRS_tensor& rhs)
+   LRS_tensor operator-(const LRS_tensor& rhs) const
    {
       return LRS_tensor(std::make_tuple(L()-rhs.L(), R()-rhs.R(), S()-rhs.S()));
+   }
+
+   LRS_tensor operator-() const
+   {
+      return LRS_tensor(std::make_tuple(-L(), -R(), -S()));
    }
 
    LRS_tensor& operator+=(const LRS_tensor& rhs)
