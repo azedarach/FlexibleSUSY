@@ -931,22 +931,37 @@ CountNumberOfEntries[CConversion`MatrixType[type_, m_, n_]] := m n CountNumberOf
 CountNumberOfEntries[CConversion`TensorType[type_, dims__]] := Times[dims] CountNumberOfEntries[type];
 
 (* rewrite sums (Author: Jae-hyeon Park *)
-RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @ SumToSumOver @
-		       expr;
+RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @
+		       NestedSumToSumOver @ RecordSumDepths[expr, {}];
 
-RecordSumCosts[expr_] := expr //.
-    SumOver[idx_, a_, b_] x_ :> SumOver[idx, a, b, IndexCost[idx, x]] x;
+RecordSumDepths[x_?AtomQ, depths_] := x;
+
+RecordSumDepths[x_, depths_] := RecordSumDepths[#, depths]& /@ x;
+
+RecordSumDepths[SARAH`sum[idx_, a_, b_, x_], {p___, m:{a_|b_,depth_}, q___}] :=
+    NestedSum[depth - 1, idx, a, b,
+	RecordSumDepths[x, {p, m, q, {idx, depth - 1}}]];
+
+RecordSumDepths[SARAH`sum[idx_, a_, b_, x_], {p___}] :=
+    NestedSum[0, idx, a, b, RecordSumDepths[x, {p, {idx, 0}}]];
 
 SumToSumOver[expr_] := expr //.
     SARAH`sum[idx_, a_, b_, x_] :> SumOver[idx, a, b] x;
+
+NestedSumToSumOver[expr_] := expr //.
+    NestedSum[depth_, idx_, a_, b_, x_] :> SumOver[depth, idx, a, b] x;
+
+RecordSumCosts[expr_] := expr //.
+    SumOver[depth_Integer, idx_, a_, b_] x_ :>
+    SumOver[{depth, IndexCost[idx, x]}, idx, a, b] x;
 
 SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
 	lst = List @@ prod,
 	sumOverToConvert,
 	idx, a, b, summand
     },
-    sumOverToConvert = First @ SortBy[Cases[lst, SumOver[_,_,_,_]], Last];
-    {idx, a, b} = Take[List @@ sumOverToConvert, 3];
+    sumOverToConvert = First @ Sort[Cases[lst, SumOver[_,_,_,_]]];
+    {idx, a, b} = Drop[List @@ sumOverToConvert, 1];
     summand = Select[DeleteCases[lst, sumOverToConvert],
 		     !FreeQ[#, idx]&];
     SumOverToSum[SARAH`sum[idx, a, b, Eval[SumOverToSum[Times @@ summand]]]
