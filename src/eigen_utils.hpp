@@ -29,6 +29,23 @@
 
 namespace flexiblesusy {
 
+template <typename T> struct LRS_tensor_one;
+template <typename T> struct LRS_tensor_zero;
+
+template <>
+template <typename Scalar, int M, int N>
+struct LRS_tensor_one<Eigen::Matrix<Scalar,M,N>> {
+   using Matrix_t = Eigen::Matrix<Scalar,M,N>;
+   static Matrix_t get() { return Matrix_t::Ones(); }
+};
+
+template <>
+template <typename Scalar, int M, int N>
+struct LRS_tensor_zero<Eigen::Matrix<Scalar,M,N>> {
+   using Matrix_t = Eigen::Matrix<Scalar,M,N>;
+   static Matrix_t get() { return Matrix_t::Zero(); }
+};
+
 /**
  * @class LRS_tensor
  * @brief collection of 3 matrices
@@ -39,7 +56,7 @@ public:
    using Tuple_t = std::tuple<Matrix_t,Matrix_t,Matrix_t>;
 
    LRS_tensor()
-      : lrs(std::make_tuple(Matrix_t::Zero(),Matrix_t::Zero(),Matrix_t::Zero())) {}
+      : lrs(std::make_tuple(LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get())) {}
    explicit LRS_tensor(const Tuple_t& t)
       : lrs(t) {}
 
@@ -47,9 +64,9 @@ public:
    Matrix_t R() const { return std::get<1>(lrs); }
    Matrix_t S() const { return std::get<2>(lrs); }
    Tuple_t tuple() const { return lrs; }
-   static LRS_tensor PL() { return LRS_tensor(std::make_tuple(Matrix_t::Ones(),Matrix_t::Zero(),Matrix_t::Zero())); }
-   static LRS_tensor PR() { return LRS_tensor(std::make_tuple(Matrix_t::Zero(),Matrix_t::Ones(),Matrix_t::Zero())); }
-   static LRS_tensor PS() { return LRS_tensor(std::make_tuple(Matrix_t::Zero(),Matrix_t::Zero(),Matrix_t::Ones())); }
+   static LRS_tensor PL() { return LRS_tensor(std::make_tuple(LRS_tensor_one<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get())); }
+   static LRS_tensor PR() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_one<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get())); }
+   static LRS_tensor PS() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_one<Matrix_t>::get())); }
 
    LRS_tensor operator+(const LRS_tensor& rhs)
    {
