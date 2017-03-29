@@ -53,19 +53,19 @@ public:
 
    LRS_tensor operator+(const LRS_tensor& rhs)
    {
-      return LRS_tensor(std::make_tuple((L()+rhs.L()).eval(), (R()+rhs.R()).eval(), (S()+rhs.S()).eval()));
+      return LRS_tensor(std::make_tuple(L()+rhs.L(), R()+rhs.R(), S()+rhs.S()));
    }
 
    template <typename T>
    LRS_tensor operator*(T rhs)
    {
-      return LRS_tensor(std::make_tuple((rhs*L()).eval(), (rhs*R()).eval(), (rhs*S()).eval()));
+      return LRS_tensor(std::make_tuple(rhs*L(), rhs*R(), rhs*S()));
    }
 
    template <typename T>
    friend LRS_tensor operator*(T lhs, const LRS_tensor& rhs)
    {
-      return LRS_tensor(std::make_tuple((lhs*rhs.L()).eval(), (lhs*rhs.R()).eval(), (lhs*rhs.S()).eval()));
+      return LRS_tensor(std::make_tuple(lhs*rhs.L(), lhs*rhs.R(), lhs*rhs.S()));
    }
 
 private:
