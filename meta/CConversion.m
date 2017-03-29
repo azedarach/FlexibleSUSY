@@ -932,7 +932,7 @@ CountNumberOfEntries[CConversion`TensorType[type_, dims__]] := Times[dims] Count
 
 (* rewrite sums (Author: Jae-hyeon Park *)
 RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @
-		       NestedSumToSumOver @ RecordSumDepths[expr, {}];
+		       NestedSumToSumOver @ RecordSumDepths[expr /. Eval -> Identity, {}];
 
 RecordSumDepths[x_?AtomQ, depths_] := x;
 
