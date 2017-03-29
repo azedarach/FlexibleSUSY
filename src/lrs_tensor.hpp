@@ -80,7 +80,7 @@ public:
 
    LRS_tensor()
       : lrs(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get())) {}
-   explicit LRS_tensor(const Tuple_t& t)
+   LRS_tensor(const Tuple_t& t)
       : lrs(t) {}
 
    const T& L() const { return std::get<0>(lrs); }
