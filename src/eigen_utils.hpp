@@ -76,37 +76,53 @@ struct LRS_tensor_zero<double> {
  * @class LRS_tensor
  * @brief collection of 3 matrices
  */
-template <typename Matrix_t>
+template <typename T>
 class LRS_tensor {
 public:
-   using Tuple_t = std::tuple<Matrix_t,Matrix_t,Matrix_t>;
+   using Tuple_t = std::tuple<T,T,T>;
 
    LRS_tensor()
-      : lrs(std::make_tuple(LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get())) {}
+      : lrs(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get())) {}
    explicit LRS_tensor(const Tuple_t& t)
       : lrs(t) {}
 
-   Matrix_t L() const { return std::get<0>(lrs); }
-   Matrix_t R() const { return std::get<1>(lrs); }
-   Matrix_t S() const { return std::get<2>(lrs); }
+   const T& L() const { return std::get<0>(lrs); }
+   const T& R() const { return std::get<1>(lrs); }
+   const T& S() const { return std::get<2>(lrs); }
+   T& L() { return std::get<0>(lrs); }
+   T& R() { return std::get<1>(lrs); }
+   T& S() { return std::get<2>(lrs); }
    Tuple_t tuple() const { return lrs; }
-   static LRS_tensor PL() { return LRS_tensor(std::make_tuple(LRS_tensor_one<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get())); }
-   static LRS_tensor PR() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_one<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get())); }
-   static LRS_tensor PS() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_zero<Matrix_t>::get(),LRS_tensor_one<Matrix_t>::get())); }
+   static LRS_tensor PL() { return LRS_tensor(std::make_tuple(LRS_tensor_one<T>::get(),LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get())); }
+   static LRS_tensor PR() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_one<T>::get(),LRS_tensor_zero<T>::get())); }
+   static LRS_tensor PS() { return LRS_tensor(std::make_tuple(LRS_tensor_zero<T>::get(),LRS_tensor_zero<T>::get(),LRS_tensor_one<T>::get())); }
 
    LRS_tensor operator+(const LRS_tensor& rhs)
    {
       return LRS_tensor(std::make_tuple(L()+rhs.L(), R()+rhs.R(), S()+rhs.S()));
    }
 
-   template <typename T>
-   LRS_tensor operator*(T rhs)
+   LRS_tensor operator-(const LRS_tensor& rhs)
    {
-      return LRS_tensor(std::make_tuple(rhs*L(), rhs*R(), rhs*S()));
+      return LRS_tensor(std::make_tuple(L()-rhs.L(), R()-rhs.R(), S()-rhs.S()));
    }
 
-   template <typename T>
-   friend LRS_tensor operator*(T lhs, const LRS_tensor& rhs)
+   LRS_tensor& operator+=(const LRS_tensor& rhs)
+   {
+      L() += rhs.L();
+      R() += rhs.R();
+      S() += rhs.S();
+      return *this;
+   }
+
+   template <typename U>
+   friend LRS_tensor operator*(const LRS_tensor& lhs, U rhs)
+   {
+      return LRS_tensor(std::make_tuple(lhs.L()*rhs, lhs.R()*rhs, lhs.S()*rhs));
+   }
+
+   template <typename U>
+   friend LRS_tensor operator*(U lhs, const LRS_tensor& rhs)
    {
       return LRS_tensor(std::make_tuple(lhs*rhs.L(), lhs*rhs.R(), lhs*rhs.S()));
    }
