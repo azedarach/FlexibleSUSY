@@ -29,7 +29,9 @@
 
 namespace flexiblesusy {
 
+/// class to represent a one component of LRS_tensor
 template <typename T> struct LRS_tensor_one;
+/// class to represent a zero component of LRS_tensor
 template <typename T> struct LRS_tensor_zero;
 
 template <>
@@ -40,10 +42,34 @@ struct LRS_tensor_one<Eigen::Matrix<Scalar,M,N>> {
 };
 
 template <>
+template <typename Scalar>
+struct LRS_tensor_one<std::complex<Scalar>> {
+   using T = std::complex<Scalar>;
+   static T get() { return T(1,0); }
+};
+
+template <>
+struct LRS_tensor_one<double> {
+   static double get() { return 1.; }
+};
+
+template <>
 template <typename Scalar, int M, int N>
 struct LRS_tensor_zero<Eigen::Matrix<Scalar,M,N>> {
    using Matrix_t = Eigen::Matrix<Scalar,M,N>;
    static Matrix_t get() { return Matrix_t::Zero(); }
+};
+
+template <>
+template <typename Scalar>
+struct LRS_tensor_zero<std::complex<Scalar>> {
+   using T = std::complex<Scalar>;
+   static T get() { return T{}; }
+};
+
+template <>
+struct LRS_tensor_zero<double> {
+   static double get() { return 0.; }
 };
 
 /**
