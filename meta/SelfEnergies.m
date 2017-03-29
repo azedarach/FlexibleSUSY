@@ -425,9 +425,11 @@ ExpressionToStringSequentially[expr_, heads_, result_String] :=
     result <> " = " <> ExpressionToString[expr, heads] <> ";\n";
 
 PrepareExpr[{S_,R_,L_}, CConversion`ChiralitySum[t_], vertexRules_] :=
-    PrepareExpr[S, t, vertexRules] CConversion`PS +
-    PrepareExpr[R, t, vertexRules] SARAH`PR +
-    PrepareExpr[L, t, vertexRules] SARAH`PL;
+    CConversion`RefactorSums[
+        PrepareExpr[S, t, vertexRules] CConversion`PS +
+        PrepareExpr[R, t, vertexRules] SARAH`PR +
+        PrepareExpr[L, t, vertexRules] SARAH`PL
+    ];
 
 PrepareExpr[expr_, _, vertexRules_] :=
     expr /.
