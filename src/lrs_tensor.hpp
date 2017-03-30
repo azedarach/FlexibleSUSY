@@ -148,6 +148,12 @@ auto Im(const LRS_tensor<T>& t) -> LRS_tensor<decltype(Im(t.L()))>
    return Result_t(std::make_tuple(Im(t.L()), Im(t.R()), Im(t.S())));
 }
 
+template <typename T>
+LRS_tensor<T> Eval(const LRS_tensor<T>& t)
+{
+   return t;
+}
+
 } // namespace flexiblesusy
 
 #endif
