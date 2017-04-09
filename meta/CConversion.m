@@ -931,8 +931,9 @@ CountNumberOfEntries[CConversion`MatrixType[type_, m_, n_]] := m n CountNumberOf
 CountNumberOfEntries[CConversion`TensorType[type_, dims__]] := Times[dims] CountNumberOfEntries[type];
 
 (* rewrite sums (Author: Jae-hyeon Park *)
-RefactorSums[expr_] := SumOverToSum @ RecordSumCosts @ Expand @
-		       NestedSumToSumOver @ RecordSumDepths[expr /. Eval -> Identity, {}];
+RefactorSums[expr_] := SumOverToSum @ CollectSumOvers @ RecordSumCosts @
+		       Expand @ NestedSumToSumOver @
+		       RecordSumDepths[expr /. Eval -> Identity, {}];
 
 RecordSumDepths[x_?AtomQ, depths_] := x;
 
@@ -952,12 +953,47 @@ RecordSumCosts[expr_] := expr //.
     SumOver[depth_Integer, idx_, a_, b_] x_ :>
     SumOver[{depth, IndexCost[idx, x]}, idx, a, b] x;
 
+CollectSumOvers[expr_] /; FreeQ[expr, SumOver[_,_,_,_]] := expr;
+
+CollectSumOvers[expr_] := Module[{
+	sumOverToCollect =
+	    Last @ Union @ Cases[expr, SumOver[_,_,_,_], Infinity],
+	clst, idx
+    },
+    clst = CoefficientList[expr, sumOverToCollect, 2];
+    idx = sumOverToCollect[[2]];
+    CollectSumOvers[clst[[1]]] +
+    sumOverToCollect CollectSubSumOvers[CollectCommonFactors[idx, clst[[2]]]]
+];
+
+CollectCommonFactors[idx_, expr_Plus] :=
+    FixedPoint[
+	Replace[#, f_ a_ + f_ b_ + c_:0 /; CollectableQ[idx, f, {a, b}] :>
+		   f (a + b) + c]&,
+	expr];
+
+CollectCommonFactors[idx_, expr_] := expr;
+
+CollectableQ[fidx_, factor_, rest_] :=
+    !FreeQ[factor, fidx] &&
+    FreeQ[factor, Alternatives @@ Union @
+		  Cases[rest, SumOver[_,idx_,_,_] :> idx, Infinity]];
+
+CollectSubSumOvers[factor_ s_Plus] := factor CollectSumOvers[s];
+
+CollectSubSumOvers[Plus[factored : Longest[(_ _Plus)...], rest___]] :=
+    Plus @@ (CollectSubSumOvers /@ {factored}) + CollectSumOvers @ Plus[rest];
+
+CollectSubSumOvers[x_] := CollectSumOvers[x];
+
+SumOverToSum[x_] /; FreeQ[x, SumOver[_,_,_,_]] := x;
+
 SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
 	lst = List @@ prod,
 	sumOverToConvert,
 	idx, a, b, summand
     },
-    sumOverToConvert = First @ Sort[Cases[lst, SumOver[_,_,_,_]]];
+    sumOverToConvert = First @ Sort @ Cases[lst, SumOver[_,_,_,_]];
     {idx, a, b} = Drop[List @@ sumOverToConvert, 1];
     summand = Select[DeleteCases[lst, sumOverToConvert],
 		     !FreeQ[#, idx]&];
@@ -965,9 +1001,7 @@ SumOverToSum[prod : SumOver[_,_,_,_] _] := Module[{
 		 Times @@ Complement[lst, {sumOverToConvert}, summand]]
 ];
 
-SumOverToSum[x_Plus] := SumOverToSum /@ x;
-
-SumOverToSum[x_] := x;
+SumOverToSum[x_Plus | x_Times] := SumOverToSum /@ x;
 
 IndexCost[idx_, _?AtomQ] := 0;
 
