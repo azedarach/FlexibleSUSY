@@ -1,4 +1,4 @@
-BeginPackage["SelfEnergies2L`", {"SARAH`", "SelfEnergies`"}];
+BeginPackage["SelfEnergies2L`", {"SARAH`"}];
 
 ConvertSarah2LDiagramList::usage = "Converts SARAH's list with 2-loop
  self-energy and tadpole diagrams."
