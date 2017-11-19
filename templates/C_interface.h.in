@@ -1,0 +1,64 @@
+/* ====================================================================
+ * This file is part of FlexibleSUSY.
+ *
+ * FlexibleSUSY is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * FlexibleSUSY is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FlexibleSUSY.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ * ==================================================================== */
+
+#ifndef @ModelName@_C_INTERFACE_H
+#define @ModelName@_C_INTERFACE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int FlexibleSUSY_@ModelName@_open_handle(
+   int* handle,                  /** returned handle */
+   const double settings[],      /** FlexibleSUSY settings */
+   const double sm_input[],      /** Standard Model input parameters */
+   const double model_input[]    /** model input parameters */
+);
+
+int FlexibleSUSY_@ModelName@_open_handle_SLHA_input_file(
+   int* handle,                  /** returned handle */
+   const char* slha_input_file   /** SLHA input file */
+);
+
+void FlexibleSUSY_@ModelName@_close_handle(int handle);
+
+int FlexibleSUSY_@ModelName@_calculate_spectrum(
+   int handle,                   /** handle */
+   double parameters[],          /** model parameters */
+   double extra_parameters[],    /** model extra parameters */
+   double running_masses[],      /** model running MS/DR masses */
+   double running_mixings[],     /** model running MS/DR mixing matrix entries */
+   double pole_masses[],         /** model pole masses */
+   double pole_mixings[]         /** model pole mixing matrix entries */
+);
+
+int FlexibleSUSY_@ModelName@_get_settings_size();         /** number of FlexibleSUSY settings */
+int FlexibleSUSY_@ModelName@_get_sm_input_size();         /** number of Standard Model input parameters */
+int FlexibleSUSY_@ModelName@_get_model_input_size();      /** number of model input parameters */
+int FlexibleSUSY_@ModelName@_get_parameters_size();       /** number of model parameters */
+int FlexibleSUSY_@ModelName@_get_extra_parameters_size(); /** number of model extra parameters */
+int FlexibleSUSY_@ModelName@_get_running_masses_size();   /** number of model running MS/DR masses */
+int FlexibleSUSY_@ModelName@_get_running_mixings_size();  /** number of model running MS/DR mixing matrix entries */
+int FlexibleSUSY_@ModelName@_get_pole_masses_size();      /** number of model pole masses */
+int FlexibleSUSY_@ModelName@_get_pole_mixings_size();     /** number of model pole mixing matrix entries */
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif

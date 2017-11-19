@@ -1,0 +1,145 @@
+// ====================================================================
+// This file is part of FlexibleSUSY.
+//
+// FlexibleSUSY is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version.
+//
+// FlexibleSUSY is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with FlexibleSUSY.  If not, see
+// <http://www.gnu.org/licenses/>.
+// ====================================================================
+
+// File generated at @DateAndTime@
+
+#include "C_interface.h"
+#include "error.hpp"
+#include "logger.hpp"
+
+#include <string>
+#include <cstdlib>
+
+namespace flexiblesusy {
+namespace @ModelName@_C_interface {
+
+} // namespace @ModelName@_C_interface
+} // namespace flexiblesusy
+
+extern "C" {
+
+int FlexibleSUSY_@ModelName@_open_handle(
+   int* handle,                        /** returned handle */
+   const double settings[],            /** FlexibleSUSY settings */
+   const double sm_input[],            /** Standard Model input parameters */
+   const double model_input[]          /** model input parameters */
+)
+{
+   Model_data data;
+   data.set_settings(sg_settings);
+   data.set_modsel(modsel);
+   data.set_sm_input_parameters(qedqcd);
+   data.set_physical_input(physical_input);
+   data.set_input_parameters(input);
+
+   try {
+      *handle = FlexibleSUSY_@ModelName@_open_handle(data);
+   } catch (const Error& error) {
+      ERROR(error.what());
+      return EXIT_FAILURE;
+   } catch (...) {
+      ERROR("exception of unknown type has been thrown.");
+      return EXIT_FAILURE;
+   }
+
+   return 0;
+}
+
+int FlexibleSUSY_@ModelName@_open_handle_SLHA_input_file(
+   int* handle,
+   const char* slha_input_file)
+{
+   using namespace flexiblesusy;
+
+   const std::string slha_input_source(slha_input_file);
+
+   if (slha_input_source.empty()) {
+      ERROR("Invalid SLHA input file: \"" << slha_input_source << "\"");
+      return EXIT_FAILURE;
+   }
+
+   Spectrum_generator_settings settings;
+   softsusy::QedQcd qedqcd;
+   Physical_input physical_input;
+   @ModelName@_input_parameters input;
+
+   try {
+      @ModelName@_slha_io slha_io;
+      slha_io.read_from_source(slha_input_source);
+      slha_io.fill(settings);
+      slha_io.fill(qedqcd);
+      slha_io.fill(physical_input);
+      slha_io.fill(input);
+   } catch (const Error& error) {
+      ERROR(error.what());
+      return EXIT_FAILURE;
+   } catch (...) {
+      ERROR("exception of unknown type has been thrown.");
+      return EXIT_FAILURE;
+   }
+
+   Model_data data;
+   data.set_settings(settings);
+   data.set_modsel(modsel);
+   data.set_sm_input_parameters(qedqcd);
+   data.set_physical_input(physical_input);
+   data.set_input_parameters(input);
+
+   try {
+      *handle = FlexibleSUSY_@ModelName@_open_handle(data);
+   } catch (const Error& error) {
+      ERROR(error.what());
+      return EXIT_FAILURE;
+   } catch (...) {
+      ERROR("exception of unknown type has been thrown.");
+      return EXIT_FAILURE;
+   }
+
+   return 0;
+}
+
+void FlexibleSUSY_@ModelName@_close_handle(int handle)
+{
+   // @TODO fill me
+}
+
+int FlexibleSUSY_@ModelName@_calculate_spectrum(
+   int handle,
+   double parameters[],
+   double extra_parameters[],
+   double running_masses[],
+   double running_mixings[],
+   double pole_masses[],
+   double pole_mixings[])
+{
+   // @TODO fill me
+
+   return 0;
+}
+
+int FlexibleSUSY_@ModelName@_get_settings_size() {}
+int FlexibleSUSY_@ModelName@_get_sm_input_size() {}
+int FlexibleSUSY_@ModelName@_get_model_input_size() {}
+int FlexibleSUSY_@ModelName@_get_parameters_size() {}
+int FlexibleSUSY_@ModelName@_get_extra_parameters_size() {}
+int FlexibleSUSY_@ModelName@_get_running_masses_size() {}
+int FlexibleSUSY_@ModelName@_get_running_mixings_size() {}
+int FlexibleSUSY_@ModelName@_get_pole_masses_size() {}
+int FlexibleSUSY_@ModelName@_get_pole_mixings_size() {}
+
+} // extern "C"
