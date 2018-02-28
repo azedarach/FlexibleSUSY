@@ -69,9 +69,10 @@ T divide_finite(T a, T b) noexcept {
 double fB(const std::complex<double>& a) noexcept
 {
   using flexiblesusy::fast_log;
+  using std::abs;
   const double x = a.real();
 
-  if (fabs(x) < EPSTOL)
+  if (abs(x) < EPSTOL)
      return -1. - x + sqr(x) * 0.5;
 
   if (is_close(x, 1., EPSTOL))
@@ -416,6 +417,53 @@ double a0(double m2, double q2) noexcept
       return 0.;
 
    return m2 * (1.0 - std::log(std::abs(m2 / q2)));
+}
+
+/**
+ * B0 function with squared arguments, from hep-ph/9606211.
+ * Note it returns the REAL PART ONLY.
+ */
+double b0(double p2, double m12, double m22, double q2) noexcept
+{
+   using namespace softsusy;
+   using std::log;
+   using std::abs;
+
+   // protect against infrared divergence
+   if (is_close(p2, 0., EPSTOL) && is_close(m12, 0., EPSTOL)
+       && is_close(m22, 0., EPSTOL))
+      return 0.;
+
+   double ans = 0.;
+   const double mMax2 = std::max(abs(m12), abs(m22));
+   const double pTest = abs(divide_finite(p2, mMax2));
+
+   if (pTest > 1e-10) {
+      const double s = p2 - m22 + m12;
+      const double s2 = sqr(s);
+      const std::complex<double> iEpsilon(0., EPSTOL * mMax2);
+      const std::complex<double> xPlus =
+         (s + sqrt(s2 - 4.*p2*(m12 - iEpsilon))) / (2.*p2);
+      const std::complex<double> xMinus =
+         (s - sqrt(s2 - 4.*p2*(m12 - iEpsilon))) / (2.*p2);
+
+      ans = -log(abs(p2 / q2)) - fB(xPlus) - fB(xMinus);
+   } else {
+      const double mMin2 = std::min(abs(m12), abs(m22));
+
+      if (is_close(m12, m22, EPSTOL)) {
+         ans = -log(abs(m12 / q2));
+      } else {
+         if (mMin2 < 1.e-30) {
+            ans = 1. - log(abs(mMax2 / q2));
+         } else {
+            ans = (m12*(1. - log(abs(m12/q2))) - m22*(1. - log(abs(m22/q2))))
+               / (m12 - m22);
+         }
+      }
+   }
+
+   return ans;
 }
 
 } // namespace flexiblesusy

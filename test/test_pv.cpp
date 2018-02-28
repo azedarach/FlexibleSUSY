@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( test_ReA0 )
    BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(1e-5, scale), flexiblesusy::a0(1e-10, scale2), 1e-15);
 }
 
-BOOST_AUTO_TEST_CASE( test_ReB0 )
+BOOST_AUTO_TEST_CASE( test_ReB0_limits )
 {
    BOOST_CHECK_EQUAL(ReB0(0., 0., 0., scale2), 0.);
 
@@ -120,6 +120,70 @@ BOOST_AUTO_TEST_CASE( test_ReB0 )
    BOOST_CHECK_EQUAL(ReB0(p2, 0., p2, scale2), ReB0(p2, p2, 0., scale2));
 }
 
+struct Values {
+   Values(double p_, double m1_, double m2_, double q_)
+      : p(p_), m1(m1_), m2(m2_), q(q_) {}
+   double p{}, m1{}, m2{}, q{};
+};
+
+BOOST_AUTO_TEST_CASE( test_ReB0_values )
+{
+   const std::vector<Values> vals = {
+      Values(0.  , 1.  , 0., 1.),
+      Values(1e-1, 1.  , 0., 1.),
+      Values(1e-2, 1.  , 0., 1.),
+      Values(1e-3, 1.  , 0., 1.),
+      Values(1e-4, 1.  , 0., 1.),
+      Values(1e-5, 1.  , 0., 1.),
+      Values(0.  , 1.  , 1e-15, 1.),
+      Values(1e-1, 1.  , 1e-15, 1.),
+      Values(1e-2, 1.  , 1e-15, 1.),
+      Values(1e-3, 1.  , 1e-15, 1.),
+      Values(1e-4, 1.  , 1e-15, 1.),
+      Values(1e-5, 1.  , 1e-15, 1.),
+      Values(0.  , 1e20, 0., 1.),
+      Values(1e-1, 1e20, 0., 1.),
+      Values(1e-2, 1e20, 0., 1.),
+      Values(1e-3, 1e20, 0., 1.),
+      Values(1e-4, 1e20, 0., 1.),
+      Values(1e-5, 1e20, 0., 1.),
+      Values(0.  , 0.  , 1., 1.),
+      Values(1e-1, 0.  , 1., 1.),
+      Values(1e-2, 0.  , 1., 1.),
+      Values(1e-3, 0.  , 1., 1.),
+      Values(1e-4, 0.  , 1., 1.),
+      Values(1e-5, 0.  , 1., 1.),
+      Values(0.  , 1e20, 1., 1.),
+      Values(1e-1, 1e20, 1., 1.),
+      Values(1e-2, 1e20, 1., 1.),
+      Values(1e-3, 1e20, 1., 1.),
+      Values(1e-4, 1e20, 1., 1.),
+      Values(1e-5, 1e20, 1., 1.),
+      Values(0.  , 0., 1e20, 1.),
+      Values(1e-1, 0., 1e20, 1.),
+      Values(1e-2, 0., 1e20, 1.),
+      Values(1e-3, 0., 1e20, 1.),
+      Values(1e-4, 0., 1e20, 1.),
+      Values(1e-5, 0., 1e20, 1.),
+      Values(1.  , 1.  , 1., 1.),
+      Values(1.  , 2.  , 3., 4.)
+   };
+
+   for (const auto v: vals) {
+      const auto p = v.p;
+      const auto m1 = v.m1;
+      const auto m2 = v.m2;
+      const auto q = v.q;
+
+      const auto v1 = softsusy::b0(p,m1,m2,q);
+      const auto v2 = flexiblesusy::b0(sqr(p),sqr(m1),sqr(m2),sqr(q));
+
+      BOOST_TEST_MESSAGE("testing p = " << p << ", m1 = " << m1
+                         << ", m2 = " << m2 << ", q = " << q);
+      BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
+   }
+}
+
 BOOST_AUTO_TEST_CASE( test_ReB1 )
 {
    BOOST_CHECK_EQUAL(ReB1(0., 0., 0., scale2), 0.);
@@ -129,12 +193,6 @@ BOOST_AUTO_TEST_CASE( test_ReB1 )
 
    BOOST_CHECK(ReB1(0,1e300,0,1e-10) != 0.);
 }
-
-struct Values {
-   Values(double p_, double m1_, double m2_, double q_)
-      : p(p_), m1(m1_), m2(m2_), q(q_) {}
-   double p{}, m1{}, m2{}, q{};
-};
 
 BOOST_AUTO_TEST_CASE( test_ReB1_integral )
 {
