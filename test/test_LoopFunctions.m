@@ -104,7 +104,7 @@ RunTests[] := (
 
     Print["testing B0[] function ..."];
 
-    TestEquality[Simplify[
+    TestEquality[FullSimplify[
         (B0[1, 2, 3, 4] /. LFFull[]) -
         LoopFunctions`Private`B0integral[1, 2, 3, 4]],
                  0
@@ -114,7 +114,7 @@ RunTests[] := (
 
     loopFunctions = {
         A0[m^2,Q^2],
-        B0[p,m1,m2,Q],
+        B0[p^2,m1^2,m2^2,Q^2],
         B1[p,m1,m2,Q],
         B00[p,m1,m2,Q],
         B11[p,m1,m2,Q],
@@ -148,7 +148,7 @@ RunTests[] := (
 
     loopFunctions = {
         A0[m^2, mu^2],
-        B0[p, m1, m2, mu],
+        B0[p^2, m1^2, m2^2, mu^2],
         B1[p, m1, m2, mu],
         B00[p, m1, m2, mu],
         B11[p, m1, m2, mu],

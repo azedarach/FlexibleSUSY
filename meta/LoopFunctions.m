@@ -164,54 +164,54 @@ LogA0[m2_, mu2_] :=
 (********************* B0 *********************)
 
 (* B0 [arxiv:hep-ph/9606211 Eq. (B.6)] *)
-B0impl[p_, m1_, m2_, mu_] :=
-    Which[PossibleZeroQ[p],
-          B0zero[m1,m2,mu],
-          PossibleZeroQ[p - m2] && PossibleZeroQ[m1],
-          Delta + Log[mu^2/m2^2] + 2,
-          PossibleZeroQ[p - m1] && PossibleZeroQ[m2],
-          Delta + Log[mu^2/m1^2] + 2,
-          PossibleZeroQ[m1] && PossibleZeroQ[m2],
-          Delta - Log[(-p^2 - I eps)/mu^2] + 2,
+B0impl[p2_, m12_, m22_, mu2_] :=
+    Which[PossibleZeroQ[p2],
+          B0zero[m12,m22,mu2],
+          PossibleZeroQ[p2 - m22] && PossibleZeroQ[m12],
+          Delta + Log[mu2/m22] + 2,
+          PossibleZeroQ[p2 - m12] && PossibleZeroQ[m22],
+          Delta + Log[mu2/m12] + 2,
+          PossibleZeroQ[m12] && PossibleZeroQ[m22],
+          Delta - Log[(-p2 - I eps)/mu] + 2,
           True,
-          B0analytic[p,m1,m2,mu]
+          B0analytic[p2,m12,m22,mu2]
       ];
 
-(* B0 for p = 0 *)
-B0zero[m1_, m2_, mu_] :=
-    Which[PossibleZeroQ[m1 - m2],
-          Delta + Log[mu^2/m2^2],
-          PossibleZeroQ[m1],
-          Delta + 1 + Log[mu^2/m2^2],
-          PossibleZeroQ[m2],
-          Delta + 1 + Log[mu^2/m1^2],
+(* B0 for p^2 = 0 *)
+B0zero[m12_, m22_, mu2_] :=
+    Which[PossibleZeroQ[m12 - m22],
+          Delta + Log[mu2/m22],
+          PossibleZeroQ[m12],
+          Delta + 1 + Log[mu2/m22],
+          PossibleZeroQ[m22],
+          Delta + 1 + Log[mu2/m12],
           True,
-          Delta + 1 + (m1^2 Log[mu^2/m1^2] - m2^2 Log[mu^2/m2^2])/(m1^2 - m2^2)
+          Delta + 1 + (m12 Log[mu2/m12] - m22 Log[mu2/m22])/(m12 - m22)
    ];
 
 (* B0 general (symmetric) form [arxiv:hep-ph/9606211 Eq. (B.7)] *)
-B0analytic[p_, m1_, m2_, mu_] :=
+B0analytic[p2_, m12_, m22_, mu2_] :=
     Module[{eps, fB, s, xp, xm},
-           s = p^2 - m2^2 + m1^2;
-           xp = (s + Sqrt[s^2 - 4 p^2 (m1^2 - I eps)]) / (2 p^2);
-           xm = (s - Sqrt[s^2 - 4 p^2 (m1^2 - I eps)]) / (2 p^2);
+           s = p2 - m22 + m12;
+           xp = (s + Sqrt[s^2 - 4 p2 (m12 - I eps)]) / (2 p2);
+           xm = (s - Sqrt[s^2 - 4 p2 (m12 - I eps)]) / (2 p2);
            fB[x_] := Log[1-x] - x Log[1 - 1/x] - 1;
-           Limit[Delta - Log[p^2/mu^2] - fB[xp] - fB[xm], eps -> 0,
-                 Direction -> -1,
-                 Assumptions :> p > 0 && m1 >= 0 && m2 >= 0 && mu > 0]
+           Limit[Delta - Log[p2/mu2] - fB[xp] - fB[xm],
+                 eps -> 0, Direction -> -1,
+                 Assumptions :> p2 > 0 && m12 >= 0 && m22 >= 0 && mu2 > 0]
           ];
 
 (* B0 with explicit integration [arxiv:hep-ph/9606211 Eq. (B.6)] *)
-B0integral[p_, m1_, m2_, mu_] :=
+B0integral[p2_, m12_, m22_, mu2_] :=
     Module[{eps},
            Limit[
-               Delta - Integrate[Log[((1-x) m1^2 + x m2^2 - x (1-x) p^2 - I eps)/mu^2], {x,0,1}],
+               Delta - Integrate[Log[((1-x) m12 + x m22 - x (1-x) p2 - I eps)/mu2], {x,0,1}],
                eps -> 0]
           ];
 
 DivB0[_, _, _, _] := Delta;
 
-LogB0[p_, _, _, mu_] := Log[mu^2/p^2];
+LogB0[p2_, _, _, mu2_] := Log[mu2/p2];
 
 (********************* B1 *********************)
 
@@ -220,7 +220,7 @@ B1impl[p_, m1_, m2_, mu_] :=
     If[PossibleZeroQ[p],
        B1zero[m1,m2,mu],
        $BPMZSign 1/(2 p^2) (A0impl[m2^2,mu^2] - A0impl[m1^2,mu^2]
-                            + (p^2 + m1^2 - m2^2) B0impl[p,m1,m2,mu])
+                            + (p^2 + m1^2 - m2^2) B0impl[p^2,m1^2,m2^2,mu^2])
       ];
 
 (* B1 for p = 0 *)
@@ -243,7 +243,7 @@ LogB1[p_, m1_, m2_, mu_] :=
     If[PossibleZeroQ[p],
        $BPMZSign Log[mu^2/m2^2]/2,
        $BPMZSign 1/(2 p^2) (LogA0[m2^2,mu^2] - LogA0[m1^2,mu^2]
-                            + (p^2 + m1^2 - m2^2) LogB0[p,m1,m2,mu])
+                            + (p^2 + m1^2 - m2^2) LogB0[p^2,m1^2,m2^2,mu^2])
       ];
 
 (********************* B11 *********************)
@@ -254,7 +254,7 @@ B11impl[p_, m1_, m2_, mu_] :=
        B11zero[m1,m2,mu],
        1/(6 p^2) (
            2 A0impl[m2^2,mu^2]
-           - 2 m1^2 B0impl[p,m1,m2,mu]
+           - 2 m1^2 B0impl[p^2,m1^2,m2^2,mu^2]
            + $BPMZSign 4 (p^2 - m2^2 + m1^2) B1impl[p,m1,m2,mu]
            - m1^2 - m2^2 + p^2/3)
       ];
@@ -270,7 +270,7 @@ LogB11[p_, m1_, m2_, mu_] :=
        Undefined,
        1/(6 p^2) (
            2 LogA0[m2^2,mu^2]
-           - 2 m1^2 LogB0[p,m1,m2,mu]
+           - 2 m1^2 LogB0[p^2,m1^2,m2^2,mu^2]
            + $BPMZSign 4 (p^2 - m2^2 + m1^2) LogB1[p,m1,m2,mu])
       ];
 
@@ -282,9 +282,9 @@ B22impl[p_, m1_, m2_, mu_] :=
     If[PossibleZeroQ[p],
        B22zero[m1,m2,mu],
        1/6 (1/2 (A0impl[m1^2,mu^2] + A0impl[m2^2,mu^2])
-            + (m1^2 + m2^2 - p^2/2) B0impl[p,m1,m2,mu]
+            + (m1^2 + m2^2 - p^2/2) B0impl[p^2,m1^2,m2^2,mu^2]
             + (m2^2 - m1^2)/(2 p^2) (A0impl[m2^2,mu^2] - A0impl[m1^2,mu^2]
-                                     - (m2^2 - m1^2) B0impl[p,m1,m2,mu])
+                                     - (m2^2 - m1^2) B0impl[p^2,m1^2,m2^2,mu^2])
             + m1^2 + m2^2 - p^2/3)
       ];
 
@@ -313,9 +313,9 @@ LogB22[p_, m1_, m2_, mu_] :=
            m2^2*(m1^2 + 3*m2^2)*Log[mu^2/m2^2])/(12*(m1^2 - m2^2)),
           True,
           1/6 (1/2 (LogA0[m1^2,mu^2] + LogA0[m2^2,mu^2])
-               + (m1^2 + m2^2 - p^2/2) LogB0[p,m1,m2,mu]
+               + (m1^2 + m2^2 - p^2/2) LogB0[p^2,m1^2,m2^2,mu^2]
                + (m2^2 - m1^2)/(2 p^2) (LogA0[m2^2,mu^2] - LogA0[m1^2,mu^2]
-                                        - (m2^2 - m1^2) LogB0[p,m1,m2,mu]))
+                                        - (m2^2 - m1^2) LogB0[p^2,m1^2,m2^2,mu^2]))
          ];
 
 (********************* C0 *********************)
@@ -508,27 +508,27 @@ D27zero[m1_, m2_, m3_, m4_] :=
 
 (* F [arxiv:hep-ph/9606211 Eq. (B.11)] *)
 Fimpl[p_, m1_, m2_, mu_] :=
-    A0impl[m1^2,mu^2] - 2 A0impl[m2^2,mu^2] - (2 p^2 + 2 m1^2 - m2^2) B0impl[p,m1,m2,mu];
+    A0impl[m1^2,mu^2] - 2 A0impl[m2^2,mu^2] - (2 p^2 + 2 m1^2 - m2^2) B0impl[p^2,m1^2,m2^2,mu^2];
 
 Fzero[m1_, m2_, mu_] := Fimpl[0,m1,m2,mu];
 
 DivF[p_, m1_, m2_, mu_] := Delta (-m1^2 - m2^2 - 2*p^2);
 
 LogF[p_, m1_, m2_, mu_] :=
-    LogA0[m1^2,mu^2] - 2 LogA0[m2^2,mu^2] - (2 p^2 + 2 m1^2 - m2^2) LogB0[p,m1,m2,mu];
+    LogA0[m1^2,mu^2] - 2 LogA0[m2^2,mu^2] - (2 p^2 + 2 m1^2 - m2^2) LogB0[p^2,m1^2,m2^2,mu^2];
 
 (********************* G *********************)
 
 (* G [arxiv:hep-ph/9606211 Eq. (B.12)] *)
 Gimpl[p_, m1_, m2_, mu_] :=
-    (p^2 - m1^2 - m2^2) B0impl[p,m1,m2,mu] - A0impl[m1^2,mu^2] - A0impl[m2^2,mu^2];
+    (p^2 - m1^2 - m2^2) B0impl[p^2,m1^2,m2^2,mu^2] - A0impl[m1^2,mu^2] - A0impl[m2^2,mu^2];
 
 Gzero[m1_, m2_, mu_] := Gimpl[0,m1,m2,mu];
 
 DivG[p_, m1_, m2_, mu_] := Delta (-2*m1^2 - 2*m2^2 + p^2);
 
 LogG[p_, m1_, m2_, mu_] :=
-    (p^2 - m1^2 - m2^2) LogB0[p,m1,m2,mu] - LogA0[m1^2,mu^2] - LogA0[m2^2,mu^2];
+    (p^2 - m1^2 - m2^2) LogB0[p^2,m1^2,m2^2,mu^2] - LogA0[m1^2,mu^2] - LogA0[m2^2,mu^2];
 
 (********************* H *********************)
 
