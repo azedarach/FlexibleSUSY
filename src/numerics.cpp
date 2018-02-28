@@ -407,3 +407,15 @@ double c0(double m1, double m2, double m3) noexcept
 }
 
 } // namespace softsusy
+
+namespace flexiblesusy {
+
+double a0(double m2, double q2) noexcept
+{
+   if (std::abs(m2) < 1e-8)
+      return 0.;
+
+   return m2 * (1.0 - std::log(std::abs(m2 / q2)));
+}
+
+} // namespace flexiblesusy

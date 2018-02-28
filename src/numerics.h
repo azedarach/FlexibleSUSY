@@ -44,4 +44,10 @@ double b22bar(double p, double m1, double m2, double q) noexcept;
 
 } // namespace softsusy
 
+namespace flexiblesusy {
+
+double a0(double m2, double q2) noexcept;
+
+} // namespace flexiblesusy
+
 #endif

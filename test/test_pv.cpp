@@ -101,6 +101,10 @@ const double p2 = Sqr(p);
 BOOST_AUTO_TEST_CASE( test_ReA0 )
 {
    BOOST_CHECK_EQUAL(ReA0(0., scale2), 0.);
+   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(p, scale), flexiblesusy::a0(p2, scale2), 1e-15);
+   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(0, scale), flexiblesusy::a0(0., scale2), 1e-15);
+   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(1e-4, scale), flexiblesusy::a0(1e-8, scale2), 1e-15);
+   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(1e-5, scale), flexiblesusy::a0(1e-10, scale2), 1e-15);
 }
 
 BOOST_AUTO_TEST_CASE( test_ReB0 )
