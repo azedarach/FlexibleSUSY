@@ -113,7 +113,7 @@ RunTests[] := (
     Print["testing divergences ..."];
 
     loopFunctions = {
-        A0[m,Q],
+        A0[m^2,Q^2],
         B0[p,m1,m2,Q],
         B1[p,m1,m2,Q],
         B00[p,m1,m2,Q],
@@ -147,7 +147,7 @@ RunTests[] := (
     Print["testing logarithms ..."];
 
     loopFunctions = {
-        A0[m, mu],
+        A0[m^2, mu^2],
         B0[p, m1, m2, mu],
         B1[p, m1, m2, mu],
         B00[p, m1, m2, mu],
