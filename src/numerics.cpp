@@ -440,20 +440,18 @@ double b0(double p2, double m12, double m22, double q2) noexcept
 
    if (pTest > 1e-10) {
       const double s = p2 - m22 + m12;
-      const double s2 = sqr(s);
       const std::complex<double> iEpsilon(0., EPSTOL * mMax2);
-      const std::complex<double> xPlus =
-         (s + sqrt(s2 - 4.*p2*(m12 - iEpsilon))) / (2.*p2);
-      const std::complex<double> xMinus =
-         (s - sqrt(s2 - 4.*p2*(m12 - iEpsilon))) / (2.*p2);
+      const std::complex<double> rt = sqrt(sqr(s) - 4.*p2*(m12 - iEpsilon));
+      const std::complex<double> xPlus = 0.5 * (s + rt) / p2;
+      const std::complex<double> xMinus = 0.5 * (s - rt) / p2;
 
       ans = -log(abs(p2 / q2)) - fB(xPlus) - fB(xMinus);
    } else {
-      const double mMin2 = std::min(abs(m12), abs(m22));
-
       if (is_close(m12, m22, EPSTOL)) {
          ans = -log(abs(m12 / q2));
       } else {
+         const double mMin2 = std::min(abs(m12), abs(m22));
+
          if (mMin2 < 1.e-30) {
             ans = 1. - log(abs(mMax2 / q2));
          } else {
