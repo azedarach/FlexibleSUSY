@@ -24,18 +24,18 @@ program run_loops
      write(*,*) "Error: file ",trim(file_name)," does not exist!"
      stop 1
   end if
-  open(1, file=trim(file_name), err=1)
+  open(100, file=trim(file_name), err=1)
 
   call Init_cll(6,6,"")
 
   write (*,*) "# A0(m0^2) A0(m1^2) B0(p^2,m0^2,m1^2) B1(p^2,m0^2,m1^2) B00(p^2,m0^2,m1^2) B11(p^2,m0^2,m1^2)"
 
   do
-     read(1,"(a255)", end=1, err=1) read_line
+     read(100,"(a255)", end=1, err=1) read_line
      if (read_line(1:1).eq."#") cycle
-     if (read_line.eq." ") cycle
+     if (read_line.eq."") cycle
 
-     read(1,*) p2, m12, m22, mu2
+     read(100,*) p2, m12, m22, mu2
 
      call SetMuUV2_cll(mu2)
      call SetMuIR2_cll(mu2)
@@ -51,6 +51,6 @@ program run_loops
      write(*,*) real(A01), real(A02), real(B0), real(B1), real(B00)
   end do
 
-1 close(1)
+1 close(100)
 
 end program run_loops
