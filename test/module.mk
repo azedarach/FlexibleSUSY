@@ -41,6 +41,7 @@ TEST_SRC := \
 		$(DIR)/test_numerics.cpp \
 		$(DIR)/test_problems.cpp \
 		$(DIR)/test_pv.cpp \
+		$(DIR)/test_pv2.cpp \
 		$(DIR)/test_raii.cpp \
 		$(DIR)/test_root_finder.cpp \
 		$(DIR)/test_scan.cpp \
