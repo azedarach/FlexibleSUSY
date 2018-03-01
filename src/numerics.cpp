@@ -330,7 +330,7 @@ double d0(double m1, double m2, double m3, double m4) noexcept
 double d27(double m1, double m2, double m3, double m4) noexcept
 {
   if (is_close(m1, m2, EPSTOL))
-    m1 += TOL * 0.01;
+    m1 += TOL * 0.1;
 
   const double m12 = sqr(m1), m22 = sqr(m2);
 

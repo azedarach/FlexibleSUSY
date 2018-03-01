@@ -186,5 +186,29 @@ BOOST_AUTO_TEST_CASE( test_softsusy )
          const auto v2 = flexiblesusy::h0(p2,m12,m22,q2);
          BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-7);
       }
+
+      {
+         const auto v1 = softsusy::c0(p,m1,m2);
+         const auto v2 = flexiblesusy::c0(p2,m12,m22);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-7);
+      }
+
+      {
+         const auto v1 = softsusy::d0(p,m1,m2,q2);
+         const auto v2 = flexiblesusy::d0(p2,m12,m22,q2);
+
+         // not so precise because limits of equal masse are not implemented
+         if (!(v1 < 1e-4 && v1 < 1e-4))
+            BOOST_CHECK_CLOSE_FRACTION(v1, v2, 2e-3);
+      }
+
+      {
+         const auto v1 = softsusy::d27(p,m1,m2,q2);
+         const auto v2 = flexiblesusy::d27(p2,m12,m22,q2);
+
+         // not so precise because limits of equal masse are not implemented
+         if (!(v1 < 1e-7 && v1 < 1e-7))
+            BOOST_CHECK_CLOSE_FRACTION(v1, v2, 2e-3);
+      }
    }
 }

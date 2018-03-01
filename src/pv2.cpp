@@ -351,7 +351,7 @@ double d0(double m12, double m22, double m32, double m42) noexcept
 double d27(double m12, double m22, double m32, double m42) noexcept
 {
    if (is_close(m12, m22, EPSTOL))
-      m12 += TOL * 0.01;
+      m12 += TOL * 0.2;
 
    return (m12 * c0(m12, m32, m42) - m22 * c0(m22, m32, m42))
       / (4.0 * (m12 - m22));
