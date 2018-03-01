@@ -123,8 +123,8 @@ BOOST_AUTO_TEST_CASE( test_ReA0 )
 
 BOOST_AUTO_TEST_CASE( test_ReB0_values )
 {
-   auto rand_vals = generate_random_values(10000, 0., 2000);
-   auto vals = concat(positive_vals, rand_vals);
+   const auto rand_vals = generate_random_values(10000, 0., 2000);
+   const auto vals = concat(positive_vals, rand_vals);
 
    for (const auto v: vals) {
       const auto p2 = v.p2;
@@ -147,8 +147,8 @@ BOOST_AUTO_TEST_CASE( test_ReB0_values )
 
 BOOST_AUTO_TEST_CASE( test_ReB1_values )
 {
-   auto rand_vals = generate_random_values(10000, 0., 2000);
-   auto vals = concat(positive_vals, rand_vals);
+   const auto rand_vals = generate_random_values(10000, 0., 2000);
+   const auto vals = concat(positive_vals, rand_vals);
 
    for (const auto v: vals) {
       const auto p2 = v.p2;
