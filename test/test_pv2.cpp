@@ -30,12 +30,53 @@
 #include <boost/test/floating_point_comparison.hpp>
 
 struct Values {
-   Values(double p_, double m1_, double m2_, double q_)
-      : p(p_), m1(m1_), m2(m2_), q(q_) {}
-   double p{}, m1{}, m2{}, q{};
+   Values(double p2_, double m12_, double m22_, double q2_)
+      : p2(p2_), m12(m12_), m22(m22_), q2(q2_) {}
+   double p2{}, m12{}, m22{}, q2{};
 };
 
-constexpr double sqr(double a) noexcept { return a*a; }
+const std::vector<Values> positive_vals = {
+   Values(0.  , 1.  , 0., 1.),
+   Values(1e-1, 1.  , 0., 1.),
+   Values(1e-2, 1.  , 0., 1.),
+   Values(1e-3, 1.  , 0., 1.),
+   Values(1e-4, 1.  , 0., 1.),
+   Values(1e-5, 1.  , 0., 1.),
+   Values(0.  , 1.  , 1e-15, 1.),
+   Values(1e-1, 1.  , 1e-15, 1.),
+   Values(1e-2, 1.  , 1e-15, 1.),
+   Values(1e-3, 1.  , 1e-15, 1.),
+   Values(1e-4, 1.  , 1e-15, 1.),
+   Values(1e-5, 1.  , 1e-15, 1.),
+   Values(0.  , 1e20, 0., 1.),
+   Values(1e-1, 1e20, 0., 1.),
+   Values(1e-2, 1e20, 0., 1.),
+   Values(1e-3, 1e20, 0., 1.),
+   Values(1e-4, 1e20, 0., 1.),
+   Values(1e-5, 1e20, 0., 1.),
+   Values(0.  , 0.  , 1., 1.),
+   Values(1e-1, 0.  , 1., 1.),
+   Values(1e-2, 0.  , 1., 1.),
+   Values(1e-3, 0.  , 1., 1.),
+   Values(1e-4, 0.  , 1., 1.),
+   Values(1e-5, 0.  , 1., 1.),
+   Values(0.  , 1e20, 1., 1.),
+   Values(1e-1, 1e20, 1., 1.),
+   Values(1e-2, 1e20, 1., 1.),
+   Values(1e-3, 1e20, 1., 1.),
+   Values(1e-4, 1e20, 1., 1.),
+   Values(1e-5, 1e20, 1., 1.),
+   Values(0.  , 0., 1e20, 1.),
+   Values(1e-1, 0., 1e20, 1.),
+   Values(1e-2, 0., 1e20, 1.),
+   Values(1e-3, 0., 1e20, 1.),
+   Values(1e-4, 0., 1e20, 1.),
+   Values(1e-5, 0., 1e20, 1.),
+   Values(1.  , 1.  , 1., 1.)
+};
+
+constexpr double sqr(double x) noexcept { return x*x; }
+constexpr double sqrtabs(double x) noexcept { return std::sqrt(std::abs(x)); }
 
 const double scale  = 100;
 const double scale2 = sqr(scale);
@@ -53,115 +94,42 @@ BOOST_AUTO_TEST_CASE( test_ReA0 )
 
 BOOST_AUTO_TEST_CASE( test_ReB0_values )
 {
-   const std::vector<Values> vals = {
-      Values(0.  , 1.  , 0., 1.),
-      Values(1e-1, 1.  , 0., 1.),
-      Values(1e-2, 1.  , 0., 1.),
-      Values(1e-3, 1.  , 0., 1.),
-      Values(1e-4, 1.  , 0., 1.),
-      Values(1e-5, 1.  , 0., 1.),
-      Values(0.  , 1.  , 1e-15, 1.),
-      Values(1e-1, 1.  , 1e-15, 1.),
-      Values(1e-2, 1.  , 1e-15, 1.),
-      Values(1e-3, 1.  , 1e-15, 1.),
-      Values(1e-4, 1.  , 1e-15, 1.),
-      Values(1e-5, 1.  , 1e-15, 1.),
-      Values(0.  , 1e20, 0., 1.),
-      Values(1e-1, 1e20, 0., 1.),
-      Values(1e-2, 1e20, 0., 1.),
-      Values(1e-3, 1e20, 0., 1.),
-      Values(1e-4, 1e20, 0., 1.),
-      Values(1e-5, 1e20, 0., 1.),
-      Values(0.  , 0.  , 1., 1.),
-      Values(1e-1, 0.  , 1., 1.),
-      Values(1e-2, 0.  , 1., 1.),
-      Values(1e-3, 0.  , 1., 1.),
-      Values(1e-4, 0.  , 1., 1.),
-      Values(1e-5, 0.  , 1., 1.),
-      Values(0.  , 1e20, 1., 1.),
-      Values(1e-1, 1e20, 1., 1.),
-      Values(1e-2, 1e20, 1., 1.),
-      Values(1e-3, 1e20, 1., 1.),
-      Values(1e-4, 1e20, 1., 1.),
-      Values(1e-5, 1e20, 1., 1.),
-      Values(0.  , 0., 1e20, 1.),
-      Values(1e-1, 0., 1e20, 1.),
-      Values(1e-2, 0., 1e20, 1.),
-      Values(1e-3, 0., 1e20, 1.),
-      Values(1e-4, 0., 1e20, 1.),
-      Values(1e-5, 0., 1e20, 1.),
-      Values(1.  , 1.  , 1., 1.),
-      Values(1.  , 2.  , 3., 4.)
-   };
-
-   for (const auto v: vals) {
-      const auto p = v.p;
-      const auto m1 = v.m1;
-      const auto m2 = v.m2;
-      const auto q = v.q;
+   for (const auto v: positive_vals) {
+      const auto p2 = v.p2;
+      const auto m12 = v.m12;
+      const auto m22 = v.m22;
+      const auto q2 = v.q2;
+      const auto p = sqrtabs(p2);
+      const auto m1 = sqrtabs(m12);
+      const auto m2 = sqrtabs(m22);
+      const auto q = sqrtabs(q2);
 
       const auto v1 = softsusy::b0(p,m1,m2,q);
-      const auto v2 = flexiblesusy::b0(sqr(p),sqr(m1),sqr(m2),sqr(q));
+      const auto v2 = flexiblesusy::b0(p2,m12,m22,q2);
 
-      BOOST_TEST_MESSAGE("testing p = " << p << ", m1 = " << m1
-                         << ", m2 = " << m2 << ", q = " << q);
+      BOOST_TEST_MESSAGE("testing p2 = " << p2 << ", m12 = " << m12
+                         << ", m22 = " << m22 << ", q2 = " << q2);
       BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
    }
 }
 
 BOOST_AUTO_TEST_CASE( test_ReB1_values )
 {
-   const std::vector<Values> vals = {
-      Values(0.  , 1.  , 0., 1.),
-      Values(1e-1, 1.  , 0., 1.),
-      Values(1e-2, 1.  , 0., 1.),
-      Values(1e-3, 1.  , 0., 1.),
-      Values(1e-4, 1.  , 0., 1.),
-      Values(1e-5, 1.  , 0., 1.),
-      Values(0.  , 1.  , 1e-15, 1.),
-      Values(1e-1, 1.  , 1e-15, 1.),
-      Values(1e-2, 1.  , 1e-15, 1.),
-      Values(1e-3, 1.  , 1e-15, 1.),
-      Values(1e-4, 1.  , 1e-15, 1.),
-      Values(1e-5, 1.  , 1e-15, 1.),
-      Values(0.  , 1e20, 0., 1.),
-      Values(1e-1, 1e20, 0., 1.),
-      Values(1e-2, 1e20, 0., 1.),
-      Values(1e-3, 1e20, 0., 1.),
-      Values(1e-4, 1e20, 0., 1.),
-      Values(1e-5, 1e20, 0., 1.),
-      Values(0.  , 0.  , 1., 1.),
-      Values(1e-1, 0.  , 1., 1.),
-      Values(1e-2, 0.  , 1., 1.),
-      Values(1e-3, 0.  , 1., 1.),
-      Values(1e-4, 0.  , 1., 1.),
-      Values(1e-5, 0.  , 1., 1.),
-      Values(0.  , 1e20, 1., 1.),
-      Values(1e-1, 1e20, 1., 1.),
-      Values(1e-2, 1e20, 1., 1.),
-      Values(1e-3, 1e20, 1., 1.),
-      Values(1e-4, 1e20, 1., 1.),
-      Values(1e-5, 1e20, 1., 1.),
-      Values(0.  , 0., 1e20, 1.),
-      Values(1e-1, 0., 1e20, 1.),
-      Values(1e-2, 0., 1e20, 1.),
-      Values(1e-3, 0., 1e20, 1.),
-      Values(1e-4, 0., 1e20, 1.),
-      Values(1e-5, 0., 1e20, 1.),
-      Values(1.  , 1.  , 1., 1.)
-   };
-
-   for (const auto v: vals) {
-      const auto p = v.p;
-      const auto m1 = v.m1;
-      const auto m2 = v.m2;
-      const auto q = v.q;
+   for (const auto v: positive_vals) {
+      const auto p2 = v.p2;
+      const auto m12 = v.m12;
+      const auto m22 = v.m22;
+      const auto q2 = v.q2;
+      const auto p = sqrtabs(p2);
+      const auto m1 = sqrtabs(m12);
+      const auto m2 = sqrtabs(m22);
+      const auto q = sqrtabs(q2);
 
       const auto v1 = softsusy::b1(p,m1,m2,q);
-      const auto v2 = flexiblesusy::b1(sqr(p),sqr(m1),sqr(m2),sqr(q));
+      const auto v2 = flexiblesusy::b1(p2,m12,m22,q2);
 
-      BOOST_TEST_MESSAGE("testing p = " << p << ", m1 = " << m1
-                         << ", m2 = " << m2 << ", q = " << q);
-      BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-12);
+      BOOST_TEST_MESSAGE("testing p2 = " << p2 << ", m12 = " << m12
+                         << ", m22 = " << m22 << ", q2 = " << q2);
+      BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
    }
 }
