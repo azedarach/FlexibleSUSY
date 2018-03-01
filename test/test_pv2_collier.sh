@@ -36,7 +36,7 @@ out_CO="${BASEDIR}/test_pv2_collier_2point.COLLIER.out.dat"
         exit 0
     }
 
-    gfortran "${src_CO}" -o "${run_CO}" -J"${COLLIER_DIR}/modules" -L"${COLLIER_DIR}" -lcollier
+    $("${FSCONFIG}" --fc) "${src_CO}" -o "${run_CO}" -J"${COLLIER_DIR}/modules" -L"${COLLIER_DIR}" -lcollier
 
     [ $? != 0 ] && {
         echo "Error: could not build ${run_FS}"
