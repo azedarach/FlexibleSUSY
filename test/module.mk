@@ -58,6 +58,7 @@ TEST_SH := \
 		$(DIR)/test_depgen.sh \
 		$(DIR)/test_run_examples.sh \
 		$(DIR)/test_run_all_spectrum_generators.sh \
+		$(DIR)/test_pv2_collier.sh \
 		$(DIR)/test_space_dir.sh
 
 TEST_META := \
