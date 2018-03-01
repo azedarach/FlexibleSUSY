@@ -254,107 +254,107 @@ double h0(double p2, double m12, double m22, double q2) noexcept
 
 double c0(double m12, double m22, double m32) noexcept
 {
-  using std::log;
+   using std::log;
 
-  double ans = 0.;
+   double ans = 0.;
 
-  if (is_close(m12,0.,EPSTOL) && is_close(m22,0.,EPSTOL) && is_close(m32,0.,EPSTOL)) {
-     // c0 is undefined for m1 == m2 == m3 == 0
-     ans = 0.;
-  } else if (is_close(m22,0.,EPSTOL) && is_close(m32,0.,EPSTOL)) {
-     // c0 is undefined for m2 == m3 == 0
-     ans = 0.;
-  } else if (is_close(m12,0.,EPSTOL) && is_close(m32,0.,EPSTOL)) {
-     // c0 is undefined for m1 == m3 == 0
-     ans = 0.;
-  } else if (is_close(m12,0.,EPSTOL) && is_close(m22,0.,EPSTOL)) {
-     // c0 is undefined for m1 == m2 == 0
-     ans= 0.;
-  } else if (is_close(m12,0.,EPSTOL)) {
-     if (is_close(m22,m32,EPSTOL)) {
-        ans = -1./m22;
-     } else {
-        ans = log(m32/m22)/(m22 - m32);
-     }
-  } else if (is_close(m22,0.,EPSTOL)) {
-     if (is_close(m12,m32,EPSTOL)) {
-        ans = -1./m12;
-     } else {
-        ans = log(m32/m12)/(m12 - m32);
-     }
-  } else if (is_close(m32,0.,EPSTOL)) {
-     if (is_close(m12,m22,EPSTOL)) {
-        ans = -1./m12;
-     } else {
-        ans = log(m22/m12)/(m12 - m22);
-     }
-  } else if (is_close(m22, m32, EPSTOL)) {
-    if (is_close(m12, m22, EPSTOL)) {
-      ans = ( - 0.5 / m22 );
-    } else {
-      ans = ( m12 / sqr(m12-m22) * log(m22/m12)
-               + 1.0 / (m12 - m22) );
-    }
-  } else if (is_close(m12, m22, EPSTOL)) {
-     ans = ( - ( 1.0 + m32 / (m22-m32) * log(m32/m22) )
-             / (m22-m32) );
-  } else if (is_close(m12, m32, EPSTOL)) {
-     ans = ( - (1.0 + m22 / (m32-m22) * log(m22/m32))
-             / (m32-m22) );
-  } else {
-     ans = (1.0 / (m22 - m32) *
-            (m22 / (m12 - m22) *
-             log(m22 / m12) -
-             m32 / (m12 - m32) *
-             log(m32 / m12)) );
-  }
+   if (is_close(m12,0.,EPSTOL) && is_close(m22,0.,EPSTOL) && is_close(m32,0.,EPSTOL)) {
+      // c0 is undefined for m1 == m2 == m3 == 0
+      ans = 0.;
+   } else if (is_close(m22,0.,EPSTOL) && is_close(m32,0.,EPSTOL)) {
+      // c0 is undefined for m2 == m3 == 0
+      ans = 0.;
+   } else if (is_close(m12,0.,EPSTOL) && is_close(m32,0.,EPSTOL)) {
+      // c0 is undefined for m1 == m3 == 0
+      ans = 0.;
+   } else if (is_close(m12,0.,EPSTOL) && is_close(m22,0.,EPSTOL)) {
+      // c0 is undefined for m1 == m2 == 0
+      ans= 0.;
+   } else if (is_close(m12,0.,EPSTOL)) {
+      if (is_close(m22,m32,EPSTOL)) {
+         ans = -1./m22;
+      } else {
+         ans = log(m32/m22)/(m22 - m32);
+      }
+   } else if (is_close(m22,0.,EPSTOL)) {
+      if (is_close(m12,m32,EPSTOL)) {
+         ans = -1./m12;
+      } else {
+         ans = log(m32/m12)/(m12 - m32);
+      }
+   } else if (is_close(m32,0.,EPSTOL)) {
+      if (is_close(m12,m22,EPSTOL)) {
+         ans = -1./m12;
+      } else {
+         ans = log(m22/m12)/(m12 - m22);
+      }
+   } else if (is_close(m22, m32, EPSTOL)) {
+      if (is_close(m12, m22, EPSTOL)) {
+         ans = ( - 0.5 / m22 );
+      } else {
+         ans = ( m12 / sqr(m12-m22) * log(m22/m12)
+                 + 1.0 / (m12 - m22) );
+      }
+   } else if (is_close(m12, m22, EPSTOL)) {
+      ans = ( - ( 1.0 + m32 / (m22-m32) * log(m32/m22) )
+              / (m22-m32) );
+   } else if (is_close(m12, m32, EPSTOL)) {
+      ans = ( - (1.0 + m22 / (m32-m22) * log(m22/m32))
+              / (m32-m22) );
+   } else {
+      ans = (1.0 / (m22 - m32) *
+             (m22 / (m12 - m22) *
+              log(m22 / m12) -
+              m32 / (m12 - m32) *
+              log(m32 / m12)) );
+   }
 
-  return ans;
+   return ans;
 }
 
 double d0(double m12, double m22, double m32, double m42) noexcept
 {
-  using std::log;
+   using std::log;
 
-  if (is_close(m12, m22, EPSTOL)) {
-    if (is_close(m22,0.,EPSTOL)) {
-       // d0 is undefined for m1 == m2 == 0
-       return 0.;
-    } else if (is_close(m32,0.,EPSTOL)) {
-       return (-m22 + m42 - m22 * log(m42/m22))/
-          (m22 * sqr(m22 - m42));
-    } else if (is_close(m42,0.,EPSTOL)) {
-       return (-m22 + m32 - m22 * log(m32/m22))/
-          (m22 * sqr(m22 - m32));
-    } else if (is_close(m22, m32, EPSTOL) && is_close(m22, m42, EPSTOL)) {
-      return 1.0 / (6.0 * sqr(m22));
-    } else if (is_close(m22, m32, EPSTOL)) {
-      return (sqr(m22) - sqr(m42) + 2.0 * m42 * m22 * log(m42 / m22)) /
-	(2.0 * m22 * sqr(m22 - m42) * (m22 - m42));
-    } else if (is_close(m22, m42, EPSTOL)) {
-      return (sqr(m22) - sqr(m32) + 2.0 * m32 * m22 * log(m32 / m22)) /
-	(2.0 * m22 * sqr(m22 - m32) * (m22 - m32));
-    } else if (is_close(m32, m42, EPSTOL)) {
-      return -1.0 / sqr(m22 - m32) *
-	((m22 + m32) / (m22 - m32) * log(m32 / m22) + 2.0);
-    }
+   if (is_close(m12, m22, EPSTOL)) {
+      if (is_close(m22,0.,EPSTOL)) {
+         // d0 is undefined for m1 == m2 == 0
+         return 0.;
+      } else if (is_close(m32,0.,EPSTOL)) {
+         return (-m22 + m42 - m22 * log(m42/m22))/
+            (m22 * sqr(m22 - m42));
+      } else if (is_close(m42,0.,EPSTOL)) {
+         return (-m22 + m32 - m22 * log(m32/m22))/
+            (m22 * sqr(m22 - m32));
+      } else if (is_close(m22, m32, EPSTOL) && is_close(m22, m42, EPSTOL)) {
+         return 1.0 / (6.0 * sqr(m22));
+      } else if (is_close(m22, m32, EPSTOL)) {
+         return (sqr(m22) - sqr(m42) + 2.0 * m42 * m22 * log(m42 / m22)) /
+            (2.0 * m22 * sqr(m22 - m42) * (m22 - m42));
+      } else if (is_close(m22, m42, EPSTOL)) {
+         return (sqr(m22) - sqr(m32) + 2.0 * m32 * m22 * log(m32 / m22)) /
+            (2.0 * m22 * sqr(m22 - m32) * (m22 - m32));
+      } else if (is_close(m32, m42, EPSTOL)) {
+         return -1.0 / sqr(m22 - m32) *
+            ((m22 + m32) / (m22 - m32) * log(m32 / m22) + 2.0);
+      }
 
-    return
-      (m42 / sqr(m22 - m42) * log(m42 / m22) +
-       m42 / (m22 * (m22 - m42)) -
-       m32 / sqr(m22 - m32) * log(m32 / m22) -
-       m32 / (m22 * (m22 - m32))) / (m32 - m42);
-  }
-  return (c0(m12, m32, m42) - c0(m22, m32, m42)) / (m12 - m22);
+      return
+         (m42 / sqr(m22 - m42) * log(m42 / m22) +
+          m42 / (m22 * (m22 - m42)) -
+          m32 / sqr(m22 - m32) * log(m32 / m22) -
+          m32 / (m22 * (m22 - m32))) / (m32 - m42);
+   }
+   return (c0(m12, m32, m42) - c0(m22, m32, m42)) / (m12 - m22);
 }
 
 double d27(double m12, double m22, double m32, double m42) noexcept
 {
-  if (is_close(m12, m22, EPSTOL))
-    m12 += TOL * 0.01;
+   if (is_close(m12, m22, EPSTOL))
+      m12 += TOL * 0.01;
 
-  return (m12 * c0(m12, m32, m42) - m22 * c0(m22, m32, m42))
-    / (4.0 * (m12 - m22));
+   return (m12 * c0(m12, m32, m42) - m22 * c0(m22, m32, m42))
+      / (4.0 * (m12 - m22));
 }
 
 } // namespace flexiblesusy
