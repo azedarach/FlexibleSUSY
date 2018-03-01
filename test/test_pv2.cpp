@@ -108,3 +108,60 @@ BOOST_AUTO_TEST_CASE( test_ReB0_values )
       BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
    }
 }
+
+BOOST_AUTO_TEST_CASE( test_ReB1_values )
+{
+   const std::vector<Values> vals = {
+      Values(0.  , 1.  , 0., 1.),
+      Values(1e-1, 1.  , 0., 1.),
+      Values(1e-2, 1.  , 0., 1.),
+      Values(1e-3, 1.  , 0., 1.),
+      Values(1e-4, 1.  , 0., 1.),
+      Values(1e-5, 1.  , 0., 1.),
+      Values(0.  , 1.  , 1e-15, 1.),
+      Values(1e-1, 1.  , 1e-15, 1.),
+      Values(1e-2, 1.  , 1e-15, 1.),
+      Values(1e-3, 1.  , 1e-15, 1.),
+      Values(1e-4, 1.  , 1e-15, 1.),
+      Values(1e-5, 1.  , 1e-15, 1.),
+      Values(0.  , 1e20, 0., 1.),
+      Values(1e-1, 1e20, 0., 1.),
+      Values(1e-2, 1e20, 0., 1.),
+      Values(1e-3, 1e20, 0., 1.),
+      Values(1e-4, 1e20, 0., 1.),
+      Values(1e-5, 1e20, 0., 1.),
+      Values(0.  , 0.  , 1., 1.),
+      Values(1e-1, 0.  , 1., 1.),
+      Values(1e-2, 0.  , 1., 1.),
+      Values(1e-3, 0.  , 1., 1.),
+      Values(1e-4, 0.  , 1., 1.),
+      Values(1e-5, 0.  , 1., 1.),
+      Values(0.  , 1e20, 1., 1.),
+      Values(1e-1, 1e20, 1., 1.),
+      Values(1e-2, 1e20, 1., 1.),
+      Values(1e-3, 1e20, 1., 1.),
+      Values(1e-4, 1e20, 1., 1.),
+      Values(1e-5, 1e20, 1., 1.),
+      Values(0.  , 0., 1e20, 1.),
+      Values(1e-1, 0., 1e20, 1.),
+      Values(1e-2, 0., 1e20, 1.),
+      Values(1e-3, 0., 1e20, 1.),
+      Values(1e-4, 0., 1e20, 1.),
+      Values(1e-5, 0., 1e20, 1.),
+      Values(1.  , 1.  , 1., 1.)
+   };
+
+   for (const auto v: vals) {
+      const auto p = v.p;
+      const auto m1 = v.m1;
+      const auto m2 = v.m2;
+      const auto q = v.q;
+
+      const auto v1 = softsusy::b1(p,m1,m2,q);
+      const auto v2 = flexiblesusy::b1(sqr(p),sqr(m1),sqr(m2),sqr(q));
+
+      BOOST_TEST_MESSAGE("testing p = " << p << ", m1 = " << m1
+                         << ", m2 = " << m2 << ", q = " << q);
+      BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-12);
+   }
+}
