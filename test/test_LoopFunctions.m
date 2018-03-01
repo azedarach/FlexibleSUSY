@@ -115,7 +115,7 @@ RunTests[] := (
     loopFunctions = {
         A0[m^2,Q^2],
         B0[p^2,m1^2,m2^2,Q^2],
-        B1[p,m1,m2,Q],
+        B1[p^2,m1^2,m2^2,Q^2],
         B00[p,m1,m2,Q],
         B11[p,m1,m2,Q],
         B22[p,m1,m2,Q],
@@ -149,7 +149,7 @@ RunTests[] := (
     loopFunctions = {
         A0[m^2, mu^2],
         B0[p^2, m1^2, m2^2, mu^2],
-        B1[p, m1, m2, mu],
+        B1[p^2, m1^2, m2^2, mu^2],
         B00[p, m1, m2, mu],
         B11[p, m1, m2, mu],
         B22[p, m1, m2, mu],

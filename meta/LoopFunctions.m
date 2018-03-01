@@ -216,34 +216,34 @@ LogB0[p2_, _, _, mu2_] := Log[mu2/p2];
 (********************* B1 *********************)
 
 (* B1 [arxiv:hep-ph/9606211 Eq. (B.9)] *)
-B1impl[p_, m1_, m2_, mu_] :=
-    If[PossibleZeroQ[p],
-       B1zero[m1,m2,mu],
-       $BPMZSign 1/(2 p^2) (A0impl[m2^2,mu^2] - A0impl[m1^2,mu^2]
-                            + (p^2 + m1^2 - m2^2) B0impl[p^2,m1^2,m2^2,mu^2])
+B1impl[p2_, m12_, m22_, mu2_] :=
+    If[PossibleZeroQ[p2],
+       B1zero[m12,m22,mu2],
+       $BPMZSign 1/(2 p2) (A0impl[m22,mu2] - A0impl[m12,mu2]
+                           + (p2 + m12 - m22) B0impl[p2,m12,m22,mu2])
       ];
 
 (* B1 for p = 0 *)
-B1zero[m1_, m2_, mu_] :=
-    Which[PossibleZeroQ[m1],
-          $BPMZSign (1/4 + Delta/2 + Log[mu^2/m2^2]/2),
-          PossibleZeroQ[m2],
-          $BPMZSign (3/4 + Delta/2 + Log[mu^2/m1^2]/2),
-          PossibleZeroQ[m1 - m2],
-          $BPMZSign (Delta + Log[mu^2/m2^2])/2,
+B1zero[m12_, m22_, mu2_] :=
+    Which[PossibleZeroQ[m12],
+          $BPMZSign (1/4 + Delta/2 + Log[mu2/m22]/2),
+          PossibleZeroQ[m22],
+          $BPMZSign (3/4 + Delta/2 + Log[mu2/m12]/2),
+          PossibleZeroQ[m12 - m22],
+          $BPMZSign (Delta + Log[mu2/m22])/2,
           True,
-          $BPMZSign 1/2 (Delta + 1 + Log[mu^2/m2^2]
-                         + (m1^2/(m1^2 - m2^2))^2 Log[m2^2/m1^2]
-                         + 1/2 (m1^2 + m2^2)/(m1^2 - m2^2))
+          $BPMZSign 1/2 (Delta + 1 + Log[mu2/m22]
+                         + (m12/(m12 - m22))^2 Log[m22/m12]
+                         + 1/2 (m12 + m22)/(m12 - m22))
          ];
 
 DivB1[_, _, _, _] := $BPMZSign Delta / 2;
 
-LogB1[p_, m1_, m2_, mu_] :=
-    If[PossibleZeroQ[p],
-       $BPMZSign Log[mu^2/m2^2]/2,
-       $BPMZSign 1/(2 p^2) (LogA0[m2^2,mu^2] - LogA0[m1^2,mu^2]
-                            + (p^2 + m1^2 - m2^2) LogB0[p^2,m1^2,m2^2,mu^2])
+LogB1[p2_, m12_, m22_, mu2_] :=
+    If[PossibleZeroQ[p2],
+       $BPMZSign Log[mu2/m22]/2,
+       $BPMZSign 1/(2 p2) (LogA0[m22,mu2] - LogA0[m12,mu2]
+                           + (p2 + m12 - m22) LogB0[p2,m12,m22,mu2])
       ];
 
 (********************* B11 *********************)
@@ -255,7 +255,7 @@ B11impl[p_, m1_, m2_, mu_] :=
        1/(6 p^2) (
            2 A0impl[m2^2,mu^2]
            - 2 m1^2 B0impl[p^2,m1^2,m2^2,mu^2]
-           + $BPMZSign 4 (p^2 - m2^2 + m1^2) B1impl[p,m1,m2,mu]
+           + $BPMZSign 4 (p^2 - m2^2 + m1^2) B1impl[p^2,m1^2,m2^2,mu^2]
            - m1^2 - m2^2 + p^2/3)
       ];
 
@@ -271,7 +271,7 @@ LogB11[p_, m1_, m2_, mu_] :=
        1/(6 p^2) (
            2 LogA0[m2^2,mu^2]
            - 2 m1^2 LogB0[p^2,m1^2,m2^2,mu^2]
-           + $BPMZSign 4 (p^2 - m2^2 + m1^2) LogB1[p,m1,m2,mu])
+           + $BPMZSign 4 (p^2 - m2^2 + m1^2) LogB1[p^2,m1^2,m2^2,mu^2])
       ];
 
 (********************* B22 (= B00) *********************)
