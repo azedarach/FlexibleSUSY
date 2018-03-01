@@ -31,6 +31,7 @@ namespace flexiblesusy {
 double a0(double m2, double q2) noexcept;
 double b0(double p2, double m12, double m22, double q2) noexcept;
 double b1(double p2, double m12, double m22, double q2) noexcept;
+double b22(double p2, double m12, double m22, double q2) noexcept;
 
 } // namespace flexiblesusy
 

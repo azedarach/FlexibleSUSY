@@ -186,4 +186,49 @@ double b1(double p2, double m12, double m22, double q2) noexcept
    return ans;
 }
 
+double b22(double p2,  double m12, double m22, double q2) noexcept
+{
+   using std::abs;
+   using std::log;
+
+   // protect against infrared divergence
+   if (is_close(p2, 0., EPSTOL) && is_close(m12, 0., EPSTOL)
+       && is_close(m22, 0., EPSTOL))
+      return 0.;
+
+   double ans = 0.;
+   const double mMax2 = std::max(abs(m12), abs(m22));
+   const double pTolerance = 1.0e-10;
+
+   if (p2 < pTolerance * mMax2 ) {
+      if (is_close(m12, m22, EPSTOL)) {
+         ans = -m12 * log(abs(m12 / q2)) * 0.5 + m12 * 0.5;
+      } else {
+         if (abs(m12) > EPSTOL && abs(m22) > EPSTOL) {
+            ans = 0.375 * (m12 + m22) - 0.25 *
+               (sqr(m22) * log(abs(m22 / q2)) - sqr(m12) *
+                log(abs(m12 / q2))) / (m22 - m12);
+         } else {
+            if (abs(m12) < EPSTOL) {
+               ans = 0.375 * m22 - 0.25 * m22 * log(abs(m22 / q2));
+            } else {
+               ans = 0.375 * m12 - 0.25 * m12 * log(abs(m12 / q2));
+            }
+         }
+      }
+   } else {
+      const double b0Save = b0(p2, m12, m22, q2);
+      const double a01 = a0(m12, q2);
+      const double a02 = a0(m22, q2);
+
+      ans = 1.0 / 6.0 *
+         (0.5 * (a01 + a02) + (m12 + m22 - 0.5 * p2)
+          * b0Save + (m22 - m12) / (2.0 * p2) *
+          (a02 - a01 - (m22 - m12) * b0Save) +
+          m12 + m22 - p2 / 3.0);
+   }
+
+   return ans;
+}
+
 } // namespace flexiblesusy
