@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <limits>
+#include <random>
 
 #include "numerics.h"
 #include "numerics2.hpp"
@@ -30,6 +31,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 
 struct Values {
+   Values() = default;
    Values(double p2_, double m12_, double m22_, double q2_)
       : p2(p2_), m12(m12_), m22(m22_), q2(q2_) {}
    double p2{}, m12{}, m22{}, q2{};
@@ -75,6 +77,33 @@ const std::vector<Values> positive_vals = {
    Values(1.  , 1.  , 1., 1.)
 };
 
+std::vector<Values> generate_random_values(int n, double start, double stop)
+{
+   std::minstd_rand gen;
+   std::uniform_real_distribution<double> dist(start, stop);
+
+   const auto rand = [&dist,&gen](){
+      return Values(dist(gen), dist(gen), dist(gen), std::abs(dist(gen)));
+   };
+
+   std::vector<Values> v(n);
+   std::generate(begin(v), end(v), rand);
+
+   return v;
+}
+
+template <class T>
+std::vector<T> concat(const std::vector<T>& v1, const std::vector<T>& v2)
+{
+   std::vector<T> res = v1;
+   res.reserve(v1.size() + v2.size());
+
+   for (const auto v: v2)
+      res.push_back(v);
+
+   return res;
+}
+
 constexpr double sqr(double x) noexcept { return x*x; }
 constexpr double sqrtabs(double x) noexcept { return std::sqrt(std::abs(x)); }
 
@@ -94,7 +123,10 @@ BOOST_AUTO_TEST_CASE( test_ReA0 )
 
 BOOST_AUTO_TEST_CASE( test_ReB0_values )
 {
-   for (const auto v: positive_vals) {
+   auto rand_vals = generate_random_values(10000, 0., 2000);
+   auto vals = concat(positive_vals, rand_vals);
+
+   for (const auto v: vals) {
       const auto p2 = v.p2;
       const auto m12 = v.m12;
       const auto m22 = v.m22;
@@ -115,7 +147,10 @@ BOOST_AUTO_TEST_CASE( test_ReB0_values )
 
 BOOST_AUTO_TEST_CASE( test_ReB1_values )
 {
-   for (const auto v: positive_vals) {
+   auto rand_vals = generate_random_values(10000, 0., 2000);
+   auto vals = concat(positive_vals, rand_vals);
+
+   for (const auto v: vals) {
       const auto p2 = v.p2;
       const auto m12 = v.m12;
       const auto m22 = v.m22;
