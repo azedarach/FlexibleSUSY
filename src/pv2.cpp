@@ -150,7 +150,7 @@ double b1(double p2, double m12, double m22, double q2) noexcept
    if (pTest > pTolerance) {
       ans = (a0(m22,q2) - a0(m12,q2) + (p2 + m12 - m22)
              * b0(p2,m12,m22,q2)) / (2.*p2);
-   } else if (abs(m12) > 1.0e-15 && abs(m22) > 1.0e-15) {
+   } else if (abs(m12) > 1.0e-30 && abs(m22) > 1.0e-30) {
       const double m14 = sqr(m12), m24 = sqr(m22);
       const double m16 = m12*m14 , m26 = m22*m24;
       const double m18 = sqr(m14), m28 = sqr(m24);
