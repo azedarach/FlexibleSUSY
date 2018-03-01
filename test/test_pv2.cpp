@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( test_ReA0 )
    BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(1e-5, scale), flexiblesusy::a0(1e-10, scale2), 1e-15);
 }
 
-BOOST_AUTO_TEST_CASE( test_ReB0_values )
+BOOST_AUTO_TEST_CASE( test_softsusy )
 {
    const auto rand_vals = generate_random_values(10000, 0., 2000);
    const auto vals = concat(positive_vals, rand_vals);
@@ -136,35 +136,17 @@ BOOST_AUTO_TEST_CASE( test_ReB0_values )
       const auto m2 = sqrtabs(m22);
       const auto q = sqrtabs(q2);
 
-      const auto v1 = softsusy::b0(p,m1,m2,q);
-      const auto v2 = flexiblesusy::b0(p2,m12,m22,q2);
-
       BOOST_TEST_MESSAGE("testing p2 = " << p2 << ", m12 = " << m12
                          << ", m22 = " << m22 << ", q2 = " << q2);
-      BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
-   }
-}
 
-BOOST_AUTO_TEST_CASE( test_ReB1_values )
-{
-   const auto rand_vals = generate_random_values(10000, 0., 2000);
-   const auto vals = concat(positive_vals, rand_vals);
+      const auto b01 = softsusy::b0(p,m1,m2,q);
+      const auto b02 = flexiblesusy::b0(p2,m12,m22,q2);
 
-   for (const auto v: vals) {
-      const auto p2 = v.p2;
-      const auto m12 = v.m12;
-      const auto m22 = v.m22;
-      const auto q2 = v.q2;
-      const auto p = sqrtabs(p2);
-      const auto m1 = sqrtabs(m12);
-      const auto m2 = sqrtabs(m22);
-      const auto q = sqrtabs(q2);
+      BOOST_CHECK_CLOSE_FRACTION(b01, b02, 8e-5);
 
-      const auto v1 = softsusy::b1(p,m1,m2,q);
-      const auto v2 = flexiblesusy::b1(p2,m12,m22,q2);
+      const auto b11 = softsusy::b1(p,m1,m2,q);
+      const auto b12 = flexiblesusy::b1(p2,m12,m22,q2);
 
-      BOOST_TEST_MESSAGE("testing p2 = " << p2 << ", m12 = " << m12
-                         << ", m22 = " << m22 << ", q2 = " << q2);
-      BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
+      BOOST_CHECK_CLOSE_FRACTION(b11, b12, 1e-8);
    }
 }
