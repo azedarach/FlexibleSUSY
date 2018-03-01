@@ -116,13 +116,13 @@ RunTests[] := (
         A0[m^2,Q^2],
         B0[p^2,m1^2,m2^2,Q^2],
         B1[p^2,m1^2,m2^2,Q^2],
-        B00[p,m1,m2,Q],
-        B11[p,m1,m2,Q],
-        B22[p,m1,m2,Q],
-        B22tilde[p,m1,m2,Q],
-        F[p,m1,m2,Q],
-        G[p,m1,m2,Q],
-        H[p,m1,m2,Q]
+        B00[p^2,m1^2,m2^2,Q^2],
+        B11[p^2,m1^2,m2^2,Q^2],
+        B22[p^2,m1^2,m2^2,Q^2],
+        B22tilde[p^2,m1^2,m2^2,Q^2],
+        F[p^2,m1^2,m2^2,Q^2],
+        G[p^2,m1^2,m2^2,Q^2],
+        H[p^2,m1^2,m2^2,Q^2]
     };
 
     For[i = 1, i <= Length[loopFunctions], i++,
@@ -150,16 +150,16 @@ RunTests[] := (
         A0[m^2, mu^2],
         B0[p^2, m1^2, m2^2, mu^2],
         B1[p^2, m1^2, m2^2, mu^2],
-        B00[p, m1, m2, mu],
-        B11[p, m1, m2, mu],
-        B22[p, m1, m2, mu],
-        B22tilde[p, m1, m2, mu],
+        B00[p^2, m1^2, m2^2, mu^2],
+        B11[p^2, m1^2, m2^2, mu^2],
+        B22[p^2, m1^2, m2^2, mu^2],
+        B22tilde[p^2, m1^2, m2^2, mu^2],
         C0[p1, p2, m1, m2, m3, mu],
         D0[p1, p2, p3, m1, m2, m3, m4, mu],
         D27[p1, p2, p3, m1, m2, m3, m4, mu],
-        F[p, m1, m2, mu],
-        G[p, m1, m2, mu],
-        H[p, m1, m2, mu]
+        F[p^2, m1^2, m2^2, mu^2],
+        G[p^2, m1^2, m2^2, mu^2],
+        H[p^2, m1^2, m2^2, mu^2]
     };
 
     divs = loopFunctions /. LFDivergence[] /. Delta -> Log[mu^2];
