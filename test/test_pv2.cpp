@@ -139,14 +139,52 @@ BOOST_AUTO_TEST_CASE( test_softsusy )
       BOOST_TEST_MESSAGE("testing p2 = " << p2 << ", m12 = " << m12
                          << ", m22 = " << m22 << ", q2 = " << q2);
 
-      const auto b01 = softsusy::b0(p,m1,m2,q);
-      const auto b02 = flexiblesusy::b0(p2,m12,m22,q2);
+      {
+         const auto v1 = softsusy::a0(m1,q);
+         const auto v2 = flexiblesusy::a0(m12,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
+      }
 
-      BOOST_CHECK_CLOSE_FRACTION(b01, b02, 8e-5);
+      {
+         const auto v1 = softsusy::b0(p,m1,m2,q);
+         const auto v2 = flexiblesusy::b0(p2,m12,m22,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 8e-5);
+      }
 
-      const auto b11 = softsusy::b1(p,m1,m2,q);
-      const auto b12 = flexiblesusy::b1(p2,m12,m22,q2);
+      {
+         const auto v1 = softsusy::b1(p,m1,m2,q);
+         const auto v2 = flexiblesusy::b1(p2,m12,m22,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-8);
+      }
 
-      BOOST_CHECK_CLOSE_FRACTION(b11, b12, 1e-8);
+      {
+         const auto v1 = softsusy::b22(p,m1,m2,q);
+         const auto v2 = flexiblesusy::b22(p2,m12,m22,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-7);
+      }
+
+      {
+         const auto v1 = softsusy::b22bar(p,m1,m2,q);
+         const auto v2 = flexiblesusy::b22bar(p2,m12,m22,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-6);
+      }
+
+      {
+         const auto v1 = softsusy::ffn(p,m1,m2,q);
+         const auto v2 = flexiblesusy::f0(p2,m12,m22,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-8);
+      }
+
+      {
+         const auto v1 = softsusy::gfn(p,m1,m2,q);
+         const auto v2 = flexiblesusy::g0(p2,m12,m22,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-8);
+      }
+
+      {
+         const auto v1 = softsusy::hfn(p,m1,m2,q);
+         const auto v2 = flexiblesusy::h0(p2,m12,m22,q2);
+         BOOST_CHECK_CLOSE_FRACTION(v1, v2, 1e-7);
+      }
    }
 }
