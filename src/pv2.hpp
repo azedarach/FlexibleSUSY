@@ -37,6 +37,13 @@ double f0(double p2, double m12, double m22, double q2) noexcept;
 double g0(double p2, double m12, double m22, double q2) noexcept;
 double h0(double p2, double m12, double m22, double q2) noexcept;
 
+// 3-point function for p^2 = 0
+double c0(double m12, double m22, double m32) noexcept;
+
+// 4-point function for p^2 = 0
+double d27(double m12, double m22, double m32, double m42) noexcept;
+double d0(double m12, double m22, double m32, double m42) noexcept;
+
 } // namespace flexiblesusy
 
 #endif
