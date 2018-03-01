@@ -320,31 +320,32 @@ LogB22[p2_, m12_, m22_, mu2_] :=
 
 (********************* C0 *********************)
 
-C0impl[p1_, p2_, m1_, m2_, m3_, mu_] :=
-    If[PossibleZeroQ[p1] && PossibleZeroQ[p2],
-       C0zero[m1,m2,m3],
-       C0analytic[p1, p2, m1, m2, m3, mu]
+C0impl[p12_, p22_, m12_, m22_, m32_, mu2_] :=
+    If[PossibleZeroQ[p12] && PossibleZeroQ[p22],
+       C0zero[m12,m22,m32],
+       C0analytic[Sqrt[p12], Sqrt[p22], Sqrt[m12], Sqrt[m22], Sqrt[m32], Sqrt[mu2]]
       ];
 
 (* C0 for p = 0 [arxiv:hep-ph/9606211 Eq. (C.19)] *)
-C0zero[m1_, m2_, m3_] := Which[
-    PossibleZeroQ[m1 - m2] && PossibleZeroQ[m1 - m3],
-    -1/(2*m3^2),
-    PossibleZeroQ[m1 - m2],
-    (-m2^2 + m3^2 - m3^2*Log[m3^2/m2^2])/(m2^2 - m3^2)^2,
-    PossibleZeroQ[m1 - m3],
-    (m2^2 - m3^2 - m2^2*Log[m2^2/m3^2])/(m2^2 - m3^2)^2,
-    PossibleZeroQ[m2 - m3],
-    (m1^2 - m3^2 + m1^2*Log[m3^2/m1^2])/(m1^2 - m3^2)^2,
+C0zero[m12_, m22_, m32_] := Which[
+    PossibleZeroQ[m12 - m22] && PossibleZeroQ[m12 - m32],
+    -1/(2*m32),
+    PossibleZeroQ[m12 - m22],
+    (-m22 + m32 - m32*Log[m32/m22])/(m22 - m32)^2,
+    PossibleZeroQ[m12 - m32],
+    (m22 - m32 - m22*Log[m22/m32])/(m22 - m32)^2,
+    PossibleZeroQ[m22 - m32],
+    (m12 - m32 + m12*Log[m32/m12])/(m12 - m32)^2,
     (* general case *)
     True,
-    (+ m2^2 / (m1^2 - m2^2) Log[m2^2/m1^2]
-     - m3^2 / (m1^2 - m3^2) Log[m3^2/m1^2]) / (m2^2 - m3^2)
+    (+ m22 / (m12 - m22) Log[m22/m12]
+     - m32 / (m12 - m32) Log[m32/m12]) / (m22 - m32)
 ];
 
 (* C0 for complex momenta [arxiv:hep-ph/0709.1075, Eq. (4.26)] *)
 (* Note: This implementation is divergent for real momenta.    *)
 (* For real momenta a different implementation should be used. *)
+(* Note: takes non-squared mass arguments! *)
 C0analytic[p1_, p2_, m1_, m2_, m3_, mu_] :=
     Module[{p21 = (p2 - p1), p12 = (p1 - p2), pjk, pki, pij, mi, mj, mk,
             Dilogs, y0, xi, yi, alpha, alphai, eps, kappa, eta, result},
@@ -400,109 +401,109 @@ C0analytic[p1_, p2_, m1_, m2_, m3_, mu_] :=
 
 (********************* C1 *********************)
 
-C1impl[p1_, p2_, m1_, m2_, m3_] :=
-    If[PossibleZeroQ[p1] && PossibleZeroQ[p2],
-       C1zero[m1,m2,m3],
+C1impl[p12_, p22_, m12_, m22_, m32_] :=
+    If[PossibleZeroQ[p12] && PossibleZeroQ[p22],
+       C1zero[m12,m22,m32],
        NotImplemented
       ];
 
 (* C1 for p = 0 *)
-C1zero[m1_, m2_, m3_] :=
-    Module[{t1 = m2^2/m1^2, t2 = m3^2/m1^2},
+C1zero[m12_, m22_, m32_] :=
+    Module[{t1 = m22/m12, t2 = m32/m12},
            Which[
-               PossibleZeroQ[m1 - m2] && PossibleZeroQ[m1 - m3],
-               -1/(6 m1^2),
-               PossibleZeroQ[m1 - m2],
-               -(m2^4 - 4*m2^2*m3^2 + 3*m3^4 - 2*m3^4*Log[m3^2/m2^2])/(4*(m2^2 - m3^2)^3),
-               PossibleZeroQ[m2 - m3],
-               (3*m1^4 - 4*m1^2*m3^2 + m3^4 + 2*m1^4*Log[m3^2/m1^2])/(4*(m1^2 - m3^2)^3),
-               PossibleZeroQ[m1 - m3],
-               (-m2^4 + m3^4 + 2*m2^2*m3^2*Log[m2^2/m3^2])/(2*(m2^2 - m3^2)^3),
+               PossibleZeroQ[m12 - m22] && PossibleZeroQ[m12 - m32],
+               -1/(6 m12),
+               PossibleZeroQ[m12 - m22],
+               -(m22^2 - 4*m22*m32 + 3*m32^2 - 2*m32^2*Log[m32/m22])/(4*(m22 - m32)^3),
+               PossibleZeroQ[m22 - m32],
+               (3*m12^2 - 4*m12*m32 + m32^2 + 2*m12^2*Log[m32/m12])/(4*(m12 - m32)^3),
+               PossibleZeroQ[m12 - m32],
+               (-m22^2 + m32^2 + 2*m22*m32*Log[m22/m32])/(2*(m22 - m32)^3),
                (* general case *)
                True,
                -(t1 / (2 (t1 - 1) (t1 - t2))
                  - t1 (t1 - 2 t2 + t1 t2) Log[t1] / (2 (t1 - 1)^2 (t1 - t2)^2)
                  + (t2^2 - 2 t1 t2^2 + t1^2 t2^2) Log[t2] / (2 (t1 - 1)^2 (t1 - t2)^2 (t2 - 1))
-                )/m1^2
+                )/m12
                 ]
           ];
 
 (********************* C2 *********************)
 
-C2impl[p1_, p2_, m1_, m2_, m3_] :=
-    If[PossibleZeroQ[p1] && PossibleZeroQ[p2],
-       C2zero[m1,m2,m3],
+C2impl[p12_, p22_, m12_, m22_, m32_] :=
+    If[PossibleZeroQ[p12] && PossibleZeroQ[p22],
+       C2zero[m12,m22,m32],
        NotImplemented
       ];
 
 (* C2 for p = 0 *)
-C2zero[m1_, m2_, m3_] :=
-    Module[{t1 = m2^2/m1^2, t2 = m3^2/m1^2},
+C2zero[m12_, m22_, m32_] :=
+    Module[{t1 = m22/m12, t2 = m32/m12},
            Which[
-               PossibleZeroQ[m1 - m2] && PossibleZeroQ[m1 - m3],
-               -1/(6 m1^2),
-               PossibleZeroQ[m1 - m2],
-               (-m2^4 + m3^4 + 2*m2^2*m3^2*Log[m2^2/m3^2])/(2*(m2^2 - m3^2)^3),
-               PossibleZeroQ[m2 - m3],
-               (3*m1^4 - 4*m1^2*m3^2 + m3^4 + 2*m1^4*Log[m3^2/m1^2])/(4*(m1^2 - m3^2)^3),
-               PossibleZeroQ[m1 - m3],
-               (3*m2^4 - 4*m2^2*m3^2 + m3^4 - 2*m2^4*Log[m2^2/m3^2])/(4*(m2^2 - m3^2)^3),
+               PossibleZeroQ[m12 - m22] && PossibleZeroQ[m12 - m32],
+               -1/(6 m12),
+               PossibleZeroQ[m12 - m22],
+               (-m22^2 + m32^2 + 2*m22*m32*Log[m22/m32])/(2*(m22 - m32)^3),
+               PossibleZeroQ[m22 - m32],
+               (3*m12^2 - 4*m12*m32 + m32^2 + 2*m12^2*Log[m32/m12])/(4*(m12 - m32)^3),
+               PossibleZeroQ[m12 - m32],
+               (3*m22^2 - 4*m22*m32 + m32^2 - 2*m22^2*Log[m22/m32])/(4*(m22 - m32)^3),
                (* general case *)
                True,
                -(- t2 / (2 (t1 - t2) (t2 - 1))
                  + Log[t1] / (2 (t1 - 1) (t2 - 1)^2)
                  + (2 t1 t2 - 2 t1^2 t2 - t2^2 + t1^2 t2^2) Log[t1/t2] / (2 (t1 - 1) (t1 - t2)^2 (t2 - 1)^2)
-                )/m1^2
+                )/m12
                 ]
           ];
 
 (********************* D0 *********************)
 
 (* D0 *)
-D0impl[p1_, p2_, p3_, m1_, m2_, m3_, m4_, mu_] :=
-    If[PossibleZeroQ[p1] && PossibleZeroQ[p2] && PossibleZeroQ[p3],
-       D0zero[m1, m2, m3, m4],
+D0impl[p12_, p22_, p32_, m12_, m22_, m32_, m42_, mu2_] :=
+    If[PossibleZeroQ[p12] && PossibleZeroQ[p22] && PossibleZeroQ[p32],
+       D0zero[m12, m22, m32, m42],
        NotImplemented
       ];
 
 (* D0 for p = 0 [arxiv:hep-ph/9606211 Eq. (C.21)] *)
-D0zero[m1_, m2_, m3_, m4_] := Which[
-   PossibleZeroQ[m1 - m2] && PossibleZeroQ[m1 - m3] && 
-    PossibleZeroQ[m1 - m4],
-   1/(6 m1^4),
-   PossibleZeroQ[m1 - m2] && PossibleZeroQ[m2 - m3],
-   (8*(m2^2 - m4^2)^2*(m2^2 + m4^2) + (-23*m2^4*m4^2 - 10*m2^2*m4^4 + 
-         m4^6)*Log[m2^2/m4^2] + (-7*m2^4*m4^2 - 26*m2^2*m4^4 + m4^6)*
-       Log[m4^2/m2^2])/(16*m2^2*(m2^2 - m4^2)^4),
-   PossibleZeroQ[m1 - m2] && PossibleZeroQ[m2 - m4],
-   (8*(m2^2 - m3^2)^2*(m2^2 + m3^2) + (7*m2^4*m3^2 + 26*m2^2*m3^4 - 
-         m3^6)*Log[m2^2/m3^2] + (23*m2^4*m3^2 + 10*m2^2*m3^4 - m3^6)*
-       Log[m3^2/m2^2])/(16*m2^2*(m2^2 - m3^2)^4),
-   PossibleZeroQ[m1 - m2] && PossibleZeroQ[m3 - m4],
-   (-8*(m2^2 - m4^2)^2 + (m2^4 - 8*m2^2*m4^2 - 5*m4^4)*
-       Log[m2^2/m4^2] - (3*m2^4 + 8*m2^2*m4^2 + m4^4)*
-       Log[m4^2/m2^2])/(4*(m2^2 - m4^2)^4),
-   PossibleZeroQ[m1 - m2],
+D0zero[m12_, m22_, m32_, m42_] := Which[
+   PossibleZeroQ[m12 - m22] && PossibleZeroQ[m12 - m32] && 
+    PossibleZeroQ[m12 - m42],
+   1/(6 m12^2),
+   PossibleZeroQ[m12 - m22] && PossibleZeroQ[m22 - m32],
+   (8*(m22 - m42)2*(m22 + m42) + (-23*m22^2*m42 - 10*m22*m42^2 + 
+         m42^3)*Log[m22/m42] + (-7*m22^2*m42 - 26*m22*m42^2 + m42^3)*
+       Log[m42/m22])/(16*m22*(m22 - m42)2^2),
+   PossibleZeroQ[m12 - m22] && PossibleZeroQ[m22 - m42],
+   (8*(m22 - m32)2*(m22 + m32) + (7*m22^2*m32 + 26*m22*m32^2 - 
+         m32^3)*Log[m22/m32] + (23*m22^2*m32 + 10*m22*m32^2 - m32^3)*
+       Log[m32/m22])/(16*m22*(m22 - m32)2^2),
+   PossibleZeroQ[m12 - m22] && PossibleZeroQ[m32 - m42],
+   (-8*(m22 - m42)2 + (m22^2 - 8*m22*m42 - 5*m42^2)*
+       Log[m22/m42] - (3*m22^2 + 8*m22*m42 + m42^2)*
+       Log[m42/m22])/(4*(m22 - m42)2^2),
+   PossibleZeroQ[m12 - m22],
    (-((m2 - m3)*(m2 + m3)*(m2 - m4)*(m3 - m4)*(m2 + m4)*(m3 + 
-           m4)) - (m2^4 - m3^2*m4^2)*(m3^2*Log[m3^2/m2^2] + 
-         m4^2*Log[m2^2/m4^2]) + 
-      m3^2*m4^2*(-2*m2^2 + m3^2 + m4^2)*
-       Log[m4^2/m3^2])/((m2^2 - m3^2)^2*(m2^2 - m4^2)^2*(m3^2 - m4^2)),
+           m4)) - (m22^2 - m32*m42)*(m32*Log[m32/m22] + 
+         m42*Log[m22/m42]) + 
+      m32*m42*(-2*m22 + m32 + m42)*
+       Log[m42/m32])/((m22 - m32)2*(m22 - m42)2*(m32 - m42)),
    True,
-   (C0zero[m1, m3, m4] - C0zero[m2, m3, m4])/(m1^2 - m2^2)];
+   (C0zero[m12, m32, m42] - C0zero[m22, m32, m42])/(m12 - m22)];
 
 (********************* D27 *********************)
 
 (* D27 *)
-D27impl[p1_, p2_, p3_, m1_, m2_, m3_, m4_, mu_] :=
-    If[PossibleZeroQ[p1] && PossibleZeroQ[p2] && PossibleZeroQ[p3],
-       D27zero[m1, m2, m3, m4],
+D27impl[p12_, p22_, p32_, m12_, m22_, m32_, m42_, mu2_] :=
+    If[PossibleZeroQ[p12] && PossibleZeroQ[p22] && PossibleZeroQ[p32],
+       D27zero[m12, m22, m32, m42],
        NotImplemented
       ];
 
 (* D27 for p = 0 [arxiv:hep-ph/9606211 Eq. (C.22)] *)
-D27zero[m1_, m2_, m3_, m4_] :=
-   (m1^2 C0zero[m1, m3, m4] - m2^2 C0zero[m2, m3, m4])/(4 (m1^2 - m2^2));
+D27zero[m12_, m22_, m32_, m42_] :=
+   (m12 C0zero[m12, m32, m42] - m22 C0zero[m22, m32, m42])/(4 (m12 - m22));
 
 (********************* F *********************)
 
