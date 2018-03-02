@@ -4,7 +4,7 @@ program run_loops
   Implicit none
 
   double precision :: p2, m12, m22, mu2
-  double complex :: A01,A02,B0,B1,B00,B11
+  double complex :: A01,A02,B0,B1,B00
   double complex, allocatable :: Bcoeff(:,:),Bcoeffuv(:,:)
   double precision, allocatable :: Berr(:)
   integer :: rank, st
@@ -32,7 +32,7 @@ program run_loops
 
   call Init_cll(6,6,"")
 
-  write (*,*) "# A0(m0^2) A0(m1^2) B0(p^2,m0^2,m1^2) B1(p^2,m0^2,m1^2) B00(p^2,m0^2,m1^2) B11(p^2,m0^2,m1^2)"
+  write (*,*) "# A0(m0^2) A0(m1^2) B0(p^2,m0^2,m1^2) B1(p^2,m0^2,m1^2) B00(p^2,m0^2,m1^2)"
 
   do
      read(100, "(a255)", iostat=st) read_line
@@ -56,9 +56,8 @@ program run_loops
      B0 = Bcoeff(0,0)
      B1 = Bcoeff(0,1)
      B00 = Bcoeff(1,0)
-     B11 = Bcoeff(1,1)
 
-     write(*,*) real(A01), real(A02), real(B0), real(B1), real(B00), real(B11)
+     write(*,*) real(A01), real(A02), real(B0), real(B1), real(B00)
   end do
 
   close(100)

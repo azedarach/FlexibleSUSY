@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
    std::cout.setf(std::ios_base::fixed, std::ios_base::floatfield);
    std::cout.precision(16);
    std::cout << "# A0(m0^2) A0(m1^2) B0(p^2,m0^2,m1^2) B1(p^2,m0^2,m1^2)"
-      " B00(p^2,m0^2,m1^2) B11(p^2,m0^2,m1^2)\n";
+      " B00(p^2,m0^2,m1^2)\n";
 
    while (std::getline(ifs, line)) {
       if (line.empty() || line[0] == '#')
@@ -35,8 +35,7 @@ int main(int argc, char *argv[])
          << flexiblesusy::a0(m12, mu2) << ' '
          << flexiblesusy::b0(p2, m02, m12, mu2) << ' '
          << -flexiblesusy::b1(p2, m02, m12, mu2) << ' '
-         << flexiblesusy::b22(p2, m02, m12, mu2) << ' '
-         << flexiblesusy::b22bar(p2, m02, m12, mu2) << '\n';
+         << flexiblesusy::b22(p2, m02, m12, mu2) << '\n';
    }
 
    return 0;
