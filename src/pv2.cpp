@@ -39,13 +39,12 @@ bool is_close(double m1, double m2, double tol) noexcept
 {
    using std::abs;
    const double mmax = abs(std::max(abs(m1), abs(m2)));
-   const double mmin = abs(std::min(abs(m1), abs(m2)));
    const double max_tol = tol * mmax;
 
    if (max_tol == 0. && mmax != 0. && tol != 0.)
-      return mmax - mmin <= tol;
+      return abs(m1 - m2) <= tol;
 
-   return mmax - mmin <= max_tol;
+   return abs(m1 - m2) <= max_tol;
 }
 
 /// returns a/b if a/b is finite, otherwise returns numeric_limits::max()
