@@ -175,8 +175,7 @@ double b1(double p2, double m12, double m22, double q2) noexcept
             (24.*pow6(m12 - m22)) - 0.5*log(abs(m22/q2));
       }
    } else {
-      // TODO:
-      if (m12 > m22)
+      if (abs(m12) > abs(m22))
          ans = -0.5*log(abs(m12/q2)) + 0.75;
       else
          ans = -0.5*log(abs(m22/q2)) + 0.25;
