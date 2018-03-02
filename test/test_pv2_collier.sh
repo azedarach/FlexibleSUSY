@@ -56,6 +56,6 @@ command -v numdiff > /dev/null || {
 
 sed -i -e '/^ *$/d' -e '/ *\*/d' "${out_CO}"
 
-diff=$(numdiff "${out_FS}" "${out_CO}")
+diff=$(numdiff --relative-tolerance=1e-6 "${out_FS}" "${out_CO}")
 
 echo "$diff"
