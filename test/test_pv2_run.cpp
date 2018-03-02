@@ -17,6 +17,8 @@ int main(int argc, char *argv[])
    std::ifstream ifs(argv[1]);
    std::string line;
 
+   std::cout.setf(std::ios_base::fixed, std::ios_base::floatfield);
+   std::cout.precision(16);
    std::cout << "# A0(m0^2) A0(m1^2) B0(p^2,m0^2,m1^2) B1(p^2,m0^2,m1^2)"
       " B00(p^2,m0^2,m1^2) B11(p^2,m0^2,m1^2)\n";
 
