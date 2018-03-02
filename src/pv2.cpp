@@ -141,7 +141,7 @@ double b1(double p2, double m12, double m22, double q2) noexcept
 
    double ans = 0.;
    const double mMax2 = std::max(abs(m12), abs(m22));
-   const double pTest = divide_finite(p2, mMax2);
+   const double pTest = abs(divide_finite(p2, mMax2));
 
    /// Decides level at which one switches to p=0 limit of calculations
    const double pTolerance = 1e-4;
@@ -198,7 +198,7 @@ double b22(double p2,  double m12, double m22, double q2) noexcept
    const double mMax2 = std::max(abs(m12), abs(m22));
    const double pTolerance = 1.0e-10;
 
-   if (p2 < pTolerance * mMax2 ) {
+   if (abs(p2) < pTolerance * mMax2) {
       if (is_close(m12, m22, EPSTOL)) {
          ans = -m12 * log(abs(m12 / q2)) * 0.5 + m12 * 0.5;
       } else {
