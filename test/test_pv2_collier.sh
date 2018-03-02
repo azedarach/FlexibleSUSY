@@ -56,6 +56,22 @@ command -v numdiff > /dev/null || {
 
 sed -i -e '/^ *$/d' -e '/ *\*/d' "${out_CO}"
 
-diff=$(numdiff --relative-tolerance=1e-6 "${out_FS}" "${out_CO}")
+rel_error=4e-6
+abs_error=1e-6
 
-echo "$diff"
+diff=$(numdiff --relative-tolerance="$rel_error" --absolute-tolerance="$abs_error" "${out_FS}" "${out_CO}")
+diff=$(echo "$diff" | sed -e '/^ *#/d' | sed -e '/^+++/d')
+
+if [ -n "$diff" ]; then
+    echo "Error: difference between ${out_FS} and ${out_CO} larger that $rel_error"
+    echo "$diff"
+    echo ""
+    echo "Test result: FAIL"
+    exit_code=1
+else
+    echo ""
+    echo "Test result: OK"
+    exit_code=0
+fi
+
+exit $exit_code
