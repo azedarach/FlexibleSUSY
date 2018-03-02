@@ -11,8 +11,8 @@ input="${BASEDIR}/test_pv2_collier_2point.in.dat"
 out_FS="${BASEDIR}/test_pv2_collier_2point.FlexibleSUSY.out.dat"
 out_CO="${BASEDIR}/test_pv2_collier_2point.COLLIER.out.dat"
 
-[ -e "${run_FS}" ] || {
-    echo "${run_FS} has not been build, building it now ..."
+[ -e "${run_FS}" -a "${run_FS}" -nt "${src_FS}" ] || {
+    echo "${run_FS} must be rebuild, building it now ..."
     eval "$("${FSCONFIG}" --compile-cmd) ${src_FS} -o ${run_FS} $("${FSCONFIG}" --libs)"
     [ $? != 0 ] && {
         echo "Error: could not build ${run_FS}"
@@ -28,8 +28,8 @@ out_CO="${BASEDIR}/test_pv2_collier_2point.COLLIER.out.dat"
 #      -o test/test_pv2_run_collier.x \
 #      -J${COLLIER_DIR}/modules -L${COLLIER_DIR} -lcollier
 
-[ -e "${run_CO}" ] || {
-    echo "${run_CO} has not been build, trying to build it ..."
+[ -e "${run_CO}" -a "${run_CO}" -nt "${src_CO}" ] || {
+    echo "${run_CO} must be rebuild, building it now ..."
 
     [ -z "${COLLIER_DIR}" ] && {
         echo "Please set COLLIER_DIR to the path of your COLLIER installation"
