@@ -25,9 +25,9 @@
 #include "logger.hpp"
 #include "numerics2.hpp"
 #include "config.h"
-#include "numerics.h"
 #include "error.hpp"
 #include "pv.hpp"
+#include "pv2.hpp"
 
 #include <limits>
 #include <cmath>
@@ -420,17 +420,17 @@ double CLASSNAME::B1(double p2, double m12, double m22) const noexcept
 
 double CLASSNAME::C0(double m12, double m22, double m32) const noexcept
 {
-   return softsusy::c0(std::sqrt(m12), std::sqrt(m22), std::sqrt(m32));
+   return c0(m12, m22, m32);
 }
 
 double CLASSNAME::D0(double m12, double m22, double m32, double m42) const noexcept
 {
-   return softsusy::d0(std::sqrt(m12), std::sqrt(m22), std::sqrt(m32), std::sqrt(m42));
+   return d0(m12, m22, m32, m42);
 }
 
 double CLASSNAME::D27(double m12, double m22, double m32, double m42) const noexcept
 {
-   return softsusy::d27(std::sqrt(m12), std::sqrt(m22), std::sqrt(m32), std::sqrt(m42));
+   return d27(m12, m22, m32, m42);
 }
 
 /**
@@ -546,8 +546,8 @@ double CLASSNAME::calculate_self_energy_@VectorZ@_top(double p, double mt) const
 
    const double self_energy_z_top =
       Nc * Sqr(g2) / cw2 * oneOver16PiSqr *
-      (softsusy::hfn(p, mt, mt, q) * (Sqr(guL) + Sqr(guR)) -
-       4.0 * guL * guR * Sqr(mt) * softsusy::b0(p, mt, mt, q));
+      (h0(p*p, mt*mt, mt*mt, q*q) * (Sqr(guL) + Sqr(guR)) -
+       4.0 * guL * guR * Sqr(mt) * b0(p*p, mt*mt, mt*mt, q*q));
 
    return self_energy_z_top;
 }
@@ -568,7 +568,7 @@ double CLASSNAME::calculate_self_energy_@VectorW@_top(double p, double mt) const
    @DefSMleftCoupling@
 
    const double self_energy_w_top =
-      0.5 * Nc * softsusy::hfn(p, mt, mb, q) * Sqr(g2) * oneOver16PiSqr;
+      0.5 * Nc * h0(p*p, mt*mt, mb*mb, q*q) * Sqr(g2) * oneOver16PiSqr;
 
    return self_energy_w_top;
 }
