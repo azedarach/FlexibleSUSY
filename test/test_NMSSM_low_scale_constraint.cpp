@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE( test_low_energy_constraint )
    const double fs_new_vev = Sqrt(Sqr(fs_new_vu) + Sqr(fs_new_vd));
 
    BOOST_CHECK_CLOSE_FRACTION(fs_mt, ss_mt, 9.5e-05);
-   BOOST_CHECK_CLOSE_FRACTION(fs_mb, ss_mb, 2.6e-14);
+   BOOST_CHECK_CLOSE_FRACTION(fs_mb, ss_mb, 1.0e-10);
    BOOST_CHECK_CLOSE_FRACTION(fs_me, ss_me, 2.1e-04);
    BOOST_CHECK_CLOSE_FRACTION(fs_MZ, ss_MZ, 5.0e-10);
    BOOST_CHECK_CLOSE_FRACTION(fs_new_vev, ss_new_vev, 5.0e-10);

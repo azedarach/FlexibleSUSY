@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE( test_delta_vb )
    double fs_delta_vb =
       Weinberg_angle::calculate_delta_vb(outrho, outsin, data);
 
-   BOOST_CHECK_CLOSE_FRACTION(ss_delta_vb, fs_delta_vb, 1.0e-10);
+   BOOST_CHECK_CLOSE_FRACTION(ss_delta_vb, fs_delta_vb, 1.0e-07);
 
    // test with FlexibleSUSY CMSSM parameters
 
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE( test_delta_vb )
    fs_delta_vb =
       Weinberg_angle::calculate_delta_vb(outrho, outsin, data);
 
-   BOOST_CHECK_CLOSE_FRACTION(ss_delta_vb, fs_delta_vb, 3.0e-9);
+   BOOST_CHECK_CLOSE_FRACTION(ss_delta_vb, fs_delta_vb, 1.0e-7);
 }
 
 BOOST_AUTO_TEST_CASE( test_delta_r )
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE( test_delta_r )
    double fs_delta_r =
       Weinberg_angle::calculate_delta_r(outrho, outsin, data);
 
-   BOOST_CHECK_CLOSE_FRACTION(ss_delta_r, fs_delta_r, 1.0e-10);
+   BOOST_CHECK_CLOSE_FRACTION(ss_delta_r, fs_delta_r, 1.0e-7);
 
    // test with FlexibleSUSY CMSSM parameters
 
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE( test_delta_r )
    fs_delta_r =
       Weinberg_angle::calculate_delta_r(outrho, outsin, data);
 
-   BOOST_CHECK_CLOSE_FRACTION(ss_delta_r, fs_delta_r, 4.0e-9);
+   BOOST_CHECK_CLOSE_FRACTION(ss_delta_r, fs_delta_r, 1.0e-6);
 }
 
 BOOST_AUTO_TEST_CASE( test_delta_rho )
@@ -556,8 +556,8 @@ BOOST_AUTO_TEST_CASE( test_rho_sinTheta )
 
    const double fs_rhohat = weinberg.get_rho_hat();
 
-   BOOST_CHECK_CLOSE_FRACTION(outsin, fs_sintheta, 1.0e-10);
-   BOOST_CHECK_CLOSE_FRACTION(outrho, fs_rhohat  , 1.0e-10);
+   BOOST_CHECK_CLOSE_FRACTION(outsin, fs_sintheta, 1.0e-9);
+   BOOST_CHECK_CLOSE_FRACTION(outrho, fs_rhohat  , 1.0e-9);
 }
 
 BOOST_AUTO_TEST_CASE( test_self_energy_top_correction )

@@ -123,11 +123,11 @@ BOOST_AUTO_TEST_CASE( test_SMSSM_pole_masses )
    // neutralinos
    const DoubleVector MChi(ToDoubleVector(m.get_physical().MChi));
    const DoubleVector mneut = s.displayPhys().mneut.apply(fabs);
-   BOOST_CHECK_CLOSE(mneut(1), MChi(1), 1.0e-12);
-   BOOST_CHECK_CLOSE(mneut(2), MChi(2), 1.0e-12);
-   BOOST_CHECK_CLOSE(mneut(3), MChi(3), 1.0e-12);
-   BOOST_CHECK_CLOSE(mneut(4), MChi(4), 1.0e-12);
-   BOOST_CHECK_CLOSE(mneut(5), MChi(5), 1.0e-12);
+   BOOST_CHECK_CLOSE(mneut(1), MChi(1), 1.0e-10);
+   BOOST_CHECK_CLOSE(mneut(2), MChi(2), 1.0e-10);
+   BOOST_CHECK_CLOSE(mneut(3), MChi(3), 1.0e-10);
+   BOOST_CHECK_CLOSE(mneut(4), MChi(4), 1.0e-10);
+   BOOST_CHECK_CLOSE(mneut(5), MChi(5), 1.0e-10);
 
    // charginos
    const DoubleVector MCha(ToDoubleVector(m.get_physical().MCha));
@@ -149,39 +149,39 @@ BOOST_AUTO_TEST_CASE( test_SMSSM_pole_masses )
    // down-type squarks
    const DoubleVector Sd(ToDoubleVector(m.get_physical().MSd));
    const DoubleVector md(s.displayPhys().md.flatten().sort());
-   BOOST_CHECK_CLOSE(Sd(1), md(1), 1.0e-12);
-   BOOST_CHECK_CLOSE(Sd(2), md(2), 1.0e-12);
-   BOOST_CHECK_CLOSE(Sd(3), md(3), 1.0e-12);
-   BOOST_CHECK_CLOSE(Sd(4), md(4), 1.0e-12);
-   BOOST_CHECK_CLOSE(Sd(5), md(5), 1.0e-12);
-   BOOST_CHECK_CLOSE(Sd(6), md(6), 1.0e-12);
+   BOOST_CHECK_CLOSE(Sd(1), md(1), 1.0e-10);
+   BOOST_CHECK_CLOSE(Sd(2), md(2), 1.0e-10);
+   BOOST_CHECK_CLOSE(Sd(3), md(3), 1.0e-10);
+   BOOST_CHECK_CLOSE(Sd(4), md(4), 1.0e-10);
+   BOOST_CHECK_CLOSE(Sd(5), md(5), 1.0e-10);
+   BOOST_CHECK_CLOSE(Sd(6), md(6), 1.0e-10);
 
    // up-type squarks
    const DoubleVector Su(ToDoubleVector(m.get_physical().MSu));
    const DoubleVector mu(s.displayPhys().mu.flatten().sort());
-   BOOST_CHECK_CLOSE(Su(1), mu(1), 1.0e-12);
-   BOOST_CHECK_CLOSE(Su(2), mu(2), 1.0e-12);
-   BOOST_CHECK_CLOSE(Su(3), mu(3), 1.0e-12);
-   BOOST_CHECK_CLOSE(Su(4), mu(4), 1.0e-12);
-   BOOST_CHECK_CLOSE(Su(5), mu(5), 1.0e-12);
-   BOOST_CHECK_CLOSE(Su(6), mu(6), 1.0e-12);
+   BOOST_CHECK_CLOSE(Su(1), mu(1), 1.0e-10);
+   BOOST_CHECK_CLOSE(Su(2), mu(2), 1.0e-10);
+   BOOST_CHECK_CLOSE(Su(3), mu(3), 1.0e-10);
+   BOOST_CHECK_CLOSE(Su(4), mu(4), 1.0e-10);
+   BOOST_CHECK_CLOSE(Su(5), mu(5), 1.0e-10);
+   BOOST_CHECK_CLOSE(Su(6), mu(6), 1.0e-10);
 
    // down-type sleptons
    const DoubleVector Se(ToDoubleVector(m.get_physical().MSe));
    const DoubleVector me(s.displayPhys().me.flatten().sort());
-   BOOST_CHECK_CLOSE(Se(1), me(1), 1.0e-12);
-   BOOST_CHECK_CLOSE(Se(2), me(2), 1.0e-12);
-   BOOST_CHECK_CLOSE(Se(3), me(3), 1.0e-12);
-   BOOST_CHECK_CLOSE(Se(4), me(4), 1.0e-12);
-   BOOST_CHECK_CLOSE(Se(5), me(5), 1.0e-12);
-   BOOST_CHECK_CLOSE(Se(6), me(6), 1.0e-12);
+   BOOST_CHECK_CLOSE(Se(1), me(1), 1.0e-10);
+   BOOST_CHECK_CLOSE(Se(2), me(2), 1.0e-10);
+   BOOST_CHECK_CLOSE(Se(3), me(3), 1.0e-10);
+   BOOST_CHECK_CLOSE(Se(4), me(4), 1.0e-10);
+   BOOST_CHECK_CLOSE(Se(5), me(5), 1.0e-10);
+   BOOST_CHECK_CLOSE(Se(6), me(6), 1.0e-10);
 
    // up-type sleptons
    const DoubleVector Sv(ToDoubleVector(m.get_physical().MSv));
    const DoubleVector msnu(s.displayPhys().msnu.sort());
-   BOOST_CHECK_CLOSE(Sv(1), msnu(1), 1.0e-12);
-   BOOST_CHECK_CLOSE(Sv(2), msnu(2), 1.0e-12);
-   BOOST_CHECK_CLOSE(Sv(3), msnu(3), 1.0e-12);
+   BOOST_CHECK_CLOSE(Sv(1), msnu(1), 1.0e-10);
+   BOOST_CHECK_CLOSE(Sv(2), msnu(2), 1.0e-10);
+   BOOST_CHECK_CLOSE(Sv(3), msnu(3), 1.0e-10);
 
    // neutrinos
    const DoubleVector MFv(ToDoubleVector(m.get_physical().MFv));

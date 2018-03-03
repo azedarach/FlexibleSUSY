@@ -573,19 +573,19 @@ void compare_selectron_self_energy(MssmSoftsusy s, CMSSM<Two_scale> m)
    }
 
    // compare families 1 and 2
-   TEST_CLOSE(Se_softsusy_se(1,1), Se_sarah_se(1,1), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(1,2), Se_sarah_se(1,2), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(2,1), Se_sarah_se(2,1), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(2,2), Se_sarah_se(2,2), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(4,4), Se_sarah_se(4,4), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(4,5), Se_sarah_se(4,5), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(5,4), Se_sarah_se(5,4), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(5,5), Se_sarah_se(5,5), 1.0e-10);
+   TEST_CLOSE(Se_softsusy_se(1,1), Se_sarah_se(1,1), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(1,2), Se_sarah_se(1,2), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(2,1), Se_sarah_se(2,1), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(2,2), Se_sarah_se(2,2), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(4,4), Se_sarah_se(4,4), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(4,5), Se_sarah_se(4,5), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(5,4), Se_sarah_se(5,4), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(5,5), Se_sarah_se(5,5), 1.0e-7);
    // compare 3rd family
-   TEST_CLOSE(Se_softsusy_se(3,3), Se_sarah_se(3,3), 2.0e-10);
-   TEST_CLOSE(Se_softsusy_se(3,6), Se_sarah_se(3,6), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(6,3), Se_sarah_se(6,3), 1.0e-10);
-   TEST_CLOSE(Se_softsusy_se(6,6), Se_sarah_se(6,6), 2.0e-10);
+   TEST_CLOSE(Se_softsusy_se(3,3), Se_sarah_se(3,3), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(3,6), Se_sarah_se(3,6), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(6,3), Se_sarah_se(6,3), 1.0e-7);
+   TEST_CLOSE(Se_softsusy_se(6,6), Se_sarah_se(6,6), 1.0e-7);
 }
 
 void compare_sup_self_energy(MssmSoftsusy s, CMSSM<Two_scale> m)
@@ -632,10 +632,10 @@ void compare_sup_self_energy(MssmSoftsusy s, CMSSM<Two_scale> m)
    TEST_CLOSE(Su_softsusy_se(1,2), Su_sarah_se(1,2), 1.0e-10);
    TEST_CLOSE(Su_softsusy_se(2,1), Su_sarah_se(2,1), 1.0e-10);
    TEST_CLOSE(Su_softsusy_se(2,2), Su_sarah_se(2,2), 1.0e-10);
-   TEST_CLOSE(Su_softsusy_se(4,4), Su_sarah_se(4,4), 1.0e-10);
-   TEST_CLOSE(Su_softsusy_se(4,5), Su_sarah_se(4,5), 1.0e-10);
-   TEST_CLOSE(Su_softsusy_se(5,4), Su_sarah_se(5,4), 1.0e-10);
-   TEST_CLOSE(Su_softsusy_se(5,5), Su_sarah_se(5,5), 1.0e-10);
+   TEST_CLOSE(Su_softsusy_se(4,4), Su_sarah_se(4,4), 1.0e-07);
+   TEST_CLOSE(Su_softsusy_se(4,5), Su_sarah_se(4,5), 1.0e-07);
+   TEST_CLOSE(Su_softsusy_se(5,4), Su_sarah_se(5,4), 1.0e-07);
+   TEST_CLOSE(Su_softsusy_se(5,5), Su_sarah_se(5,5), 1.0e-07);
 
    // compare 3rd family
    {
@@ -703,14 +703,14 @@ void compare_sdown_self_energy(MssmSoftsusy s, CMSSM<Two_scale> m)
    }
 
    // compare families 1 and 2
-   TEST_CLOSE(Sd_softsusy_se(1,1), Sd_sarah_se(1,1), 1.0e-10);
-   TEST_CLOSE(Sd_softsusy_se(1,2), Sd_sarah_se(1,2), 1.0e-10);
-   TEST_CLOSE(Sd_softsusy_se(2,1), Sd_sarah_se(2,1), 1.0e-10);
-   TEST_CLOSE(Sd_softsusy_se(2,2), Sd_sarah_se(2,2), 1.0e-10);
-   TEST_CLOSE(Sd_softsusy_se(4,4), Sd_sarah_se(4,4), 1.0e-10);
-   TEST_CLOSE(Sd_softsusy_se(4,5), Sd_sarah_se(4,5), 1.0e-10);
-   TEST_CLOSE(Sd_softsusy_se(5,4), Sd_sarah_se(5,4), 1.0e-10);
-   TEST_CLOSE(Sd_softsusy_se(5,5), Sd_sarah_se(5,5), 1.0e-10);
+   TEST_CLOSE(Sd_softsusy_se(1,1), Sd_sarah_se(1,1), 1.0e-7);
+   TEST_CLOSE(Sd_softsusy_se(1,2), Sd_sarah_se(1,2), 1.0e-7);
+   TEST_CLOSE(Sd_softsusy_se(2,1), Sd_sarah_se(2,1), 1.0e-7);
+   TEST_CLOSE(Sd_softsusy_se(2,2), Sd_sarah_se(2,2), 1.0e-7);
+   TEST_CLOSE(Sd_softsusy_se(4,4), Sd_sarah_se(4,4), 1.0e-7);
+   TEST_CLOSE(Sd_softsusy_se(4,5), Sd_sarah_se(4,5), 1.0e-7);
+   TEST_CLOSE(Sd_softsusy_se(5,4), Sd_sarah_se(5,4), 1.0e-7);
+   TEST_CLOSE(Sd_softsusy_se(5,5), Sd_sarah_se(5,5), 1.0e-7);
 
    // compare 3rd family
    {
@@ -872,9 +872,9 @@ void compare_charged_higgs_self_energy(MssmSoftsusy s, CMSSM<Two_scale> m)
    TEST_CLOSE(sarah_sigma_Hpm.real(), sarah_sigma_Hpm.real().transpose(), 1.0e-10);
 
    if (twisted) {
-      TEST_CLOSE(sarah_sigma_Hpm.real()(1,1), softsusy_sigma_HpHm, 1.0e-10);
+      TEST_CLOSE(sarah_sigma_Hpm.real()(1,1), softsusy_sigma_HpHm, 1.0e-7);
    } else {
-      TEST_CLOSE(sarah_sigma_Hpm.real()(2,2), softsusy_sigma_HpHm, 1.0e-10);
+      TEST_CLOSE(sarah_sigma_Hpm.real()(2,2), softsusy_sigma_HpHm, 1.0e-7);
    }
 
    // TEST_CLOSE(sarah_sigma_Hpm.real()(1,2), 0.0, 1.0e-10);
@@ -1076,9 +1076,9 @@ void compare_loop_masses(MssmSoftsusy s, CMSSM<Two_scale> m)
    TEST_CLOSE(s.displayPhys().mneut.apply(fabs), ToDoubleVector(m.get_physical().MChi), 1.0e-10);
    TEST_CLOSE(s.displayPhys().mch.apply(fabs)  , ToDoubleVector(m.get_physical().MCha), 1.0e-11);
 
-   TEST_CLOSE(s.displayPhys().me.flatten().sort(), ToDoubleVector(m.get_physical().MSe), 1.0e-10);
-   TEST_CLOSE(s.displayPhys().mu.flatten().sort(), ToDoubleVector(m.get_physical().MSu), 1.0e-10);
-   TEST_CLOSE(s.displayPhys().md.flatten().sort(), ToDoubleVector(m.get_physical().MSd), 2.0e-10);
+   TEST_CLOSE(s.displayPhys().me.flatten().sort(), ToDoubleVector(m.get_physical().MSe), 1.0e-09);
+   TEST_CLOSE(s.displayPhys().mu.flatten().sort(), ToDoubleVector(m.get_physical().MSu), 1.0e-09);
+   TEST_CLOSE(s.displayPhys().md.flatten().sort(), ToDoubleVector(m.get_physical().MSd), 1.0e-09);
 
    TEST_EQUALITY(0.0, m.get_physical().MVG);
    TEST_EQUALITY(0.0, m.get_physical().MVP);
