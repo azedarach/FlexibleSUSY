@@ -82,9 +82,6 @@ model_files/SMtower             export-ignore
 
 models/fmssm                    export-ignore
 models/fmssmn                   export-ignore
-models/SoftsusyMSSM             export-ignore
-models/SoftsusyNMSSM            export-ignore
-models/SoftsusyFlavourMSSM      export-ignore
 
 release                         export-ignore
 
