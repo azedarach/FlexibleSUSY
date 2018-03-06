@@ -101,6 +101,9 @@ ALLMODDEP:=
 # set default shell
 SHELL = /bin/sh
 
+# disable built-in rules to improve speed
+MAKEFLAGS += -rR --include-dir=$(CURDIR)
+
 # flexiblesusy-config script
 FSCONFIG := @FSCONFIG@
 
@@ -112,6 +115,7 @@ DEPGEN = $(DEPGEN_EXE)
 
 # script which lists the SARAH model files
 SARAH_DEP_GEN := @SARAH_DEP_GEN@
+SARAH_MODEL_DIR := @SARAH_MODEL_DIR@
 
 # script which installs a file without export markers
 INSTALL_STRIPPED := config/install_stripped.sh
@@ -225,6 +229,18 @@ depend:  $(ALLDEP)
 
 %.d: %.F | $(DEPGEN)
 	$(DEPGEN) $(CPPFLAGS) -MM -MI -o '$@' -MT '$*.o' $^
+
+%.o: %.c
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.f
+	$(FC) $(FFLAGS) -c $< -o $@
+
+%.o: %.F
+	$(FC) $(FFLAGS) $(CPPFLAGS) -c $< -o $@
 
 distclean::
 	-rm -f Makefile

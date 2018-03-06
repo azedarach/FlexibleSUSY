@@ -951,11 +951,8 @@ CreateSLHAYukawaGetters[] :=
            yuks = GetYukawas[];
            Block[{},
               result = result <>
-                       CConversion`CreateInlineGetter[
-                           CreateSLHAYukawaName[#], GetSLHAYukawaType[#]
-                       ] <>
-                       CConversion`CreateInlineElementGetter[
-                           CreateSLHAYukawaName[#], GetSLHAYukawaType[#]
+                       CConversion`CreateInlineGetters[
+                           CreateSLHAYukawaName[#], CreateSLHAYukawaName[#], GetSLHAYukawaType[#]
                        ];
            ]& /@ yuks;
            result
@@ -1006,11 +1003,8 @@ CreateSLHATrilinearCouplingGetters[] :=
            tril = GetTrilinearCouplings[];
            Block[{},
               result = result <>
-                       CConversion`CreateInlineGetter[
-                           CreateSLHATrilinearCouplingName[#], GetSLHATrilinearCouplingType[#]
-                       ] <>
-                       CConversion`CreateInlineElementGetter[
-                           CreateSLHATrilinearCouplingName[#], GetSLHATrilinearCouplingType[#]
+                       CConversion`CreateInlineGetters[
+                           CreateSLHATrilinearCouplingName[#], CreateSLHATrilinearCouplingName[#], GetSLHATrilinearCouplingType[#]
                        ];
            ]& /@ tril;
            result
@@ -1052,11 +1046,8 @@ CreateSLHAFermionMixingMatricesGetters[] :=
            mix = GetFermionMixingMatrices[];
            Block[{},
               result = result <>
-                       CConversion`CreateInlineGetter[
-                           CreateSLHAFermionMixingMatrixName[#], GetSLHAFermionMixingMatrixType[#]
-                       ] <>
-                       CConversion`CreateInlineElementGetter[
-                           CreateSLHAFermionMixingMatrixName[#], GetSLHAFermionMixingMatrixType[#]
+                       CConversion`CreateInlineGetters[
+                           CreateSLHAFermionMixingMatrixName[#], CreateSLHAFermionMixingMatrixName[#], GetSLHAFermionMixingMatrixType[#]
                        ];
            ]& /@ mix;
            result
@@ -1072,11 +1063,8 @@ CreateSLHASoftSquaredMassesGetters[] :=
            massSq = GetSoftSquaredMasses[];
            Block[{},
               result = result <>
-                       CConversion`CreateInlineGetter[
-                           CreateSLHASoftSquaredMassName[#], GetSLHASoftSquaredMassType[#]
-                       ] <>
-                       CConversion`CreateInlineElementGetter[
-                           CreateSLHASoftSquaredMassName[#], GetSLHASoftSquaredMassType[#]
+                       CConversion`CreateInlineGetters[
+                           CreateSLHASoftSquaredMassName[#], CreateSLHASoftSquaredMassName[#], GetSLHASoftSquaredMassType[#]
                        ];
            ]& /@ massSq;
            result
