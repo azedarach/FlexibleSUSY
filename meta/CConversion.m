@@ -879,6 +879,7 @@ RValueToCFormString[expr_] :=
            result = Block[{Which, If}, expr /. greekSymbolsRules] /.
                     SARAH`sum -> FlexibleSUSY`SUM /.
                     SARAH`Mass -> FlexibleSUSY`M /.
+                    SARAH`Mass2 -> FlexibleSUSY`M2 /.
                     SARAH`A0[0]              -> 0 /.
                     SARAH`B0[0,0,0]          -> 0 /.
                     SARAH`B1[0,0,0]          -> 0 /.
@@ -888,12 +889,13 @@ RValueToCFormString[expr_] :=
                     SARAH`B00[0,0,0]         -> 0 /.
                     SARAH`B11[0,0,0]         -> 0 /.
                     SARAH`B22[0,0,0]         -> 0 /.
-                    SARAH`Mass2[a_?NumberQ]  :> Sqr[a] /.
-                    SARAH`Mass2[a_]          :> Sqr[FlexibleSUSY`M[a]] /.
                     FlexibleSUSY`M[a_?NumberQ]   :> a /.
+                    FlexibleSUSY`M2[a_?NumberQ]  :> Sqr[a] /.
                     FlexibleSUSY`M[SARAH`bar[a_]] :> FlexibleSUSY`M[a] /.
                     FlexibleSUSY`M[a_[idx_]]     :> ToValidCSymbol[FlexibleSUSY`M[a]][idx] /.
                     FlexibleSUSY`M[a_]           :> ToValidCSymbol[FlexibleSUSY`M[a]] /.
+                    FlexibleSUSY`M2[a_[idx_]]    :> ToValidCSymbol[FlexibleSUSY`M2[a]][idx] /.
+                    FlexibleSUSY`M2[a_]          :> ToValidCSymbol[FlexibleSUSY`M2[a]] /.
                     FlexibleSUSY`BETA[l_,p_]     :> FlexibleSUSY`BETA1[l,p] /.
                     SARAH`Adj[0]                 -> 0 /.
                     SARAH`Conj[0]                -> 0 /.

@@ -547,7 +547,9 @@ FindAllParametersFromList[expr_, parameters_List] :=
                { Cases[compactExpr, a_Symbol /; MemberQ[parameters,a], {0,Infinity}],
                  Cases[compactExpr, a_[__] /; MemberQ[parameters,a] :> a, {0,Infinity}],
                  Cases[compactExpr, FlexibleSUSY`M[a_]     /; MemberQ[parameters,FlexibleSUSY`M[a]], {0,Infinity}],
-                 Cases[compactExpr, FlexibleSUSY`M[a_[__]] /; MemberQ[parameters,FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}]
+                 Cases[compactExpr, FlexibleSUSY`M[a_[__]] /; MemberQ[parameters,FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
+                 Cases[compactExpr, FlexibleSUSY`M2[a_]     /; MemberQ[parameters,FlexibleSUSY`M2[a]], {0,Infinity}],
+                 Cases[compactExpr, FlexibleSUSY`M2[a_[__]] /; MemberQ[parameters,FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}]
                }];
            DeleteDuplicates[Flatten[symbols]]
           ];
@@ -558,7 +560,9 @@ FindAllParameters[expr_, exceptions_:{}] :=
            allOutPars = DeleteDuplicates[Flatten[
                Join[allOutputParameters,
                     allOutputParameters /. FlexibleSUSY`M[{a__}] :> FlexibleSUSY`M[a],
-                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> (FlexibleSUSY`M /@ {a})
+                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> (FlexibleSUSY`M /@ {a}),
+                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> FlexibleSUSY`M2[a],
+                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> (FlexibleSUSY`M2 /@ {a})
                    ]]];
            allParameters = DeleteDuplicates[
                Join[allModelParameters, allOutPars,
@@ -575,11 +579,15 @@ FindAllParametersClassified[expr_, exceptions_:{}] :=
            allOutPars = DeleteDuplicates[Flatten[
                Join[allOutputParameters,
                     allOutputParameters /. FlexibleSUSY`M[{a__}] :> FlexibleSUSY`M[a],
-                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> (FlexibleSUSY`M /@ {a})
+                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> (FlexibleSUSY`M /@ {a}),
+                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> FlexibleSUSY`M2[a],
+                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> (FlexibleSUSY`M2 /@ {a})
                    ]]];
            poleMasses = {
                Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_]]     /; MemberQ[allOutputParameters,FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_[__]]] /; MemberQ[allOutputParameters,FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}]
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_[__]]] /; MemberQ[allOutputParameters,FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_]]     /; MemberQ[allOutputParameters,FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_[__]]] /; MemberQ[allOutputParameters,FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}]
                         };
            poleMasses   = DeleteDuplicates[Flatten[poleMasses]];
            inputPars    = DeleteDuplicates[Select[symbols, (MemberQ[GetInputParameters[],#])&]];
@@ -707,6 +715,7 @@ IsParameter[sym_] :=
 IsRealParameter[Re[sym_]] := True;
 IsRealParameter[Im[sym_]] := True;
 IsRealParameter[FlexibleSUSY`M[_]] := True;
+IsRealParameter[FlexibleSUSY`M2[_]] := True;
 
 IsRealParameter[sym_] :=
     (IsModelParameter[sym] && AllModelParametersAreReal[]) ||
@@ -899,7 +908,7 @@ GetType[sym_[indices__] /; And @@ (IsIndex /@ {indices})] :=
 
 GetType[FlexibleSUSY`SCALE] := GetRealTypeFromDimension[{}];
 
-GetType[FlexibleSUSY`M[sym_]] :=
+GetType[(FlexibleSUSY`M | FlexibleSUSY`M2)[sym_]] :=
     GetRealTypeFromDimension[{SARAH`getGen[sym, FlexibleSUSY`FSEigenstates]}];
 
 GetType[sym_?IsInputParameter] :=
@@ -1353,7 +1362,7 @@ RemoveProtectedHeads[expr_] :=
               FlexibleSUSY`Pole[__]  -> FlexibleSUSY`Pole[],
               FlexibleSUSY`BETA[__] -> FlexibleSUSY`BETA[],
               SARAH`Mass  -> FlexibleSUSY`M,
-              SARAH`Mass2 -> FlexibleSUSY`M };
+              SARAH`Mass2 -> FlexibleSUSY`M2 };
 
 CreateRulesForProtectedHead[expr_, protectedHead_Symbol] :=
     Cases[expr, protectedHead[p__] :> Rule[protectedHead[p],Symbol["x$" <> ToString[Hash[p]]]], {0, Infinity}];
@@ -1380,7 +1389,8 @@ WrapPreprocessorMacroAround[expr_, protectedHeads_List:{FlexibleSUSY`Pole, SARAH
            replacements = Join[
                RuleDelayed[#     , FindMacro[#][#]   ]& /@ allPars,
                RuleDelayed[#[i__], FindMacro[#][#][i]]& /@ allPars,
-               {RuleDelayed[FlexibleSUSY`M[p_[i__]], FindMacro[FlexibleSUSY`M[p]][FlexibleSUSY`M[p]][i]]}
+               {RuleDelayed[FlexibleSUSY`M[p_[i__]] , FindMacro[FlexibleSUSY`M[p]][FlexibleSUSY`M[p]][i]]},
+               {RuleDelayed[FlexibleSUSY`M2[p_[i__]], FindMacro[FlexibleSUSY`M2[p]][FlexibleSUSY`M2[p]][i]]}
            ];
            protectionRules = CreateRulesForProtectedHead[expr, protectedHeads];
            exprWithoutProtectedSymbols = expr /. protectionRules;
@@ -1392,8 +1402,8 @@ DefineLocalConstCopy[parameter_, macro_String, prefix_String:""] :=
     "const auto " <> prefix <> CConversion`ToValidCSymbolString[parameter] <> " = " <>
     macro <> "(" <> CConversion`ToValidCSymbolString[parameter] <> ");\n";
 
-PrivateCallLoopMassFunction[FlexibleSUSY`M[particle_Symbol]] :=
-    "calculate_" <> CConversion`ToValidCSymbolString[FlexibleSUSY`M[particle]] <> "_pole();\n";
+PrivateCallLoopMassFunction[(h:(FlexibleSUSY`M | FlexibleSUSY`M2))[particle_Symbol]] :=
+    "calculate_" <> CConversion`ToValidCSymbolString[h[particle]] <> "_pole();\n";
 
 CalculateLocalPoleMasses[parameter_] :=
     "MODEL->" <> PrivateCallLoopMassFunction[parameter];

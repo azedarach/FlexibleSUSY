@@ -73,6 +73,20 @@ GetLorentzRepresentationFactor[particle_] :=
 GetMultiplicityForUnbrokenGroups[particle_, group_] :=
     Times @@ Cases[SARAH`getIndizesWI[particle], {Except[SARAH`generation | group], i_} :> i];
 
+CalcThresholdLog[prefactor_, particle_] /; TreeMasses`IsFermion[particle] :=
+    prefactor Global`FiniteLog[Abs[TreeMasses`GetMass[particle]/Global`currentScale]];
+
+CalcThresholdLog[prefactor_, particle_] :=
+    1/2 prefactor Global`FiniteLog[Abs[TreeMasses`GetMass[particle]/Global`currentScale^2]];
+
+CalcThresholdLogs[prefactor_, particle_] :=
+    If[GetDimension[particle] == 1,
+       CalcThresholdLog[prefactor, particle]
+       ,
+       Sum[CalcThresholdLog[prefactor, particle[i-1]],
+           {i,TreeMasses`GetDimensionStartSkippingSMGoldstones[particle],GetDimension[particle]}]
+      ];
+
 (* Calculate threshold correction for a gauge coupling from SM
    (MS-bar) to a given renormalization scheme in the given model. *)
 CalculateCoupling[{coupling_, name_, group_}, scheme_] :=
@@ -91,11 +105,7 @@ CalculateCoupling[{coupling_, name_, group_}, scheme_] :=
                     ];
                If[!NumericQ[prefactor], prefactor = 0];
                (* sum over generations *)
-               If[GetDimension[particle] == 1,
-                  result -= prefactor Global`FiniteLog[Abs[FlexibleSUSY`M[particle]/Global`currentScale]];,
-                  result -= Sum[prefactor Global`FiniteLog[Abs[FlexibleSUSY`M[particle][i-1]/Global`currentScale]],
-                                {i,TreeMasses`GetDimensionStartSkippingSMGoldstones[particle],GetDimension[particle]}];
-                 ];
+               result -= CalcThresholdLogs[prefactor, particle];
               ];
            conversion = Switch[scheme,
                                FlexibleSUSY`DRbar, DRbarConversion[group],
@@ -428,8 +438,8 @@ GetParameter[par_[idx1_,idx2_], factor_:1] :=
     CConversion`RValueToCFormString[idx2] <> ")" <>
     MultiplyBy[factor];
 
-GetParameter[FlexibleSUSY`M[par_], factor_:1] :=
-    "MODEL->get_" <> CConversion`RValueToCFormString[FlexibleSUSY`M[par]] <> "()" <>
+GetParameter[(h:(FlexibleSUSY`M | FlexibleSUSY`M2))[par_], factor_:1] :=
+    "MODEL->get_" <> CConversion`RValueToCFormString[h[par]] <> "()" <>
     MultiplyBy[factor];
 
 GetParameter[par_[idx_], factor_:1] :=

@@ -1555,8 +1555,8 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
            callAllLoopMassFunctions     = LoopMasses`CallAllPoleMassFunctions[FlexibleSUSY`FSEigenstates, enablePoleMassThreads];
            enablePoleMassThreads = True;
            callAllLoopMassFunctionsInThreads = LoopMasses`CallAllPoleMassFunctions[FlexibleSUSY`FSEigenstates, enablePoleMassThreads];
-           masses                       = Flatten[(FlexibleSUSY`M[TreeMasses`GetMassEigenstate[#]]& /@ massMatrices) /.
-                                                  FlexibleSUSY`M[p_List] :> (FlexibleSUSY`M /@ p)];
+           masses                       = Flatten[(TreeMasses`GetMass[TreeMasses`GetMassEigenstate[#]]& /@ massMatrices) /.
+                                                  FlexibleSUSY`M2[p_List] :> (FlexibleSUSY`M2 /@ p)];
            {lspGetters, lspFunctions}   = LoopMasses`CreateLSPFunctions[FlexibleSUSY`PotentialLSPParticles];
            printMasses                  = WriteOut`PrintParameters[masses, "ostr"];
            getMixings                   = TreeMasses`CreateMixingArrayGetter[massMatrices];
@@ -2091,7 +2091,7 @@ WriteMathLink[inputParameters_List, extraSLHAOutputBlocks_List, files_List] :=
            setInputParameters = FSMathLink`SetInputParametersFromArguments[inputPars];
            setInputParameterDefaultArguments = FSMathLink`SetInputParameterDefaultArguments[inputPars];
            setInputParameterArguments = FSMathLink`SetInputParameterArguments[inputPars];
-           outPars = Parameters`GetOutputParameters[] /. FlexibleSUSY`M[p_List] :> Sequence @@ (FlexibleSUSY`M /@ p);
+           outPars = Parameters`GetOutputParameters[] /. FlexibleSUSY`M2[p_List] :> Sequence @@ (FlexibleSUSY`M2 /@ p);
            outPars = Join[outPars, FlexibleSUSY`Pole /@ outPars, Parameters`GetModelParameters[],
                           Parameters`GetExtraParameters[], {FlexibleSUSY`SCALE}];
            listOfInputParameters = ToString[First /@ inputParameters];
@@ -3358,7 +3358,8 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
 
            massMatrices = massMatrices /. allIntermediateOutputParameterIndexReplacementRules;
 
-           allParticles = FlexibleSUSY`M[TreeMasses`GetMassEigenstate[#]]& /@ massMatrices;
+           allParticles = TreeMasses`GetMass[TreeMasses`GetMassEigenstate[#]]& /@ massMatrices;
+
            allOutputParameters = DeleteCases[DeleteDuplicates[
                Join[allParticles,
                     Flatten[TreeMasses`GetMixingMatrixSymbol[#]& /@ massMatrices]]], Null];
