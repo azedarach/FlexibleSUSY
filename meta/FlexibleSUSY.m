@@ -1128,7 +1128,6 @@ WriteModelSLHAClass[massMatrices_List, files_List] :=
             convertSoftSquaredMassesToSLHA = "",
             slhaFerimonMixingMatricesDef = "",
             slhaFerimonMixingMatricesGetters = "",
-            slhaPoleMassGetters = "",
             slhaPoleMixingMatrixGetters = "",
             calculateCKMMatrix = "",
             calculatePMNSMatrix = ""
@@ -1147,7 +1146,6 @@ WriteModelSLHAClass[massMatrices_List, files_List] :=
            calculateCKMMatrix = WriteOut`CalculateCKMMatrix[];
            calculatePMNSMatrix = WriteOut`CalculatePMNSMatrix[];
            For[k = 1, k <= Length[massMatrices], k++,
-               slhaPoleMassGetters         = slhaPoleMassGetters <> TreeMasses`CreateSLHAPoleMassGetter[massMatrices[[k]]];
                slhaPoleMixingMatrixGetters = slhaPoleMixingMatrixGetters <> TreeMasses`CreateSLHAPoleMixingMatrixGetter[massMatrices[[k]]];
               ];
            WriteOut`ReplaceInFiles[files,
@@ -1162,7 +1160,6 @@ WriteModelSLHAClass[massMatrices_List, files_List] :=
                             "@slhaSoftSquaredMassesDef@"       -> IndentText[slhaSoftSquaredMassesDef],
                             "@slhaSoftSquaredMassesGetter@"    -> IndentText[slhaSoftSquaredMassesGetter],
                             "@convertSoftSquaredMassesToSLHA@" -> IndentText[convertSoftSquaredMassesToSLHA],
-                            "@slhaPoleMassGetters@"            -> IndentText[slhaPoleMassGetters],
                             "@slhaPoleMixingMatrixGetters@"    -> IndentText[slhaPoleMixingMatrixGetters],
                             "@calculateCKMMatrix@"             -> IndentText[calculateCKMMatrix],
                             "@calculatePMNSMatrix@"             -> IndentText[calculatePMNSMatrix],
@@ -1405,7 +1402,6 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
             independentEwsbEquations,
             massGetters = "", k,
             mixingMatrixGetters = "",
-            slhaPoleMassGetters = "", slhaPoleMixingMatrixGetters = "",
             higgsMassGetters = "", higgsToEWSBEqAssociation,
             tadpoleEqPrototypes = "", tadpoleEqFunctions = "",
             numberOfEWSBEquations = Length[ewsbEquations],
@@ -1627,8 +1623,6 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
                             "@lspFunctions@"         -> lspFunctions,
                             "@massGetters@"          -> IndentText[massGetters],
                             "@mixingMatrixGetters@"  -> IndentText[mixingMatrixGetters],
-                            "@slhaPoleMassGetters@"  -> IndentText[slhaPoleMassGetters],
-                            "@slhaPoleMixingMatrixGetters@" -> IndentText[slhaPoleMixingMatrixGetters],
                             "@higgsMassGetterPrototypes@"   -> IndentText[higgsMassGetters[[1]]],
                             "@higgsMassGetters@"     -> higgsMassGetters[[2]],
                             "@tadpoleEqPrototypes@"  -> IndentText[tadpoleEqPrototypes],

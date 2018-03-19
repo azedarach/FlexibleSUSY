@@ -554,16 +554,21 @@ FindAllParametersFromList[expr_, parameters_List] :=
            DeleteDuplicates[Flatten[symbols]]
           ];
 
+DecomposeMassLists[outPars_List] :=
+    Join[outPars,
+         outPars /. FlexibleSUSY`M[{a__}] :> FlexibleSUSY`M[a],
+         outPars /. FlexibleSUSY`M[{a__}] :> (FlexibleSUSY`M /@ {a}),
+         outPars /. FlexibleSUSY`M2[{a__}] :> FlexibleSUSY`M2[a],
+         outPars /. FlexibleSUSY`M2[{a__}] :> (FlexibleSUSY`M2 /@ {a}),
+         outPars /. FlexibleSUSY`M2[{a__}] :> FlexibleSUSY`M[a],
+         outPars /. FlexibleSUSY`M2[{a__}] :> (FlexibleSUSY`M /@ {a}),
+         outPars /. FlexibleSUSY`M2 :> FlexibleSUSY`M
+        ];
+
 (* Returns all parameters within an expression *)
 FindAllParameters[expr_, exceptions_:{}] :=
     Module[{allParameters, allOutPars},
-           allOutPars = DeleteDuplicates[Flatten[
-               Join[allOutputParameters,
-                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> FlexibleSUSY`M[a],
-                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> (FlexibleSUSY`M /@ {a}),
-                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> FlexibleSUSY`M2[a],
-                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> (FlexibleSUSY`M2 /@ {a})
-                   ]]];
+           allOutPars = DeleteDuplicates[Flatten[DecomposeMassLists[allOutputParameters]]];
            allParameters = DeleteDuplicates[
                Join[allModelParameters, allOutPars,
                     GetInputParameters[], Phases`GetArg /@ allPhases,
@@ -576,18 +581,12 @@ FindAllParametersClassified[expr_, exceptions_:{}] :=
     Module[{symbols = DeleteDuplicates[Flatten[FindAllParameters[expr, exceptions]]],
             inputPars, modelPars, outputPars, extraPars,
             poleMasses, phases, depNum, allOutPars},
-           allOutPars = DeleteDuplicates[Flatten[
-               Join[allOutputParameters,
-                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> FlexibleSUSY`M[a],
-                    allOutputParameters /. FlexibleSUSY`M[{a__}] :> (FlexibleSUSY`M /@ {a}),
-                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> FlexibleSUSY`M2[a],
-                    allOutputParameters /. FlexibleSUSY`M2[{a__}] :> (FlexibleSUSY`M2 /@ {a})
-                   ]]];
+           allOutPars = DeleteDuplicates[Flatten[DecomposeMassLists[allOutputParameters]]];
            poleMasses = {
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_]]     /; MemberQ[allOutputParameters,FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_[__]]] /; MemberQ[allOutputParameters,FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_]]     /; MemberQ[allOutputParameters,FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}],
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_[__]]] /; MemberQ[allOutputParameters,FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}]
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_]]      /; MemberQ[allOutPars,FlexibleSUSY`M[a]]  :> FlexibleSUSY`M[a] , {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_[__]]]  /; MemberQ[allOutPars,FlexibleSUSY`M[a]]  :> FlexibleSUSY`M[a] , {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_]]     /; MemberQ[allOutPars,FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_[__]]] /; MemberQ[allOutPars,FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}]
                         };
            poleMasses   = DeleteDuplicates[Flatten[poleMasses]];
            inputPars    = DeleteDuplicates[Select[symbols, (MemberQ[GetInputParameters[],#])&]];

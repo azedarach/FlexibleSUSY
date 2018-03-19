@@ -33,9 +33,6 @@ GetUnmixedParticleMasses::usage="returns list of masses of unmixed
 CreateMassGetter::usage="creates a C function for
 the mass getter";
 
-CreateSLHAPoleMassGetter::usage="creates a C function for the pole mass
-getter";
-
 CreateParticleLaTeXNames::usage="creates a list of the particle's
 LaTeX names";
 
@@ -899,20 +896,33 @@ CreateMassGetter[p:TreeMasses`FSMassMatrix[_,massESSymbols_List,_], postFix_Stri
           ];
 
 CreateMassGetter[massMatrix_TreeMasses`FSMassMatrix, postFix_String:"", wrapper_String:""] :=
-    Module[{massESSymbol, returnType, dim, dimStr, massESSymbolStr},
+    Module[{massESSymbol, mass, dim, returnType},
            massESSymbol = GetMassEigenstate[massMatrix];
-           massESSymbolStr = CConversion`ToValidCSymbolString[GetMass[MakeESSymbol[massESSymbol]]];
+           mass = GetMass[MakeESSymbol[massESSymbol]];
            dim = GetDimension[massESSymbol];
-           dimStr = ToString[dim];
            If[dim == 1,
               returnType = CConversion`ScalarType[CConversion`realScalarCType];,
               returnType = CConversion`ArrayType[CConversion`realScalarCType, dim];
              ];
+           CreateMassGetter[mass, returnType, postFix, wrapper]
+          ];
+
+(* creates a getter for M[particle] *)
+CreateMassGetter[mass_FlexibleSUSY`M, returnType_, postFix_String, wrapper_String] :=
+    Module[{massESSymbolStr},
+           massESSymbolStr = CConversion`ToValidCSymbolString[mass];
            CConversion`CreateInlineGetters[massESSymbolStr, massESSymbolStr, returnType, postFix, wrapper]
           ];
 
-CreateSLHAPoleMassGetter[massMatrix_TreeMasses`FSMassMatrix] :=
-    CreateMassGetter[massMatrix, "_pole_slha", "PHYSICAL_SLHA"];
+(* creates a getter for M[particle] and M2[particle] *)
+CreateMassGetter[m2:FlexibleSUSY`M2[particle_], returnType_, postFix_String, wrapper_String] :=
+    Module[{massStr, mass2Str, massExpr},
+           massStr  = CConversion`ToValidCSymbolString[FlexibleSUSY`M[particle]];
+           mass2Str = CConversion`ToValidCSymbolString[m2];
+           massExpr = AbsSqrt[m2];
+           CConversion`CreateInlineGetters[mass2Str, mass2Str, returnType, postFix, wrapper] <>
+           CConversion`CreateInlineGetters[massStr, massExpr, returnType, postFix, wrapper]
+          ];
 
 CreateParticleEnum[particles_List] :=
     Module[{result},
