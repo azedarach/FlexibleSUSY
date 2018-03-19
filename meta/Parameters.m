@@ -125,6 +125,7 @@ GetInputParameters::usage="";
 GetInputParametersAndTypes::usage="";
 GetModelParameters::usage="";
 GetOutputParameters::usage="";
+GetAllMassOutputParameters::usage="returns output parameters including all M[] symbols";
 GetExtraParameters::usage="";
 GetExtraParametersAndTypes::usage="";
 GetModelParametersWithMassDimension::usage="Returns model parameters
@@ -495,6 +496,9 @@ GetOutputParameters[] := allOutputParameters;
 GetPhases[] := allPhases;
 GetExtraParameters[] := First /@ allExtraParameters;
 GetExtraParametersAndTypes[] := allExtraParameters;
+GetAllMassOutputParameters[] :=
+    Join[allOutputParameters,
+         allOutputParameters /. FlexibleSUSY`M2 -> FlexibleSUSY`M];
 
 additionalRealParameters = {};
 
@@ -1503,7 +1507,7 @@ IncreaseIndexLiterals[expr_] :=
 
 IncreaseIndexLiterals[expr_, num_Integer] :=
     IncreaseIndexLiterals[expr, num, Join[GetInputParameters[], GetExtraParameters[],
-                                          allModelParameters, allOutputParameters]];
+                                          allModelParameters, GetAllMassOutputParameters[]]];
 
 IncreaseIndexLiterals[expr_, num_Integer, heads_List] :=
     Module[{indexedSymbols, rules, allHeads},
@@ -1663,7 +1667,7 @@ ExpandExpressions[eq_] :=
     Module[{par, indexSymbols, indexRanges, indices = {SARAH`gt1, SARAH`gt2}},
            indexSymbols = DeleteDuplicates[
                Join @@ (Cases[eq, par_[idx_ /; !FreeQ[idx,#]] /;
-                                  MemberQ[Join[GetModelParameters[], GetOutputParameters[]], par] :> {#,par},
+                                  MemberQ[Join[GetModelParameters[], GetAllMassOutputParameters[]], par] :> {#,par},
                               {0,Infinity}]& /@ indices)];
            indexRanges  = DeleteDuplicates[GetIdxRange /@ indexSymbols];
            If[indexRanges === {},
@@ -1780,7 +1784,7 @@ GetAllOutputParameterDependenciesReplaced[expr_] :=
     DeleteCases[GetAllOutputParameterDependencies[expr /. GetDependenceSPhenoRules[]], _?NumericQ];
 
 GetOutputParameterDependencies[expr_] :=
-    Select[GetOutputParameters[],
+    Select[GetAllMassOutputParameters[],
            (!FreeQ[GetAllOutputParameterDependenciesReplaced[expr],#])&];
 
 GetExponent[a_^b_] := -I b;
@@ -1789,7 +1793,7 @@ GetExponent[a_]    := a;
 GetIntermediateOutputParameterDependencies[expr_] :=
     Complement[
         GetAllOutputParameterDependenciesReplaced[expr],
-        Join[GetOutputParameters[], GetInputParameters[], GetExponent /@ GetPhases[]]
+        Join[GetAllMassOutputParameters[], GetInputParameters[], GetExponent /@ GetPhases[]]
     ];
 
 CreateExtraParameterArrayGetter[{}] :=

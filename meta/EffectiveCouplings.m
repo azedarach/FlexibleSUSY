@@ -546,10 +546,10 @@ CreateLocalConstRefsIgnoringMixings[expr_, mixings_List] :=
     Module[{symbols, poleMasses},
            symbols = Parameters`FindAllParameters[expr];
            poleMasses = {
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_]]      /; MemberQ[Parameters`GetOutputParameters[],FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_[__]]]  /; MemberQ[Parameters`GetOutputParameters[],FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_]]     /; MemberQ[Parameters`GetOutputParameters[],FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}],
-               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_[__]]] /; MemberQ[Parameters`GetOutputParameters[],FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}]
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_]]      /; MemberQ[Parameters`GetAllMassOutputParameters[],FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M[a_[__]]]  /; MemberQ[Parameters`GetAllMassOutputParameters[],FlexibleSUSY`M[a]] :> FlexibleSUSY`M[a], {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_]]     /; MemberQ[Parameters`GetAllMassOutputParameters[],FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}],
+               Cases[expr, FlexibleSUSY`Pole[FlexibleSUSY`M2[a_[__]]] /; MemberQ[Parameters`GetAllMassOutputParameters[],FlexibleSUSY`M2[a]] :> FlexibleSUSY`M2[a], {0,Infinity}]
                         };
            symbols = DeleteDuplicates[Flatten[symbols]];
            symbols = Complement[symbols, mixings];

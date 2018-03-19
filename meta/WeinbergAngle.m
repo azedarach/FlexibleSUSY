@@ -60,7 +60,7 @@ CheckMuonDecayInputRequirements[] :=
            availPars = Join[TreeMasses`GetParticles[],
                             Parameters`GetInputParameters[],
                             Parameters`GetModelParameters[],
-                            Parameters`GetOutputParameters[]];
+                            Parameters`GetAllMassOutputParameters[]];
            areDefined = MemberQ[availPars, #]& /@ requiredSymbols;
            DebugPrint["Error: Unknown symbol: ", #]& /@
               Cases[Utils`Zip[areDefined, requiredSymbols], {False, p_} :> p];

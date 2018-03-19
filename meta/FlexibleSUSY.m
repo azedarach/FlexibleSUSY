@@ -3525,7 +3525,7 @@ MakeFlexibleSUSY[OptionsPattern[]] :=
 
            extraSLHAOutputBlocks = Parameters`DecreaseIndexLiterals[
                FlexibleSUSY`ExtraSLHAOutputBlocks,
-               Join[Parameters`GetOutputParameters[], Parameters`GetModelParameters[], Parameters`GetExtraParameters[]]
+               Join[Parameters`GetAllMassOutputParameters[], Parameters`GetModelParameters[], Parameters`GetExtraParameters[]]
            ];
 
            (* determine diagonalization precision for each particle *)
