@@ -1468,7 +1468,7 @@ WriteModelClass[massMatrices_List, ewsbEquations_List,
                    TreeMasses`CreateHiggsMassGetters[SARAH`HiggsBoson,""],
                    TreeMasses`CreateHiggsMassGetters[SARAH`ChargedHiggs,""],
                    TreeMasses`CreateHiggsMassGetters[SARAH`PseudoScalar,""],
-                   "\n"
+                   ""
                ];
            clearPhases = Phases`ClearPhases[phases];
            calculateAllMasses = TreeMasses`CallMassCalculationFunctions[massMatrices];

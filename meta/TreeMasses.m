@@ -1366,7 +1366,7 @@ GetHiggsName[sym_] :=
           ];
 
 CallHiggsMassGetterFunction[name_String] :=
-    "get_M" <> name <> "()";
+    "get_M2" <> name <> "()";
 
 CallPseudoscalarHiggsMassGetterFunction[] :=
     CallHiggsMassGetterFunction[GetHiggsName[SARAH`PseudoScalar]];
@@ -1421,16 +1421,20 @@ CreateHiggsMassGetters[particle_, macro_String] :=
              ];
            typeHiggs     = CreateCType[CConversion`ArrayType[CConversion`realScalarCType, dimHiggs]];
            typeGoldstone = CreateCType[CConversion`ArrayType[CConversion`realScalarCType, dimGoldstone]];
-           prototype = typeHiggs <> " get_M2" <> name <> "() const;\n";
+           prototype = typeHiggs <> " get_M" <> name <> "() const;\n" <>
+                       typeHiggs <> " get_M2" <> name <> "() const;\n";
            body =
                typeGoldstone <> " " <> particleGoldstoneStr <> ";\n" <>
                FillGoldstoneMassVector[particleGoldstoneStr, vectorList] <>
                "\n" <>
                "return remove_if_equal(" <> particleStr <> ", " <>
                                        particleGoldstoneStr <> ");\n";
-           def = typeHiggs <> " CLASSNAME::get_M2" <> name <> "() const\n{\n" <>
+           def = typeHiggs <> " CLASSNAME::get_M" <> name <> "() const\n{\n" <>
+               IndentText["return AbsSqrt(get_M2" <> name <> "());\n"] <>
+               "}\n\n" <>
+               typeHiggs <> " CLASSNAME::get_M2" <> name <> "() const\n{\n" <>
                IndentText[body] <>
-               "}\n";
+               "}\n\n";
            {prototype, def}
           ];
 
