@@ -4230,12 +4230,12 @@ double Standard_model::self_energy_hh_3loop() const
    const double mt = MFu(2);
    const double yt = Yu(2,2);
    const double gs = g3;
-   const double mh = Mhh;
+   const double mh2 = Sqr(Mhh);
    const double scale = get_scale();
    double self_energy = 0.;
 
    if (HIGGS_3LOOP_CORRECTION_AT_AT_AT) {
-      self_energy -= delta_mh_3loop_at_at_at_sm(scale, mt, yt, mh);
+      self_energy -= delta_mh_3loop_at_at_at_sm(scale, mt, yt, mh2);
    }
 
    if (HIGGS_3LOOP_CORRECTION_AT_AT_AS) {
@@ -4256,7 +4256,6 @@ double Standard_model::self_energy_hh_4loop() const
    const double mt = MFu(2);
    const double yt = Yu(2,2);
    const double gs = g3;
-   const double mh = Mhh;
    const double scale = get_scale();
    double self_energy = 0.;
 

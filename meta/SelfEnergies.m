@@ -939,12 +939,12 @@ using namespace flexiblesusy::sm_threeloophiggs;
 const double mt = " <> mtStr <> ";
 const double yt = " <> ytStr <> ";
 const double gs = " <> g3Str <> ";
-const double mh = " <> mhStr <> ";
+const double mh2 = " <> mhStr <> ";
 const double scale = get_scale();
 double self_energy = 0.;
 
 if (HIGGS_3LOOP_CORRECTION_AT_AT_AT) {
-   self_energy -= delta_mh_3loop_at_at_at_sm(scale, mt, yt, mh);
+   self_energy -= delta_mh_3loop_at_at_at_sm(scale, mt, yt, mh2);
 }
 
 if (HIGGS_3LOOP_CORRECTION_AT_AT_AS) {
@@ -968,14 +968,12 @@ GetNLoopSelfEnergyCorrections[particle_ /; particle === SARAH`HiggsBoson,
            ytStr   = CConversion`RValueToCFormString[yt];
            g3Str   = CConversion`RValueToCFormString[SARAH`strongCoupling];
            mHiggs  = TreeMasses`GetMass[particle];
-           mhStr   = CConversion`RValueToCFormString[mHiggs];
 "\
 using namespace flexiblesusy::sm_fourloophiggs;
 
 const double mt = " <> mtStr <> ";
 const double yt = " <> ytStr <> ";
 const double gs = " <> g3Str <> ";
-const double mh = " <> mhStr <> ";
 const double scale = get_scale();
 double self_energy = 0.;
 
