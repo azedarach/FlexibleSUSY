@@ -51,8 +51,8 @@ BOOST_AUTO_TEST_CASE( test_SM_tree_level_masses )
    BOOST_CHECK(m.get_mu2() != mu2);
 
    // check Higgs pole mass
-   const double Mhh_1l(m.get_physical().Mhh);
-   const double hh_1l = Sqrt(-m.get_mu2() + 1.5*lambda*Sqr(v) - Re(m.self_energy_hh_1loop(Mhh_1l)));
+   const double Mhh_1l(m.get_physical().get_Mhh());
+   const double hh_1l = Sqrt(-m.get_mu2() + 1.5*lambda*Sqr(v) - Re(m.self_energy_hh_1loop(Sqr(Mhh_1l))));
 
    BOOST_CHECK_CLOSE(Mhh_1l, hh_1l, 2.0e-4);
 
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( test_SM_heavy_top_self_energy )
       BOOST_FAIL(ostr.str());
    }
 
-   const double p = 100.;
+   const double p = 100., p2 = Sqr(p);
 
    const Eigen::Array<double,3,1> MFu(m.get_MFu());
    const double g3 = m.get_g3();
@@ -87,8 +87,8 @@ BOOST_AUTO_TEST_CASE( test_SM_heavy_top_self_energy )
    // top self-energies with and without gluon
    for (int i = 0; i < 3; i++) {
       for (int k = 0; k < 3; k++) {
-         se_t(i,k) = m.self_energy_Fu_1loop_1(p,i,k);
-         se_t_no_gluon(i,k) = m.self_energy_Fu_1loop_1_heavy_rotated(p,i,k);
+         se_t(i,k) = m.self_energy_Fu_1loop_1(p2,i,k);
+         se_t_no_gluon(i,k) = m.self_energy_Fu_1loop_1_heavy_rotated(p2,i,k);
       }
    }
 
