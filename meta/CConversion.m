@@ -266,23 +266,7 @@ CastTo[expr_String, toType_] :=
            ""
           ];
 
-CreateGetterReturnType[type_] :=
-    Print["Error: CreateGetterReturnType: unknown type: " <> ToString[type]];
-
-CreateGetterReturnType[CConversion`ScalarType[type_]] :=
-    CreateCType[CConversion`ScalarType[type]];
-
-CreateGetterReturnType[CConversion`ArrayType[type_, entries_]] :=
-    "const " <> CreateCType[CConversion`ArrayType[type, entries]] <> "&";
-
-CreateGetterReturnType[CConversion`VectorType[type_, entries_]] :=
-    "const " <> CreateCType[CConversion`VectorType[type, entries]] <> "&";
-
-CreateGetterReturnType[CConversion`MatrixType[type_, dim1_, dim2_]] :=
-    "const " <> CreateCType[CConversion`MatrixType[type, dim1, dim2]] <> "&";
-
-CreateGetterReturnType[CConversion`TensorType[type_, dims__]] :=
-    "const " <> CreateCType[CConversion`TensorType[type, dims]] <> "&";
+CreateGetterReturnType[type_] := CreateCType[type];
 
 CreateSetterInputType[type_] :=
     CreateGetterReturnType[type];
