@@ -85,10 +85,10 @@ mssm_twoloop_mt::Parameters pars;
 pars.g3 = " <> CConversion`RValueToCFormString[SARAH`strongCoupling /. Parameters`ApplyGUTNormalization[]] <> ";
 pars.mt = " <> CConversion`RValueToCFormString[TreeMasses`GetThirdGenerationMass[TreeMasses`GetSMTopQuarkMultiplet[]]] <> ";
 pars.mg = " <> CConversion`RValueToCFormString[FlexibleSUSY`M[SARAH`Gluino]] <> ";
-pars.mst1 = mst_1;
-pars.mst2 = mst_2;
+pars.mst1 = AbsSqrt(mst_1);
+pars.mst2 = AbsSqrt(mst_2);
 pars.msusy = " <> CConversion`RValueToCFormString[Sqrt[Sqrt[Abs[SARAH`SoftSquark[2,2]] Abs[SARAH`SoftDown[2,2]]]]] <> ";
-pars.xt = Sin(2*theta_t) * (Sqr(mst_1) - Sqr(mst_2)) / (2. * pars.mt);
+pars.xt = Sin(2*theta_t) * (Abs(mst_1) - Abs(mst_2)) / (2. * pars.mt);
 pars.Q = get_scale();";
 
 
@@ -159,18 +159,18 @@ if (get_thresholds() > 1 && threshold_corrections.mb > 1) {
    pars.mt = " <> CConversion`RValueToCFormString[TreeMasses`GetThirdGenerationMass[TreeMasses`GetSMTopQuarkMultiplet[]]] <> ";
    pars.mb = " <> CConversion`RValueToCFormString[TreeMasses`GetThirdGenerationMass[TreeMasses`GetSMBottomQuarkMultiplet[]]] <> ";
    pars.mg = " <> CConversion`RValueToCFormString[FlexibleSUSY`M[SARAH`Gluino]] <> ";
-   pars.mst1 = mst_1;
-   pars.mst2 = mst_2;
-   pars.msb1 = msb_1;
-   pars.msb2 = msb_2;
+   pars.mst1 = AbsSqrt(mst_1);
+   pars.mst2 = AbsSqrt(mst_2);
+   pars.msb1 = AbsSqrt(msb_1);
+   pars.msb2 = AbsSqrt(msb_2);
    pars.msusy = " <> CConversion`RValueToCFormString[
        Power[
            AbsSqrt[SARAH`SoftSquark[0,0]] AbsSqrt[SARAH`SoftUp[0,0]] AbsSqrt[SARAH`SoftDown[0,0]]
            AbsSqrt[SARAH`SoftSquark[1,1]] AbsSqrt[SARAH`SoftUp[1,1]] AbsSqrt[SARAH`SoftDown[1,1]]
            , 1/6]
    ] <> ";
-   pars.xt = Sin(2*theta_t) * (Sqr(mst_1) - Sqr(mst_2)) / (2. * pars.mt);
-   pars.xb = Sin(2*theta_b) * (Sqr(msb_1) - Sqr(msb_2)) / (2. * pars.mb);
+   pars.xt = Sin(2*theta_t) * (Abs(mst_1) - Abs(mst_2)) / (2. * pars.mt);
+   pars.xb = Sin(2*theta_b) * (Abs(msb_1) - Abs(msb_2)) / (2. * pars.mb);
    pars.Q = get_scale();
 
    const double alpha_s = Sqr(pars.g3) / (4.*Pi);

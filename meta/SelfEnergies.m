@@ -705,10 +705,10 @@ double msnu_1, msnu_2, theta_nu;
 " <> TreeMasses`CallGenerationHelperFunctionName[3, SARAH`Sneutrino, "msnu_1", "msnu_2", "theta_nu"] <>
 ";
 
-const double mst1sq = Sqr(mst_1), mst2sq = Sqr(mst_2);
-const double msb1sq = Sqr(msb_1), msb2sq = Sqr(msb_2);
-const double mstau1sq = Sqr(mstau_1), mstau2sq = Sqr(mstau_2);
-const double msnusq = Sqr(msnu_2);
+const double mst1sq = mst_1, mst2sq = mst_2;
+const double msb1sq = msb_1, msb2sq = msb_2;
+const double mstau1sq = mstau_1, mstau2sq = mstau_2;
+const double msnusq = msnu_2;
 const double sxt = Sin(theta_t), cxt = Cos(theta_t);
 const double sxb = Sin(theta_b), cxb = Cos(theta_b);
 const double sintau = Sin(theta_tau), costau = Cos(theta_tau);
@@ -794,10 +794,10 @@ double msnu_1, msnu_2, theta_nu;
 " <> TreeMasses`CallGenerationHelperFunctionName[3, SARAH`Sneutrino, "msnu_1", "msnu_2", "theta_nu"] <>
 ";
 
-const double mst1sq = Sqr(mst_1), mst2sq = Sqr(mst_2);
-const double msb1sq = Sqr(msb_1), msb2sq = Sqr(msb_2);
-const double mstau1sq = Sqr(mstau_1), mstau2sq = Sqr(mstau_2);
-const double msnusq = Sqr(msnu_2);
+const double mst1sq = mst_1, mst2sq = mst_2;
+const double msb1sq = msb_1, msb2sq = msb_2;
+const double mstau1sq = mstau_1, mstau2sq = mstau_2;
+const double msnusq = msnu_2;
 const double sxt = Sin(theta_t), cxt = Cos(theta_t);
 const double sxb = Sin(theta_b), cxb = Cos(theta_b);
 const double sintau = Sin(theta_tau), costau = Cos(theta_tau);
@@ -1052,10 +1052,10 @@ double msnu_1, msnu_2, theta_nu;
 " <> TreeMasses`CallGenerationHelperFunctionName[3, SARAH`Sneutrino, "msnu_1", "msnu_2", "theta_nu"] <>
 ";
 
-const double mst1sq = Sqr(mst_1), mst2sq = Sqr(mst_2);
-const double msb1sq = Sqr(msb_1), msb2sq = Sqr(msb_2);
-const double mstau1sq = Sqr(mstau_1), mstau2sq = Sqr(mstau_2);
-const double msnusq = Sqr(msnu_2);
+const double mst1sq = mst_1, mst2sq = mst_2;
+const double msb1sq = msb_1, msb2sq = msb_2;
+const double mstau1sq = mstau_1, mstau2sq = mstau_2;
+const double msnusq = msnu_2;
 const double sxt = Sin(theta_t), cxt = Cos(theta_t);
 const double sxb = Sin(theta_b), cxb = Cos(theta_b);
 const double sintau = Sin(theta_tau), costau = Cos(theta_tau);
@@ -1138,10 +1138,10 @@ double msnu_1, msnu_2, theta_nu;
 " <> TreeMasses`CallGenerationHelperFunctionName[3, SARAH`Sneutrino, "msnu_1", "msnu_2", "theta_nu"] <>
 ";
 
-const double mst1sq = Sqr(mst_1), mst2sq = Sqr(mst_2);
-const double msb1sq = Sqr(msb_1), msb2sq = Sqr(msb_2);
-const double mstau1sq = Sqr(mstau_1), mstau2sq = Sqr(mstau_2);
-const double msnusq = Sqr(msnu_2);
+const double mst1sq = mst_1, mst2sq = mst_2;
+const double msb1sq = msb_1, msb2sq = msb_2;
+const double mstau1sq = mstau_1, mstau2sq = mstau_2;
+const double msnusq = msnu_2;
 const double sxt = Sin(theta_t), cxt = Cos(theta_t);
 const double sxb = Sin(theta_b), cxb = Cos(theta_b);
 const double sintau = Sin(theta_tau), costau = Cos(theta_tau);
@@ -1228,10 +1228,10 @@ double msnu_1, msnu_2, theta_nu;
 " <> TreeMasses`CallGenerationHelperFunctionName[3, SARAH`Sneutrino, "msnu_1", "msnu_2", "theta_nu"] <>
 ";
 
-const double mst1sq = Sqr(mst_1), mst2sq = Sqr(mst_2);
-const double msb1sq = Sqr(msb_1), msb2sq = Sqr(msb_2);
-const double mstau1sq = Sqr(mstau_1), mstau2sq = Sqr(mstau_2);
-const double msnusq = Sqr(msnu_2);
+const double mst1sq = mst_1, mst2sq = mst_2;
+const double msb1sq = msb_1, msb2sq = msb_2;
+const double mstau1sq = mstau_1, mstau2sq = mstau_2;
+const double msnusq = msnu_2;
 const double sxt = Sin(theta_t), cxt = Cos(theta_t);
 const double sxb = Sin(theta_b), cxb = Cos(theta_b);
 const double sintau = Sin(theta_tau), costau = Cos(theta_tau);
@@ -1326,10 +1326,10 @@ double msnu_1, msnu_2, theta_nu;
 " <> TreeMasses`CallGenerationHelperFunctionName[3, SARAH`Sneutrino, "msnu_1", "msnu_2", "theta_nu"] <>
 ";
 
-const double mst1sq = Sqr(mst_1), mst2sq = Sqr(mst_2);
-const double msb1sq = Sqr(msb_1), msb2sq = Sqr(msb_2);
-const double mstau1sq = Sqr(mstau_1), mstau2sq = Sqr(mstau_2);
-const double msnusq = Sqr(msnu_2);
+const double mst1sq = mst_1, mst2sq = mst_2;
+const double msb1sq = msb_1, msb2sq = msb_2;
+const double mstau1sq = mstau_1, mstau2sq = mstau_2;
+const double msnusq = msnu_2;
 const double sxt = Sin(theta_t), cxt = Cos(theta_t);
 const double sxb = Sin(theta_b), cxb = Cos(theta_b);
 const double sintau = Sin(theta_tau), costau = Cos(theta_tau);
@@ -1434,8 +1434,8 @@ pars.MZ = AbsSqrt(" <> mZStr <> ");
 pars.Mt = " <> mtStr <> ";
 pars.Mb = " <> mbStr <> ";
 pars.MA = AbsSqrt(" <> mA0Str <> ");
-pars.MSt << mst_1, mst_2;
-pars.MSb << msb_1, msb_2;
+pars.MSt << AbsSqrt(mst_1), AbsSqrt(mst_2);
+pars.MSb << AbsSqrt(msb_1), AbsSqrt(msb_2);
 pars.s2t = Sin(2*theta_t);
 pars.s2b = Sin(2*theta_b);
 

@@ -63,6 +63,22 @@ struct Standard_model_physical {
    Eigen::Matrix<std::complex<double>,3,3> Ue;
    Eigen::Matrix<double,2,2> ZZ;
 
+   /// @todo adapt to squared masses
+   double get_MVG() const { return MVG; }
+   double get_MHp() const { return MHp; }
+   Eigen::Array<double,3,1> get_MFv() const { return MFv; }
+   double get_MFv(int i) const { return MFv(i); }
+   double get_MAh() const { return MAh; }
+   double get_Mhh() const { return Mhh; }
+   Eigen::Array<double,3,1> get_MFd() const { return MFd; }
+   double get_MFd(int i) const { return MFd(i); }
+   Eigen::Array<double,3,1> get_MFu() const { return MFu; }
+   double get_MFu(int i) const { return MFu(i); }
+   Eigen::Array<double,3,1> get_MFe() const { return MFe; }
+   double get_MFe(int i) const { return MFe(i); }
+   double get_MVWp() const { return MVWp; }
+   double get_MVP() const { return MVP; }
+   double get_MVZ() const { return MVZ; }
 };
 
 std::ostream& operator<<(std::ostream&, const Standard_model_physical&);

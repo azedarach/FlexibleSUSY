@@ -941,7 +941,7 @@ CreateParticleMassEnumName[particle_[idx_]] :=
     CreateParticleMassEnumName[particle] <> "_" <> ToString[idx];
 
 CreateParticleMassEnumName[particle_] :=
-    "M" <> CConversion`ToValidCSymbolString[particle];
+    CConversion`ToValidCSymbolString[GetMass[particle]];
 
 CreateParticleMassEnum[particles_List] :=
     Module[{result},
