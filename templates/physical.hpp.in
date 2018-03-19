@@ -42,7 +42,6 @@ struct @ModelName@_physical {
 @mixingMatricesDef@
 @massGetters@
 @mixingMatrixGetters@
-@phasesGetterSetters@
 };
 
 std::ostream& operator<<(std::ostream&, const @ModelName@_physical&);
