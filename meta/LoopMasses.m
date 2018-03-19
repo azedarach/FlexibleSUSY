@@ -1298,7 +1298,7 @@ GetLightestMassEigenstate[mass_] :=
 GetLightestMassEigenstateStr[mass_] /; TreeMasses`IsFermion[mass] :=
     "Abs(PHYSICAL(" <> CConversion`RValueToCFormString[GetLightestMassEigenstate[mass]] <> "))";
 
-GetLightestMassEigenstateStr[mass_] /; TreeMasses`IsFermion[mass] :=
+GetLightestMassEigenstateStr[mass_] :=
     "AbsSqrt(PHYSICAL(" <> CConversion`RValueToCFormString[GetLightestMassEigenstate[mass]] <> "))";
 
 CreateLSPFunctions[{}] := {"", ""};
