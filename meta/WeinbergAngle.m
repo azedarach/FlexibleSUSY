@@ -79,30 +79,30 @@ InitMuonDecay[eigenstates_:FlexibleSUSY`FSEigenstates] :=
           ];
 
 DefSMhyperCoupling[] :=
-    Module[{result},
+    Module[{result, coupStr = CConversion`ToValidCSymbolString[SARAH`hyperchargeCoupling]},
            result = "const double gY = ";
            If[!MuonDecayWorks,
               Return[result <> "1.;"]];
-           result = result <> ThresholdCorrections`GetParameter[SARAH`hyperchargeCoupling] <> " * ";
+           result = result <> "MODELPARAMETER(" <> coupStr <> ") * ";
            result = result <> FlexibleSUSY`FSModelName <> "_info::normalization_";
-           result = result <> CConversion`ToValidCSymbolString[SARAH`hyperchargeCoupling] <> ";";
+           result = result <> coupStr <> ";";
            result
           ];
 
 DefSMleftCoupling[] :=
-    Module[{result},
+    Module[{result, coupStr = CConversion`ToValidCSymbolString[SARAH`leftCoupling]},
            result = "const double g2 = ";
            If[!MuonDecayWorks,
               Return[result <> "1.;"]];
-           result = result <> ThresholdCorrections`GetParameter[SARAH`leftCoupling] <> " * ";
+           result = result <> "MODELPARAMETER(" <> coupStr <> ") * ";
            result = result <> FlexibleSUSY`FSModelName <> "_info::normalization_";
-           result = result <> CConversion`ToValidCSymbolString[SARAH`leftCoupling] <> ";";
+           result = result <> coupStr <> ";";
            result
           ];
 
-GetBottomMass[] := ThresholdCorrections`GetParameter[TreeMasses`GetMass[TreeMasses`GetDownQuark[3,True]]];
+GetBottomMass[] := "MODEL->get_" <> CConversion`RValueToCFormString[TreeMasses`GetMass[TreeMasses`GetDownQuark[3,True]]];
 
-GetTopMass[] := ThresholdCorrections`GetParameter[TreeMasses`GetMass[TreeMasses`GetUpQuark[3,True]]];
+GetTopMass[] := "MODEL->get_" <> CConversion`RValueToCFormString[TreeMasses`GetMass[TreeMasses`GetUpQuark[3,True]]];
 
 DefVZSelfEnergy[] :=
     Module[{result},

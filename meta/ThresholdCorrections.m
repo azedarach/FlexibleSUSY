@@ -26,7 +26,6 @@ CalculateGaugeCouplings::usage="";
 CalculateDeltaAlphaEm::usage="";
 CalculateDeltaAlphaS::usage="";
 CalculateThetaW::usage="";
-GetParameter::usage="";
 SetDRbarYukawaCouplingTop::usage="";
 SetDRbarYukawaCouplingBottom::usage="";
 SetDRbarYukawaCouplingElectron::usage="";
@@ -426,30 +425,6 @@ SetDRbarYukawaCouplingFermion[fermion_, yukawa_, mass_, settings_] :=
              ];
            ""
           ];
-
-MultiplyBy[factor_ /; factor == 1] := "";
-
-MultiplyBy[factor_] :=
-    " * " <> CConversion`RValueToCFormString[factor];
-
-GetParameter[par_[idx1_,idx2_], factor_:1] :=
-    "MODEL->get_" <> CConversion`RValueToCFormString[par] <>
-    "(" <> CConversion`RValueToCFormString[idx1] <> "," <>
-    CConversion`RValueToCFormString[idx2] <> ")" <>
-    MultiplyBy[factor];
-
-GetParameter[(h:(FlexibleSUSY`M | FlexibleSUSY`M2))[par_], factor_:1] :=
-    "MODEL->get_" <> CConversion`RValueToCFormString[h[par]] <> "()" <>
-    MultiplyBy[factor];
-
-GetParameter[par_[idx_], factor_:1] :=
-    "MODEL->get_" <> CConversion`RValueToCFormString[par] <>
-    "(" <> CConversion`RValueToCFormString[idx] <> ")" <>
-    MultiplyBy[factor];
-
-GetParameter[par_, factor_:1] :=
-    "MODEL->get_" <> CConversion`RValueToCFormString[par] <> "()" <>
-    MultiplyBy[factor];
 
 CalculateThetaWFromFermiConstant[] :=
     Module[{},
