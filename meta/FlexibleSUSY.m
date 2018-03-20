@@ -2086,7 +2086,9 @@ WriteMathLink[inputParameters_List, extraSLHAOutputBlocks_List, files_List] :=
            setInputParameters = FSMathLink`SetInputParametersFromArguments[inputPars];
            setInputParameterDefaultArguments = FSMathLink`SetInputParameterDefaultArguments[inputPars];
            setInputParameterArguments = FSMathLink`SetInputParameterArguments[inputPars];
-           outPars = Parameters`GetOutputParameters[] /. FlexibleSUSY`M2[p_List] :> Sequence @@ (FlexibleSUSY`M2 /@ p);
+           outPars = Parameters`GetOutputParameters[] /.
+                     FlexibleSUSY`M2[p_List] :> Sequence @@ (FlexibleSUSY`M2 /@ p) /.
+                     FlexibleSUSY`M2 -> FlexibleSUSY`M;
            outPars = Join[outPars, FlexibleSUSY`Pole /@ outPars, Parameters`GetModelParameters[],
                           Parameters`GetExtraParameters[], {FlexibleSUSY`SCALE}];
            listOfInputParameters = ToString[First /@ inputParameters];
