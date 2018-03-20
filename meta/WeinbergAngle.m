@@ -100,9 +100,11 @@ DefSMleftCoupling[] :=
            result
           ];
 
-GetBottomMass[] := "MODEL->get_" <> CConversion`RValueToCFormString[TreeMasses`GetMass[TreeMasses`GetDownQuark[3,True]]];
+GetBottomMass[] := "MODEL->get_" <> CConversion`RValueToCFormString[
+    TreeMasses`GetThirdGenerationMass[TreeMasses`GetSMBottomQuarkMultiplet[], True, True]];
 
-GetTopMass[] := "MODEL->get_" <> CConversion`RValueToCFormString[TreeMasses`GetMass[TreeMasses`GetUpQuark[3,True]]];
+GetTopMass[] := "MODEL->get_" <> CConversion`RValueToCFormString[
+    TreeMasses`GetThirdGenerationMass[TreeMasses`GetSMTopQuarkMultiplet[], True, True]];
 
 DefVZSelfEnergy[] :=
     Module[{result},
