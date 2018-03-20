@@ -2245,7 +2245,9 @@ WriteUtilitiesClass[massMatrices_List, betaFun_List, inputParameters_List, extra
            writeSLHAImMinparBlock = WriteOut`WriteSLHAImMinparBlock[imminpar];
            writeSLHAImExtparBlock = WriteOut`WriteSLHAImExtparBlock[imextpar];
            writeSLHAInputParameterBlocks = WriteSLHAInputParameterBlocks[extraSLHAInputParameters];
-           writeExtraSLHAOutputBlock = WriteOut`WriteExtraSLHAOutputBlock[extraSLHAOutputBlocks];
+           writeExtraSLHAOutputBlock = WriteOut`WriteExtraSLHAOutputBlock[extraSLHAOutputBlocks /. {
+               Pole[M[p_]] /; !TreeMasses`IsFermion[p] :> FlexibleSUSY`SignedAbsSqrt[Pole[M2[p]]]
+           }];
            numberOfDRbarBlocks  = WriteOut`GetNumberOfDRbarBlocks[lesHouchesParameters];
            drBarBlockNames      = WriteOut`GetDRbarBlockNames[lesHouchesParameters];
            gaugeCouplingNormalizationDecls = WriteOut`GetGaugeCouplingNormalizationsDecls[SARAH`Gauge];
