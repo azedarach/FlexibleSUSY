@@ -79,6 +79,21 @@ struct Standard_model_physical {
    double get_MVWp() const { return MVWp; }
    double get_MVP() const { return MVP; }
    double get_MVZ() const { return MVZ; }
+
+   const Eigen::Matrix<std::complex<double>,3,3>& get_Vd() const { return Vd; }
+   std::complex<double> get_Vd(int i, int k) const { return Vd(i,k); }
+   const Eigen::Matrix<std::complex<double>,3,3>& get_Ud() const { return Ud; }
+   std::complex<double> get_Ud(int i, int k) const { return Ud(i,k); }
+   const Eigen::Matrix<std::complex<double>,3,3>& get_Vu() const { return Vu; }
+   std::complex<double> get_Vu(int i, int k) const { return Vu(i,k); }
+   const Eigen::Matrix<std::complex<double>,3,3>& get_Uu() const { return Uu; }
+   std::complex<double> get_Uu(int i, int k) const { return Uu(i,k); }
+   const Eigen::Matrix<std::complex<double>,3,3>& get_Ve() const { return Ve; }
+   std::complex<double> get_Ve(int i, int k) const { return Ve(i,k); }
+   const Eigen::Matrix<std::complex<double>,3,3>& get_Ue() const { return Ue; }
+   std::complex<double> get_Ue(int i, int k) const { return Ue(i,k); }
+   const Eigen::Matrix<double,2,2>& get_ZZ() const { return ZZ; }
+   double get_ZZ(int i, int k) const { return ZZ(i,k); }
 };
 
 std::ostream& operator<<(std::ostream&, const Standard_model_physical&);

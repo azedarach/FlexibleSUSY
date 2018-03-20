@@ -221,8 +221,10 @@ public:
    double get_MFv(int i) const { return MFv(i); }
    double get_MAh() const { return MAh; }
    double get_Mhh() const { return Mhh; }
+   double get_M2hh() const { return Mhh*Mhh; }
    double get_MVP() const { return MVP; }
    double get_MVZ() const { return MVZ; }
+   double get_M2VZ() const { return MVZ*MVZ; }
    const Eigen::Array<double,3,1>& get_MFd() const { return MFd; }
    double get_MFd(int i) const { return MFd(i); }
    const Eigen::Array<double,3,1>& get_MFu() const { return MFu; }
@@ -230,6 +232,7 @@ public:
    const Eigen::Array<double,3,1>& get_MFe() const { return MFe; }
    double get_MFe(int i) const { return MFe(i); }
    double get_MVWp() const { return MVWp; }
+   double get_M2VWp() const { return MVWp*MVWp; }
    const Eigen::Array<double,2,1>& get_MVPVZ() const { return MVPVZ; }
    double get_MVPVZ(int i) const { return MVPVZ(i); }
 

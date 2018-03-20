@@ -110,7 +110,7 @@ double calculate_Mh2_pole(const Standard_model& sm_0l)
    const double p2 = sm_0l.get_M2hh();
    const double self_energy = Re(sm_0l.self_energy_hh_1loop(p2));
    const double tadpole = Re(sm_0l.tadpole_hh_1loop() / sm_0l.get_v());
-   const double mh2_tree = Sqr(sm_0l.get_Mhh());
+   const double mh2_tree = sm_0l.get_M2hh();
    const double Mh2_pole = mh2_tree - self_energy + tadpole;
 
    return Mh2_pole;
@@ -507,7 +507,7 @@ Eigen::Matrix<double,3,3> calculate_MFe_DRbar_1loop(
 
 double calculate_MW_pole_1loop(const Standard_model& sm_0l)
 {
-   const double mw2 = Sqr(sm_0l.get_MVWp());
+   const double mw2 = sm_0l.get_M2VWp();
    const double p2 = mw2;
    const double self_energy = Re(sm_0l.self_energy_VWp_1loop(p2));
    const double M_loop = mw2 - self_energy;
@@ -527,7 +527,7 @@ double calculate_MW_pole_1loop(const @ModelName@_mass_eigenstates& model_0l)
 
 double calculate_MZ_pole_1loop(const Standard_model& sm_0l)
 {
-   const double mz2 = Sqr(sm_0l.get_MVZ());
+   const double mz2 = sm_0l.get_M2VZ();
    const double p2 = mz2;
    const double self_energy = Re(sm_0l.self_energy_VZ_1loop(p2));
    const double M_loop = mz2 - self_energy;
