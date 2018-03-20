@@ -266,7 +266,10 @@ CastTo[expr_String, toType_] :=
            ""
           ];
 
-CreateGetterReturnType[type_] := CreateCType[type];
+CreateGetterReturnType[type_CConversion`ScalarType] := CreateCType[type];
+CreateGetterReturnType[type_] := "const " <> CreateCType[type] <> "&";
+
+CreateGetterReturnTypeCopy[type_] := CreateCType[type];
 
 CreateSetterInputType[type_] :=
     CreateGetterReturnType[type];
@@ -352,8 +355,11 @@ CreateInlineGetter[parameter_String, expr_String, type_String, postFix_String:""
     type <> " get_" <> parameter <> postFix <>
     "() const { return " <> If[wrapper != "", wrapper <> "(", ""] <> expr <> If[wrapper != "", ")", ""] <> "; }\n";
 
+CreateInlineGetter[parameter_String, expr_String, type_, postFix_String:"", wrapper_String:""] :=
+    CreateInlineGetter[parameter, expr, CreateGetterReturnType[type], postFix, wrapper];
+
 CreateInlineGetter[parameter_String, expr_, type_, postFix_String:"", wrapper_String:""] :=
-    CreateInlineGetter[ToValidCSymbolString[parameter], RValueToCFormString[expr], CreateGetterReturnType[type], postFix, wrapper];
+    CreateInlineGetter[parameter, RValueToCFormString[expr], CreateGetterReturnTypeCopy[type], postFix, wrapper];
 
 CreateInlineGetters[parameter_String, expr_, type_, postFix_String:"", wrapper_String:""] :=
     If[MatchQ[type, ScalarType[_]],
