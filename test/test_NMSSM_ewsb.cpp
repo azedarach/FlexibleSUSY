@@ -97,6 +97,10 @@ BOOST_AUTO_TEST_CASE( test_NMSSM_one_loop_tadpoles )
    const double tadpole_ss_2 = s.doCalcTadpole2oneLoop(mt, sinthDRbar);
    const double tadpole_ss_3 = s.doCalcTadpoleSoneLoop(mt, sinthDRbar);
 
+   BOOST_CHECK_CLOSE(vd, s.displayHvev()*Cos(ArcTan(s.displayTanb())), 1.0e-11);
+   BOOST_CHECK_CLOSE(vu, s.displayHvev()*Sin(ArcTan(s.displayTanb())), 1.0e-11);
+   BOOST_CHECK_CLOSE(vS, s.displaySvev(), 1.0e-11);
+
    BOOST_CHECK_SMALL(Im(tadpole_hh_1), 1.0e-12);
    BOOST_CHECK_SMALL(Im(tadpole_hh_2), 1.0e-12);
    BOOST_CHECK_SMALL(Im(tadpole_hh_3), 1.0e-12);
