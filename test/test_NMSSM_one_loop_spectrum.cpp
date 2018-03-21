@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( test_NMSSM_pole_masses )
    input.m0 = 250.;
    input.m12 = 200.;
    input.TanBeta = 10.;
-   input.Azero = -500.;
+   input.Azero = -400.;
    input.LambdaInput = 0.1;
    input.SignvS = 1;
    NMSSM<Two_scale> m;
