@@ -102,7 +102,7 @@ void Standard_model_low_scale_constraint<Two_scale>::apply()
    model->set_g3(3.5449077018110318*Sqrt(alpha_s_drbar));
 
    if (model->get_thresholds() && model->get_threshold_corrections().sin_theta_w > 0)
-      qedqcd.setPoleMW(model->recalculate_mw_pole(qedqcd.displayPoleMW()));
+      qedqcd.setPoleMW(model->recalculate_mw_pole(Sqr(qedqcd.displayPoleMW())));
 }
 
 double Standard_model_low_scale_constraint<Two_scale>::get_scale() const
