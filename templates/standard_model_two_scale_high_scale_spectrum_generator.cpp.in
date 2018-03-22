@@ -242,8 +242,8 @@ void @ModelName@_spectrum_generator<Two_scale>::calculate_spectrum(double Mt, do
 
    const int index = settings.get(Spectrum_generator_settings::eft_higgs_index);
 
-   model.get_physical().M2@HiggsBoson_index@ = SignedAbsSqr(eft.get_physical().Mhh);
-   model.get_physical().M2@VectorZ_0@ = SignedAbsSqr(eft.get_physical().MVZ);
+   model.get_physical().M2@HiggsBoson_index@ = eft.get_physical().M2hh;
+   model.get_physical().M2@VectorZ_0@ = eft.get_physical().M2VZ;
    model.get_physical().M2@VectorW_0@ = SignedAbsSqr(MW);
 @fillSMFermionPoleMasses@
    if (eft.get_problems().is_running_tachyon(standard_model_info::hh))
