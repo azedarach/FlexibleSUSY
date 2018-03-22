@@ -155,13 +155,13 @@ BOOST_AUTO_TEST_CASE( test_SM_one_loop_masses )
 
    const double eps = 1e-11;
 
-   // CHECK_CLOSE_1(M2VP, eps);
-   // CHECK_CLOSE_1(M2VG, eps);
-   // CHECK_CLOSE_1(M2VZ, eps);
-   // CHECK_CLOSE_1(M2VWp, eps);
-   // CHECK_CLOSE_1(M2Ah, eps);
-   // CHECK_CLOSE_1(M2Hp, eps);
-   // CHECK_CLOSE_1(M2hh, eps);
+   CHECK_CLOSE_1(M2VP, eps);
+   CHECK_CLOSE_1(M2VG, eps);
+   CHECK_CLOSE_1(M2VZ, eps);
+   CHECK_CLOSE_1(M2VWp, eps);
+   CHECK_CLOSE_1(M2Ah, eps);
+   CHECK_CLOSE_1(M2Hp, eps);
+   CHECK_CLOSE_1(M2hh, eps);
    CHECK_CLOSE_N(MFv, eps, 3);
    CHECK_CLOSE_N(MFu, eps, 3);
    CHECK_CLOSE_N(MFd, eps, 3);
@@ -173,20 +173,20 @@ BOOST_AUTO_TEST_CASE( test_SM_one_loop_masses )
    const double MZ = AbsSqrt(MZ2);
 
    // specific pole mass functions for gauge bosons
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_pole(MW2)), sm.calculate_MVWp_pole(MW2), eps);
+   BOOST_CHECK_CLOSE(m.calculate_M2VWp_pole(MW2), sm.calculate_M2VWp_pole(MW2), eps);
    BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_pole(MW2)), MW, 0.02);
 
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_pole(MZ2)) , sm.calculate_MVZ_pole(MZ2) , eps);
+   BOOST_CHECK_CLOSE(m.calculate_M2VZ_pole(MZ2) , sm.calculate_M2VZ_pole(MZ2) , eps);
    BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_pole(MZ2)) , MZ, 0.02);
 
    // specific DR-bar mass functions
-   BOOST_CHECK_CLOSE(m.calculate_M2VP_DRbar(0), sm.calculate_MVP_DRbar(0), eps);
+   BOOST_CHECK_CLOSE(m.calculate_M2VP_DRbar(0), sm.calculate_M2VP_DRbar(0), eps);
    BOOST_CHECK_CLOSE(m.calculate_M2VP_DRbar(0), 0., eps);
 
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_DRbar(MZ2)), sm.calculate_MVZ_DRbar(MZ), eps);
+   BOOST_CHECK_CLOSE(m.calculate_M2VZ_DRbar(MZ2), sm.calculate_M2VZ_DRbar(MZ2), eps);
    BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_DRbar(MZ2)), m.get_MVZ(), 0.01);
 
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_DRbar(MW2)), sm.calculate_MVWp_DRbar(MW), eps);
+   BOOST_CHECK_CLOSE(m.calculate_M2VWp_DRbar(MW2), sm.calculate_M2VWp_DRbar(MW2), eps);
    BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_DRbar(MW2)), m.get_MVWp(), 0.02);
 
    for (int i = 0; i < 3; i++) {

@@ -22,6 +22,7 @@
 #define STANDARD_MODEL_PHYSICAL_H
 
 #include "linalg2.hpp"
+#include "wrappers.hpp"
 #include <Eigen/Core>
 
 #include <iosfwd>
@@ -32,7 +33,6 @@ namespace flexiblesusy {
 namespace standard_model {
 
 struct Standard_model_physical {
-   Standard_model_physical();
    void clear();
    void convert_to_hk();   ///< converts pole masses to HK convention
    void convert_to_slha(); ///< converts pole masses to SLHA convention
@@ -42,43 +42,48 @@ struct Standard_model_physical {
    void set_masses(const Eigen::ArrayXd&); ///< set all masses
    void print(std::ostream&) const;
 
-   double MVG;
-   double MHp;
-   Eigen::Array<double,3,1> MFv;
-   double MAh;
-   double Mhh;
-   double MVP;
-   double MVZ;
-   Eigen::Array<double,3,1> MFd;
-   Eigen::Array<double,3,1> MFu;
-   Eigen::Array<double,3,1> MFe;
-   double MVWp;
-   Eigen::Array<double,2,1> MVPVZ;
+   double M2VG{};
+   double M2Hp{};
+   Eigen::Array<double,3,1> MFv{Eigen::Array<double,3,1>::Zero()};
+   double M2Ah{};
+   double M2hh{};
+   Eigen::Array<double,3,1> MFd{Eigen::Array<double,3,1>::Zero()};
+   Eigen::Array<double,3,1> MFu{Eigen::Array<double,3,1>::Zero()};
+   Eigen::Array<double,3,1> MFe{Eigen::Array<double,3,1>::Zero()};
+   double M2VWp{};
+   double M2VP{};
+   double M2VZ{};
 
-   Eigen::Matrix<std::complex<double>,3,3> Vd;
-   Eigen::Matrix<std::complex<double>,3,3> Ud;
-   Eigen::Matrix<std::complex<double>,3,3> Vu;
-   Eigen::Matrix<std::complex<double>,3,3> Uu;
-   Eigen::Matrix<std::complex<double>,3,3> Ve;
-   Eigen::Matrix<std::complex<double>,3,3> Ue;
-   Eigen::Matrix<double,2,2> ZZ;
+   Eigen::Matrix<std::complex<double>,3,3> Vd{Eigen::Matrix<std::complex<double>,3,3>::Zero()};
+   Eigen::Matrix<std::complex<double>,3,3> Ud{Eigen::Matrix<std::complex<double>,3,3>::Zero()};
+   Eigen::Matrix<std::complex<double>,3,3> Vu{Eigen::Matrix<std::complex<double>,3,3>::Zero()};
+   Eigen::Matrix<std::complex<double>,3,3> Uu{Eigen::Matrix<std::complex<double>,3,3>::Zero()};
+   Eigen::Matrix<std::complex<double>,3,3> Ve{Eigen::Matrix<std::complex<double>,3,3>::Zero()};
+   Eigen::Matrix<std::complex<double>,3,3> Ue{Eigen::Matrix<std::complex<double>,3,3>::Zero()};
+   Eigen::Matrix<double,2,2> ZZ{Eigen::Matrix<double,2,2>::Zero()};
 
-   /// @todo adapt to squared masses
-   double get_MVG() const { return MVG; }
-   double get_MHp() const { return MHp; }
-   Eigen::Array<double,3,1> get_MFv() const { return MFv; }
+   double get_M2VG() const { return M2VG; }
+   double get_MVG() const { return AbsSqrt(M2VG); }
+   double get_M2Hp() const { return M2Hp; }
+   double get_MHp() const { return AbsSqrt(M2Hp); }
+   const Eigen::Array<double,3,1>& get_MFv() const { return MFv; }
    double get_MFv(int i) const { return MFv(i); }
-   double get_MAh() const { return MAh; }
-   double get_Mhh() const { return Mhh; }
-   Eigen::Array<double,3,1> get_MFd() const { return MFd; }
+   double get_M2Ah() const { return M2Ah; }
+   double get_MAh() const { return AbsSqrt(M2Ah); }
+   double get_M2hh() const { return M2hh; }
+   double get_Mhh() const { return AbsSqrt(M2hh); }
+   const Eigen::Array<double,3,1>& get_MFd() const { return MFd; }
    double get_MFd(int i) const { return MFd(i); }
-   Eigen::Array<double,3,1> get_MFu() const { return MFu; }
+   const Eigen::Array<double,3,1>& get_MFu() const { return MFu; }
    double get_MFu(int i) const { return MFu(i); }
-   Eigen::Array<double,3,1> get_MFe() const { return MFe; }
+   const Eigen::Array<double,3,1>& get_MFe() const { return MFe; }
    double get_MFe(int i) const { return MFe(i); }
-   double get_MVWp() const { return MVWp; }
-   double get_MVP() const { return MVP; }
-   double get_MVZ() const { return MVZ; }
+   double get_M2VWp() const { return M2VWp; }
+   double get_MVWp() const { return AbsSqrt(M2VWp); }
+   double get_M2VP() const { return M2VP; }
+   double get_MVP() const { return AbsSqrt(M2VP); }
+   double get_M2VZ() const { return M2VZ; }
+   double get_MVZ() const { return AbsSqrt(M2VZ); }
 
    const Eigen::Matrix<std::complex<double>,3,3>& get_Vd() const { return Vd; }
    std::complex<double> get_Vd(int i, int k) const { return Vd(i,k); }
