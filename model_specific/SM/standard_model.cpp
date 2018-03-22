@@ -3398,8 +3398,6 @@ std::complex<double> Standard_model::self_energy_Fd_1loop_1(double p2 , int gO1,
 {
    std::complex<double> result;
 
-   INFO("SM: p2 = " << p2);
-
    result += SUM(gI1,0,2,B0(p2,Sqr(MFd(gI1)),M2Ah)*Conj(CpbarUFdFdAhPL(gO2,gI1)
       )*CpbarUFdFdAhPR(gO1,gI1)*MFd(gI1));
    result += SUM(gI2,0,2,B0(p2,Sqr(MFd(gI2)),M2hh)*Conj(CpbarUFdFdhhPL(gO2,gI2)
@@ -4331,7 +4329,6 @@ void Standard_model::calculate_MFd_pole()
    const Eigen::Matrix<double,3,3> M_tree(get_mass_matrix_Fd());
    for (int es = 0; es < 3; ++es) {
       const double p2 = AbsSqr(MFd(es));
-      INFO("SM [" << es << "]: p2 = " << p2);
       const Eigen::Matrix<double,3,3> self_energy_1  = Re(
          self_energy_Fd_1loop_1(p2));
       const Eigen::Matrix<double,3,3> self_energy_PL = Re(
