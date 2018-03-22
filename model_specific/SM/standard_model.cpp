@@ -3660,13 +3660,11 @@ std::complex<double> Standard_model::self_energy_Fd_1loop_1(double p2, int gO1, 
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fd_1loop_1(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fd_1loop_1(p, i, k);
+         self_energy(i, k) = self_energy_Fd_1loop_1(p2, i, k);
 
    return self_energy;
 }
@@ -3698,13 +3696,11 @@ std::complex<double> Standard_model::self_energy_Fd_1loop_PR(double p2, int gO1,
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fd_1loop_PR(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fd_1loop_PR(p, i, k);
+         self_energy(i, k) = self_energy_Fd_1loop_PR(p2, i, k);
 
    return self_energy;
 }
@@ -3736,13 +3732,11 @@ std::complex<double> Standard_model::self_energy_Fd_1loop_PL(double p2, int gO1,
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fd_1loop_PL(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fd_1loop_PL(p, i, k);
+         self_energy(i, k) = self_energy_Fd_1loop_PL(p2, i, k);
 
    return self_energy;
 }
@@ -3774,13 +3768,11 @@ std::complex<double> Standard_model::self_energy_Fu_1loop_1(double p2, int gO1, 
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fu_1loop_1(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fu_1loop_1(p, i, k);
+         self_energy(i, k) = self_energy_Fu_1loop_1(p2, i, k);
 
    return self_energy;
 }
@@ -3812,13 +3804,11 @@ std::complex<double> Standard_model::self_energy_Fu_1loop_PR(double p2, int gO1,
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fu_1loop_PR(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fu_1loop_PR(p, i, k);
+         self_energy(i, k) = self_energy_Fu_1loop_PR(p2, i, k);
 
    return self_energy;
 }
@@ -3850,13 +3840,11 @@ std::complex<double> Standard_model::self_energy_Fu_1loop_PL(double p2, int gO1,
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fu_1loop_PL(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fu_1loop_PL(p, i, k);
+         self_energy(i, k) = self_energy_Fu_1loop_PL(p2, i, k);
 
    return self_energy;
 }
@@ -3886,13 +3874,11 @@ std::complex<double> Standard_model::self_energy_Fe_1loop_1(double p2, int gO1, 
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fe_1loop_1(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fe_1loop_1(p, i, k);
+         self_energy(i, k) = self_energy_Fe_1loop_1(p2, i, k);
 
    return self_energy;
 }
@@ -3922,13 +3908,11 @@ std::complex<double> Standard_model::self_energy_Fe_1loop_PR(double p2, int gO1,
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fe_1loop_PR(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fe_1loop_PR(p, i, k);
+         self_energy(i, k) = self_energy_Fe_1loop_PR(p2, i, k);
 
    return self_energy;
 }
@@ -3958,13 +3942,11 @@ std::complex<double> Standard_model::self_energy_Fe_1loop_PL(double p2, int gO1,
 
 Eigen::Matrix<std::complex<double>,3,3> Standard_model::self_energy_Fe_1loop_PL(double p2) const
 {
-   const double p = AbsSqrt(p2);
-
    Eigen::Matrix<std::complex<double>,3,3> self_energy;
 
    for (int i = 0; i < 3; i++)
       for (int k = 0; k < 3; k++)
-         self_energy(i, k) = self_energy_Fe_1loop_PL(p, i, k);
+         self_energy(i, k) = self_energy_Fe_1loop_PL(p2, i, k);
 
    return self_energy;
 }
