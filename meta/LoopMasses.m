@@ -1268,13 +1268,13 @@ CreateRunningDRbarMassFunction[particle_, _] :=
               result = "double CLASSNAME::calculate_" <> name <> "_DRbar(double)\n{\n";
               body = "return 0.0;\n";
               ,
-              result = "double CLASSNAME::calculate_" <> name <> "_DRbar(double m_pole)\n{\n";
-              body = "const double p2 = AbsSqr(m_pole);\n" <>
+              result = "double CLASSNAME::calculate_" <> name <> "_DRbar(double m_pole_sqr)\n{\n";
+              body = "const double p2 = m_pole_sqr;\n" <>
               "const double self_energy = Re(" <> selfEnergyFunction <> "(p2));\n" <>
-              "const double mass_sqr = Sqr(m_pole) + self_energy;\n\n" <>
+              "const double mass_sqr = m_pole_sqr + self_energy;\n\n" <>
               "if (mass_sqr < 0.) {\n" <>
               IndentText[TreeMasses`FlagPoleTachyon[particleName] <>
-                         "return Sqr(m_pole);"] <> "\n}\n\n" <>
+                         "return m_pole_sqr;"] <> "\n}\n\n" <>
               "return mass_sqr;\n";
              ];
            Return[result <> IndentText[body] <> "}\n\n"];

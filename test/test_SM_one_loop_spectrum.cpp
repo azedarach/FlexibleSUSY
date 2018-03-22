@@ -183,11 +183,11 @@ BOOST_AUTO_TEST_CASE( test_SM_one_loop_masses )
    BOOST_CHECK_CLOSE(m.calculate_M2VP_DRbar(0), sm.calculate_MVP_DRbar(0), eps);
    BOOST_CHECK_CLOSE(m.calculate_M2VP_DRbar(0), 0., eps);
 
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_DRbar(MZ)), sm.calculate_MVZ_DRbar(MZ), eps);
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_DRbar(MZ)), m.get_MVZ(), 0.01);
+   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_DRbar(MZ2)), sm.calculate_MVZ_DRbar(MZ), eps);
+   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VZ_DRbar(MZ2)), m.get_MVZ(), 0.01);
 
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_DRbar(MW)), sm.calculate_MVWp_DRbar(MW), eps);
-   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_DRbar(MW)), m.get_MVWp(), 0.02);
+   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_DRbar(MW2)), sm.calculate_MVWp_DRbar(MW), eps);
+   BOOST_CHECK_CLOSE(AbsSqrt(m.calculate_M2VWp_DRbar(MW2)), m.get_MVWp(), 0.02);
 
    for (int i = 0; i < 3; i++) {
       const double eps = 1e-5, eps2 = 0.0002;

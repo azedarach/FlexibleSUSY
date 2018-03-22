@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE( test_low_energy_constraint )
    const double fs_mt = m.calculate_MFu_DRbar(qedqcd.displayPoleMt(), 2);
    const double fs_mb = m.calculate_MFd_DRbar(qedqcd.displayMass(mBottom), 2);
    const double fs_me = m.calculate_MFe_DRbar(qedqcd.displayMass(mTau), 2);
-   const double fs_MZ = AbsSqrt(m.calculate_M2VZ_DRbar(Electroweak_constants::MZ));
+   const double fs_MZ = AbsSqrt(m.calculate_M2VZ_DRbar(Sqr(Electroweak_constants::MZ)));
    const double fs_old_vd = m.get_vd();
    const double fs_old_vu = m.get_vu();
    // const double fs_old_vev = Sqrt(Sqr(fs_old_vu) + Sqr(fs_old_vd));

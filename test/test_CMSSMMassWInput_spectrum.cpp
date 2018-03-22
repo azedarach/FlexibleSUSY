@@ -246,8 +246,8 @@ void CMSSMMassWInput_weinberg_angle_low_scale_constraint::calculate_DRbar_gauge_
    mW_run = qedqcd.displayPoleMW();
 
    if (model->get_thresholds()) {
-      mZ_run = AbsSqrt(model->calculate_M2VZ_DRbar(qedqcd.displayPoleMZ()));
-      mW_run = AbsSqrt(model->calculate_M2VWm_DRbar(qedqcd.displayPoleMW()));
+      mZ_run = AbsSqrt(model->calculate_M2VZ_DRbar(Sqr(qedqcd.displayPoleMZ())));
+      mW_run = AbsSqrt(model->calculate_M2VWm_DRbar(Sqr(qedqcd.displayPoleMW())));
    }
 
    const double AlphaS = alpha_s_drbar;
