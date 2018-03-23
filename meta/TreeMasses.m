@@ -151,6 +151,8 @@ FindHyperchargeGaugeCoupling::usage="returns symbol of hypercharge gauge couplin
 CreateDependencePrototypes::usage="";
 CreateDependenceFunctions::usage="";
 
+ColorChargedQ::usage="";
+FieldInfo::usage="";
 IsScalar::usage="";
 IsFermion::usage="";
 IsVector::usage="";
@@ -273,6 +275,15 @@ GetSMParticles[states_:FlexibleSUSY`FSEigenstates] :=
 ParticleQ[p_, states_:FlexibleSUSY`FSEigenstates] :=
     MemberQ[GetParticles[states], p];
 
+FieldInfo[field_,OptionsPattern[{includeLorentzIndices -> False}]] :=
+    Module[{fieldInfo = Cases[SARAH`Particles[FlexibleSUSY`FSEigenstates],
+                                {SARAH`getParticleName @ field, ___}][[1]]},
+            fieldInfo = DeleteCases[fieldInfo, {SARAH`generation, 1}, {2}];
+            If[!OptionValue[includeLorentzIndices],
+               DeleteCases[fieldInfo, {SARAH`lorentz, _}, {2}],
+               fieldInfo]
+          ]
+
 IsOfType[sym_Symbol, type_Symbol, states_:FlexibleSUSY`FSEigenstates] :=
     SARAH`getType[sym, False, states] === type;
 
@@ -383,8 +394,11 @@ ContainsMassless[sym_Symbol, states_:FlexibleSUSY`FSEigenstates] :=
 ContainsMassless[sym_List, states_:FlexibleSUSY`FSEigenstates] :=
     Or @@ (IsMassless[#,states]& /@ sym);
 
+ColorChargedQ[field_] :=
+    !FreeQ[FieldInfo[field], SARAH`color];
+
 GetColoredParticles[] :=
-    Select[GetParticles[], (SA`Dynkin[#, Position[SARAH`Gauge, SARAH`color][[1,1]]] =!= 0)&];
+    Select[GetParticles[], ColorChargedQ];
 
 IsQuark[Susyno`LieGroups`conj[sym_]] := IsQuark[sym];
 IsQuark[SARAH`bar[sym_]] := IsQuark[sym];
