@@ -27,6 +27,14 @@ namespace flexiblesusy {
 
 namespace standard_model {
 
+double Standard_model_physical::get_MVG() const { return AbsSqrt(M2VG); }
+double Standard_model_physical::get_MHp() const { return AbsSqrt(M2Hp); }
+double Standard_model_physical::get_MAh() const { return AbsSqrt(M2Ah); }
+double Standard_model_physical::get_Mhh() const { return AbsSqrt(M2hh); }
+double Standard_model_physical::get_MVWp() const { return AbsSqrt(M2VWp); }
+double Standard_model_physical::get_MVP() const { return AbsSqrt(M2VP); }
+double Standard_model_physical::get_MVZ() const { return AbsSqrt(M2VZ); }
+
 void Standard_model_physical::clear()
 {
    M2VG = 0.;

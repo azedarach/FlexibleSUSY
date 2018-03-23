@@ -279,6 +279,14 @@ Problems& Standard_model::get_problems()
    return problems;
 }
 
+double Standard_model::get_MVG() const { return AbsSqrt(M2VG); }
+double Standard_model::get_MHp() const { return AbsSqrt(M2Hp); }
+double Standard_model::get_MAh() const { return AbsSqrt(M2Ah); }
+double Standard_model::get_Mhh() const { return AbsSqrt(M2hh); }
+double Standard_model::get_MVWp() const { return AbsSqrt(M2VWp); }
+double Standard_model::get_MVP() const { return AbsSqrt(M2VP); }
+double Standard_model::get_MVZ() const { return AbsSqrt(M2VZ); }
+
 /**
  * Method which calculates the tadpoles at the current loop order.
  *

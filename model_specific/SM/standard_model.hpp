@@ -221,15 +221,15 @@ public:
    double get_v() const { return v; }
 
    double get_M2VG() const { return M2VG; }
-   double get_MVG() const { return AbsSqrt(M2VG); }
+   double get_MVG() const;
    double get_M2Hp() const { return M2Hp; }
-   double get_MHp() const { return AbsSqrt(M2Hp); }
+   double get_MHp() const;
    const Eigen::Array<double,3,1>& get_MFv() const { return MFv; }
    double get_MFv(int i) const { return MFv(i); }
    double get_M2Ah() const { return M2Ah; }
-   double get_MAh() const { return AbsSqrt(M2Ah); }
+   double get_MAh() const;
    double get_M2hh() const { return M2hh; }
-   double get_Mhh() const { return AbsSqrt(M2hh); }
+   double get_Mhh() const;
    const Eigen::Array<double,3,1>& get_MFd() const { return MFd; }
    double get_MFd(int i) const { return MFd(i); }
    const Eigen::Array<double,3,1>& get_MFu() const { return MFu; }
@@ -237,11 +237,11 @@ public:
    const Eigen::Array<double,3,1>& get_MFe() const { return MFe; }
    double get_MFe(int i) const { return MFe(i); }
    double get_M2VWp() const { return M2VWp; }
-   double get_MVWp() const { return AbsSqrt(M2VWp); }
+   double get_MVWp() const;
    double get_M2VP() const { return M2VP; }
-   double get_MVP() const { return AbsSqrt(M2VP); }
+   double get_MVP() const;
    double get_M2VZ() const { return M2VZ; }
-   double get_MVZ() const { return AbsSqrt(M2VZ); }
+   double get_MVZ() const;
 
    const Eigen::Matrix<std::complex<double>,3,3>& get_Vd() const { return Vd; }
    const std::complex<double>& get_Vd(int i, int k) const { return Vd(i,k); }
