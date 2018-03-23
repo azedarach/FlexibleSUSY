@@ -1376,6 +1376,8 @@ CreateRulesForProtectedHead[expr_, protectedHeads_List] :=
 FindMacro[par_] :=
     Which[IsModelParameter[par] , Global`MODELPARAMETER,
           IsOutputParameter[par], Global`MODELPARAMETER,
+          IsOutputParameter[par /. FlexibleSUSY`M -> FlexibleSUSY`M2]
+                                , Global`MODELPARAMETER,
           IsPhase[par]          , Global`MODELPARAMETER,
           IsInputParameter[par] , Global`INPUTPARAMETER,
           IsExtraParameter[par] , Global`EXTRAPARAMETER,
