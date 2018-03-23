@@ -990,7 +990,7 @@ void Standard_model::calculate_Yu_DRbar(const softsusy::QedQcd& qedqcd)
    if (get_thresholds() && threshold_corrections.mt > 0)
       upQuarksDRbar(2,2) = calculate_MFu_DRbar(qedqcd.displayPoleMt(), 2);
 
-   Yu = -((1.4142135623730951*upQuarksDRbar)/v).transpose();
+   Yu = ((1.4142135623730951*upQuarksDRbar)/v).transpose();
 }
 
 void Standard_model::calculate_Yd_DRbar(const softsusy::QedQcd& qedqcd)
