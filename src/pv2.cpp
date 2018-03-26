@@ -185,6 +185,8 @@ double b1(double p2, double m12, double m22, double q2) noexcept
 
 double b22(double p2,  double m12, double m22, double q2) noexcept
 {
+   using std::abs;
+
    // protect against infrared divergence
    if (is_close(p2, 0., EPSTOL) && is_close(m12, 0., EPSTOL)
        && is_close(m22, 0., EPSTOL))
