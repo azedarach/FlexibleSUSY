@@ -253,6 +253,7 @@ double h0(double p2, double m12, double m22, double q2) noexcept
 double c0(double m12, double m22, double m32) noexcept
 {
    using std::log;
+   using std::abs;
 
    double ans = 0.;
 
@@ -267,44 +268,44 @@ double c0(double m12, double m22, double m32) noexcept
       ans = 0.;
    } else if (is_close(m12,0.,EPSTOL) && is_close(m22,0.,EPSTOL)) {
       // c0 is undefined for m1 == m2 == 0
-      ans= 0.;
+      ans = 0.;
    } else if (is_close(m12,0.,EPSTOL)) {
       if (is_close(m22,m32,EPSTOL)) {
          ans = -1./m22;
       } else {
-         ans = log(m32/m22)/(m22 - m32);
+         ans = log(abs(m32/m22))/(m22 - m32);
       }
    } else if (is_close(m22,0.,EPSTOL)) {
       if (is_close(m12,m32,EPSTOL)) {
          ans = -1./m12;
       } else {
-         ans = log(m32/m12)/(m12 - m32);
+         ans = log(abs(m32/m12))/(m12 - m32);
       }
    } else if (is_close(m32,0.,EPSTOL)) {
       if (is_close(m12,m22,EPSTOL)) {
          ans = -1./m12;
       } else {
-         ans = log(m22/m12)/(m12 - m22);
+         ans = log(abs(m22/m12))/(m12 - m22);
       }
    } else if (is_close(m22, m32, EPSTOL)) {
       if (is_close(m12, m22, EPSTOL)) {
          ans = ( - 0.5 / m22 );
       } else {
-         ans = ( m12 / sqr(m12-m22) * log(m22/m12)
+         ans = ( m12 / sqr(m12-m22) * log(abs(m22/m12))
                  + 1.0 / (m12 - m22) );
       }
    } else if (is_close(m12, m22, EPSTOL)) {
-      ans = ( - ( 1.0 + m32 / (m22-m32) * log(m32/m22) )
+      ans = ( - ( 1.0 + m32 / (m22-m32) * log(abs(m32/m22)) )
               / (m22-m32) );
    } else if (is_close(m12, m32, EPSTOL)) {
-      ans = ( - (1.0 + m22 / (m32-m22) * log(m22/m32))
+      ans = ( - (1.0 + m22 / (m32-m22) * log(abs(m22/m32)))
               / (m32-m22) );
    } else {
       ans = (1.0 / (m22 - m32) *
              (m22 / (m12 - m22) *
-              log(m22 / m12) -
+              log(abs(m22 / m12)) -
               m32 / (m12 - m32) *
-              log(m32 / m12)) );
+              log(abs(m32 / m12))) );
    }
 
    return ans;
