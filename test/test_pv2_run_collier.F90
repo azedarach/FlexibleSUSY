@@ -4,18 +4,25 @@ program run_loops
   Implicit none
 
   double precision :: p2, m12, m22, mu2
-  double complex :: A01,A02,B0,B1,B00
+  double complex :: A01,A02,B0,B1,B00,C0
   double complex, allocatable :: Bcoeff(:,:),Bcoeffuv(:,:)
-  double precision, allocatable :: Berr(:)
-  integer :: rank, st
+  double complex, allocatable :: Ccoeff(:,:,:),Ccoeffuv(:,:,:)
+  double precision, allocatable :: Berr(:), Cerr(:)
+  integer :: Brank, Crank, st
   character(len=255) :: read_line, file_name
   logical :: file_exists=.False.
 
   ! for B coefficients
-  rank = 3
-  allocate(Bcoeff(0:rank/2,0:rank))
-  allocate(Bcoeffuv(0:rank/2,0:rank))
-  allocate(Berr(0:rank))
+  Brank = 2
+  allocate(Bcoeff(0:Brank/2,0:Brank))
+  allocate(Bcoeffuv(0:Brank/2,0:Brank))
+  allocate(Berr(0:Brank))
+
+  ! for C coefficients
+  Crank = 3
+  allocate(Ccoeff(0:Crank/2,0:Crank,0:Crank))
+  allocate(Ccoeffuv(0:Crank/2,0:Crank,0:Crank))
+  allocate(Cerr(0:Crank))
 
   ! open input file
   call get_command_argument(1, file_name)
@@ -51,13 +58,20 @@ program run_loops
 
      call A0_cll(A01,dcmplx(m12))
      call A0_cll(A02,dcmplx(m22))
-     call B_cll(Bcoeff,Bcoeffuv,dcmplx(p2),dcmplx(m12),dcmplx(m22),rank,Berr)  
+     call B_cll(Bcoeff,Bcoeffuv,dcmplx(p2),dcmplx(m12),dcmplx(m22),Brank,Berr)
+     call C_cll(Ccoeff,Ccoeffuv,dcmplx(0.0),dcmplx(0.0),dcmplx(0.0), &
+                dcmplx(p2),dcmplx(m12),dcmplx(m22),Crank,Cerr)
 
      B0 = Bcoeff(0,0)
      B1 = Bcoeff(0,1)
      B00 = Bcoeff(1,0)
+     C0 = Ccoeff(0,0,0)
 
-     write(*,*) real(A01), real(A02), real(B0), real(B1), real(B00)
+     if (p2.eq.m12.and.p2.eq.0.0) C0 = 0
+     if (p2.eq.m22.and.p2.eq.0.0) C0 = 0
+     if (m12.eq.m22.and.m12.eq.0.0) C0 = 0
+
+     write(*,*) real(A01), real(A02), real(B0), real(B1), real(B00), real(C0)
   end do
 
   close(100)

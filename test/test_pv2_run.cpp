@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
          << flexiblesusy::a0(m12, mu2) << ' '
          << flexiblesusy::b0(p2, m02, m12, mu2) << ' '
          << -flexiblesusy::b1(p2, m02, m12, mu2) << ' '
-         << flexiblesusy::b22(p2, m02, m12, mu2) << '\n';
+         << flexiblesusy::b22(p2, m02, m12, mu2) << ' '
+         << flexiblesusy::c0(p2, m02, m12) << '\n';
    }
 
    return 0;
