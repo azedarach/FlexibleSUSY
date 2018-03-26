@@ -79,7 +79,7 @@ double a0(double m2, double q2) noexcept
    if (std::abs(m2) < 1e-8)
       return 0.;
 
-   return m2 * (1.0 - std::log(std::abs(m2 / q2)));
+   return m2 * (1.0 - log_abs(m2 / q2));
 }
 
 /**
@@ -89,7 +89,6 @@ double a0(double m2, double q2) noexcept
 double b0(double p2, double m12, double m22, double q2) noexcept
 {
    using std::abs;
-   using std::log;
 
    // protect against infrared divergence
    if (is_close(p2, 0., EPSTOL) && is_close(m12, 0., EPSTOL)
@@ -107,17 +106,17 @@ double b0(double p2, double m12, double m22, double q2) noexcept
       const std::complex<double> xPlus = 0.5 * (s + rt) / p2;
       const std::complex<double> xMinus = 0.5 * (s - rt) / p2;
 
-      ans = -log(abs(p2 / q2)) - fB(xPlus) - fB(xMinus);
+      ans = -log_abs(p2 / q2) - fB(xPlus) - fB(xMinus);
    } else {
       if (is_close(m12, m22, EPSTOL)) {
-         ans = -log(abs(m12 / q2));
+         ans = -log_abs(m12 / q2);
       } else {
          const double mMin2 = std::min(abs(m12), abs(m22));
 
          if (mMin2 < 1.e-30) {
-            ans = 1. - log(abs(mMax2 / q2));
+            ans = 1. - log_abs(mMax2 / q2);
          } else {
-            ans = (m12*(1. - log(abs(m12/q2))) - m22*(1. - log(abs(m22/q2))))
+            ans = (m12*(1. - log_abs(m12/q2)) - m22*(1. - log_abs(m22/q2)))
                / (m12 - m22);
          }
       }
@@ -133,7 +132,6 @@ double b0(double p2, double m12, double m22, double q2) noexcept
 double b1(double p2, double m12, double m22, double q2) noexcept
 {
    using std::abs;
-   using std::log;
 
    // protect against infrared divergence
    if (is_close(p2, 0., EPSTOL) && is_close(m12, 0., EPSTOL)
@@ -164,22 +162,22 @@ double b1(double p2, double m12, double m22, double q2) noexcept
             + (m12 - m22)*(-0.16666666666666666/m22 -
                            0.03333333333333333*p2/m24 -
                            0.007142857142857142*p4/m26)
-            - 0.5*log(abs(m22/q2));
+            - 0.5*log_abs(m22/q2);
       } else {
-         const double l12 = log(abs(m12/m22));
+         const double l12 = log_abs(m12/m22);
 
          ans = (3*m14 - 4*m12*m22 + m24 - 2*m14*l12)/(4.*sqr(m12 - m22))
             + (p2*(4*pow3(m12 - m22)*
                    (2*m14 + 5*m12*m22 - m24) +
                    (3*m18 + 44*m16*m22 - 36*m14*m24 - 12*m12*m26 + m28)*p2
                    - 12*m14*m22*(2*sqr(m12 - m22) + (2*m12 + 3*m22)*p2)*l12))/
-            (24.*pow6(m12 - m22)) - 0.5*log(abs(m22/q2));
+            (24.*pow6(m12 - m22)) - 0.5*log_abs(m22/q2);
       }
    } else {
       if (abs(m12) > abs(m22))
-         ans = -0.5*log(abs(m12/q2)) + 0.75;
+         ans = -0.5*log_abs(m12/q2) + 0.75;
       else
-         ans = -0.5*log(abs(m22/q2)) + 0.25;
+         ans = -0.5*log_abs(m22/q2) + 0.25;
    }
 
    return ans;
@@ -187,9 +185,6 @@ double b1(double p2, double m12, double m22, double q2) noexcept
 
 double b22(double p2,  double m12, double m22, double q2) noexcept
 {
-   using std::abs;
-   using std::log;
-
    // protect against infrared divergence
    if (is_close(p2, 0., EPSTOL) && is_close(m12, 0., EPSTOL)
        && is_close(m22, 0., EPSTOL))
@@ -201,17 +196,17 @@ double b22(double p2,  double m12, double m22, double q2) noexcept
 
    if (abs(p2) < pTolerance * mMax2) {
       if (is_close(m12, m22, EPSTOL)) {
-         ans = -m12 * log(abs(m12 / q2)) * 0.5 + m12 * 0.5;
+         ans = -m12 * log_abs(m12 / q2) * 0.5 + m12 * 0.5;
       } else {
          if (abs(m12) > EPSTOL && abs(m22) > EPSTOL) {
             ans = 0.375 * (m12 + m22) - 0.25 *
-               (sqr(m22) * log(abs(m22 / q2)) - sqr(m12) *
-                log(abs(m12 / q2))) / (m22 - m12);
+               (sqr(m22) * log_abs(m22 / q2) - sqr(m12) *
+                log_abs(m12 / q2)) / (m22 - m12);
          } else {
             if (abs(m12) < EPSTOL) {
-               ans = 0.375 * m22 - 0.25 * m22 * log(abs(m22 / q2));
+               ans = 0.375 * m22 - 0.25 * m22 * log_abs(m22 / q2);
             } else {
-               ans = 0.375 * m12 - 0.25 * m12 * log(abs(m12 / q2));
+               ans = 0.375 * m12 - 0.25 * m12 * log_abs(m12 / q2);
             }
          }
       }
