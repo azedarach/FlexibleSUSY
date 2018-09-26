@@ -48,7 +48,7 @@ struct LoopFunc {
     virtual U eval(const vector<T>&, double scl2) = 0;
 };
 
-#define def_func(f, nargs, ...)				    \
+#define DEF_FUNC(f, nargs, ...)				    \
 template<class T, class U>				    \
 struct f : LoopFunc<T, U> {				    \
     f() : LoopFunc<T, U>(nargs) {}			    \
@@ -56,32 +56,32 @@ struct f : LoopFunc<T, U> {				    \
     { return passarino_veltman::f(__VA_ARGS__, scl2); }	    \
 };
 
-#define def_func3(f) def_func(f, 3, a[0], a[1], a[2])
+#define DEF_FUNC3(f) DEF_FUNC(f, 3, a[0], a[1], a[2])
 
 #if defined(ENABLE_FFLITE) || defined(ENABLE_LOOPTOOLS)
 
-def_func (  A0, 1, a[0])
-def_func3(  B0 )
-def_func3(  B1 )
-def_func3(  B00)
-def_func3(  B22)
-def_func3(  H0 )
-def_func3(  F0 )
-def_func3(  G0 )
+DEF_FUNC (  A0, 1, a[0])
+DEF_FUNC3(  B0 )
+DEF_FUNC3(  B1 )
+DEF_FUNC3(  B00)
+DEF_FUNC3(  B22)
+DEF_FUNC3(  H0 )
+DEF_FUNC3(  F0 )
+DEF_FUNC3(  G0 )
 
 map<string, LoopFunc<complex<double>, complex<double> >*> ccfuncs;
 map<string, LoopFunc<	     double , complex<double> >*> rcfuncs;
 
 #endif
 
-def_func (ReA0, 1, a[0])
-def_func3(ReB0 )
-def_func3(ReB1 )
-def_func3(ReB00)
-def_func3(ReB22)
-def_func3(ReH0 )
-def_func3(ReF0 )
-def_func3(ReG0 )
+DEF_FUNC (ReA0, 1, a[0])
+DEF_FUNC3(ReB0 )
+DEF_FUNC3(ReB1 )
+DEF_FUNC3(ReB00)
+DEF_FUNC3(ReB22)
+DEF_FUNC3(ReH0 )
+DEF_FUNC3(ReF0 )
+DEF_FUNC3(ReG0 )
 
 map<string, LoopFunc<	     double ,         double  >*> rrfuncs;
 
