@@ -16,7 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 // ====================================================================
 
-#include "one_loop_functions.hpp"
+#include "loop_functions/one_loop_one_point_functions.hpp"
 #include "numerics.h"
 #include "pv.hpp"
 #include "wrappers.hpp"
@@ -24,7 +24,7 @@
 #include "stopwatch.hpp"
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE test_one_loop_functions
+#define BOOST_TEST_MODULE test_one_point_functions
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -34,6 +34,8 @@
 #else
 #include <cstdlib>
 #endif
+
+using namespace flexiblesusy;
 
 double get_random_real(double lower_bound, double upper_bound)
 {
@@ -50,7 +52,7 @@ double get_random_real(double lower_bound, double upper_bound)
 BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_value )
 {
    const double tol = 1.e-14;
-   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(2, 1), Re(loop_functions::A0(2, 1)));
+   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(std::sqrt(2), std::sqrt(1)), Re(loop_functions::A0(2, 1)), tol);
 }
 
 BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_time )
