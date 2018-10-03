@@ -35,7 +35,7 @@ TEST_SRC := \
 		$(DIR)/test_goldstones.cpp \
 		$(DIR)/test_gsl_vector.cpp \
 		$(DIR)/test_linalg2.cpp \
-		$(DIR)/test_loop_functions_type_conversions.hpp \
+		$(DIR)/test_loop_functions_type_conversions.cpp \
 		$(DIR)/test_minimizer.cpp \
 		$(DIR)/test_namespace_collisions.cpp \
 		$(DIR)/test_mssm_twoloop_mb.cpp \
