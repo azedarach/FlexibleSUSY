@@ -47,9 +47,10 @@ struct Promote_args_helper<Promotion_policy, First, Second, Rest...> {
 
 } // namespace detail
 
+// @todo handle references, cv-qualifiers etc.
 template <typename T1, typename T2>
 struct Default_promotion_rule {
-   using type = std::common_type<T1, T2>;
+   using type = typename std::common_type<T1, T2>::type;
 };
 
 template <>
@@ -59,12 +60,12 @@ struct Default_promotion_rule<int, int> {
 
 template <typename T>
 struct Default_promotion_rule<int, T> {
-   using type = Default_promotion_rule<double, T>;
+   using type = typename Default_promotion_rule<double, T>::type;
 };
 
 template <typename T>
 struct Default_promotion_rule<T, int> {
-   using type = Default_promotion_rule<T, double>;
+   using type = typename Default_promotion_rule<T, double>::type;
 };
 
 template <typename... Types>
