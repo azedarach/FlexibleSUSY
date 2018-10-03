@@ -54,11 +54,12 @@ A0_impl(T m_sq, T scale_sq, T divergence)
 
 } // namespace detail
 
+// @todo make zero limit threshold configurable
 template <typename T1, typename T2, typename T3>
-typename Complex_promotion<T1, T2, T3>::type
+typename Promote_and_complexify<T1, T2, T3>::type
 A0(T1 m_sq, T2 scale_sq, T3 divergence)
 {
-   using result_type = typename Complex_promotion<T1, T2, T3>::type;
+   using result_type = typename Promote_and_complexify<T1, T2, T3>::type;
    using argument_type = typename Promote_args<T1, T2, T3>::type;
    using std::abs;
 
@@ -70,7 +71,7 @@ A0(T1 m_sq, T2 scale_sq, T3 divergence)
 }
 
 template <typename T1, typename T2>
-typename Complex_promotion<T1,T2>::type
+typename Promote_and_complexify<T1,T2>::type
 A0(T1 m_sq, T2 scale_sq)
 {
    return A0(m_sq, scale_sq, T1(0));

@@ -116,7 +116,7 @@ struct Promote_args {
 
 // helper function
 template <typename... Types>
-struct Complex_promotion {
+struct Promote_and_complexify {
    using type =
       typename Complexification<typename Promote_args<Types...>::type>::type;
 };
