@@ -18,6 +18,7 @@
 
 #include "loop_functions/one_loop_one_point_functions.hpp"
 #include "numerics.h"
+#include "numerics2.hpp"
 #include "pv.hpp"
 #include "wrappers.hpp"
 
@@ -29,6 +30,8 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
+#include <array>
+#include <vector>
 #include <type_traits>
 
 #ifdef ENABLE_RANDOM
@@ -308,10 +311,58 @@ BOOST_AUTO_TEST_CASE( test_A0_return_type_complex_args )
                std::complex<long double> >::value));
 }
 
+BOOST_AUTO_TEST_CASE( test_A0_zero_complex_mass_limit_real_scale )
+{
+   const std::size_t n_points = 100;
+   const double smallest_mass_sq = 1.e-14;
+   const double largest_mass_sq = 1.;
+
+   const std::array<double, 8> angles{{-0.75 * Pi, -0.5 * Pi, -0.25 * Pi, 0.,
+            0.25 * Pi, 0.5 * Pi, 0.75 * Pi, Pi }};
+   std::vector<double> mass_sq(n_points);
+   for (std::size_t i = 0; i < n_points - 1; ++i) {
+      mass_sq[i] =
+         std::exp(std::log(largest_mass_sq)
+                  + i * (std::log(smallest_mass_sq) - std::log(largest_mass_sq))
+                  / (n_points - 2.));
+   }
+   mass_sq[n_points - 1] = 0.;
+
+   const double scale_sq = 1.;
+
+   const auto approx_bound = [](const std::complex<double>& m2a,
+                                const std::complex<double>& m2b,
+                                const std::complex<double>& q2) {
+      const auto delta = std::abs(m2a - m2b);
+      const auto la = (std::abs(m2a) == 0. ? 0. : m2a * fast_log(m2a));
+      const auto lb = (std::abs(m2b) == 0. ? 0. : m2b * fast_log(m2b));
+
+      return 2. * (delta + std::abs(lb - la + m2a * fast_log(q2)
+                                    - m2b * fast_log(q2)));
+   };
+
+   for (const auto theta : angles) {
+      for (std::size_t i = 1; i < n_points; ++i) {
+         const auto m_sq_im1 = std::polar(mass_sq[i - 1], theta);
+         const auto m_sq_i = std::polar(mass_sq[i], theta);
+         const auto val_im1 = loop_functions::A0(m_sq_im1, scale_sq);
+         const auto val_i = loop_functions::A0(m_sq_i, scale_sq);
+
+         BOOST_CHECK_LE(std::abs(val_i - val_im1),
+                        approx_bound(m_sq_im1, m_sq_i, scale_sq));
+
+         if (i == n_points - 1) {
+            BOOST_CHECK_EQUAL(val_i, std::complex<double>(0., 0.));
+         }
+      }
+   }
+}
+
 BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_value )
 {
    const double tol = 1.e-14;
-   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(std::sqrt(2), std::sqrt(1)), Re(loop_functions::A0(2, 1)), tol);
+   BOOST_CHECK_CLOSE_FRACTION(softsusy::a0(std::sqrt(2), std::sqrt(1)),
+                              Re(loop_functions::A0(2, 1)), tol);
 }
 
 BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_time )

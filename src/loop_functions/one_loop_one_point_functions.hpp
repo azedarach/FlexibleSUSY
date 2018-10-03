@@ -33,23 +33,32 @@ namespace loop_functions {
 
 namespace detail {
 
-// template <typename MassSq, typename ScaleSq>
-// std::enable_if<is_complex<MassSq>, MassSq>
-// A0_impl(MassSq m_sq, ScaleSq scale_sq)
-// {
-//    using std::abs;
-//    using std::arg;
-//    using std::log;
-
-//    return m_sq * (divergence + MassSq(1) - log(m_sq / scale_sq));
-// }
-
 template <typename T>
-typename Complexification<T>::type
+typename std::enable_if<Is_complex<T>::value, typename Complexification<T>::type>::type
 A0_impl(T m_sq, T scale_sq, T divergence)
 {
    using result_type = typename Complexification<T>::type;
+   using std::abs;
+
+   if (is_zero(abs(m_sq))) {
+      return result_type(0);
+   }
+
+   return m_sq * (divergence + result_type(1) - fast_log(m_sq / scale_sq));
+}
+
+template <typename T>
+typename std::enable_if<!Is_complex<T>::value, typename Complexification<T>::type>::type
+A0_impl(T m_sq, T scale_sq, T divergence)
+{
+   using result_type = typename Complexification<T>::type;
+   using std::abs;
    using std::log;
+
+   if (is_zero(abs(m_sq))) {
+      return result_type(0);
+   }
+
    return m_sq * (divergence + result_type(1) - log(m_sq / scale_sq));
 }
 
