@@ -16,6 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 // ====================================================================
 
+#include "config.h"
 #include "loop_functions/one_loop_one_point_functions.hpp"
 #include "numerics.h"
 #include "numerics2.hpp"
@@ -470,3 +471,14 @@ BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_time )
 
    BOOST_CHECK_GT(ss_time, fs_time);
 }
+
+#ifdef ENABLE_LOOPTOOLS
+
+BOOST_AUTO_TEST_CASE( test_looptools_A0_pos_real_args_value)
+{
+   const double tol = 1.e-14;
+   BOOST_CHECK_LT(std::abs(loop_functions::A0(2, 1) -
+                           passarino_veltman::A0(2, 1)), tol);
+}
+
+#endif
