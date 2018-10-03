@@ -38,11 +38,6 @@ typename std::enable_if<Is_complex<T>::value, typename Complexification<T>::type
 A0_impl(T m_sq, T scale_sq, T divergence)
 {
    using result_type = typename Complexification<T>::type;
-   using std::abs;
-
-   if (is_zero(abs(m_sq))) {
-      return result_type(0);
-   }
 
    return m_sq * (divergence + result_type(1) - fast_log(m_sq / scale_sq));
 }
@@ -52,12 +47,7 @@ typename std::enable_if<!Is_complex<T>::value, typename Complexification<T>::typ
 A0_impl(T m_sq, T scale_sq, T divergence)
 {
    using result_type = typename Complexification<T>::type;
-   using std::abs;
    using std::log;
-
-   if (is_zero(abs(m_sq))) {
-      return result_type(0);
-   }
 
    return m_sq * (divergence + result_type(1) - log(m_sq / scale_sq));
 }
@@ -68,7 +58,14 @@ template <typename T1, typename T2, typename T3>
 typename Complex_promotion<T1, T2, T3>::type
 A0(T1 m_sq, T2 scale_sq, T3 divergence)
 {
+   using result_type = typename Complex_promotion<T1, T2, T3>::type;
    using argument_type = typename Promote_args<T1, T2, T3>::type;
+   using std::abs;
+
+   if (is_zero(abs(m_sq))) {
+      return result_type(0);
+   }
+
    return detail::A0_impl<argument_type>(m_sq, scale_sq, divergence);
 }
 
@@ -76,8 +73,7 @@ template <typename T1, typename T2>
 typename Complex_promotion<T1,T2>::type
 A0(T1 m_sq, T2 scale_sq)
 {
-   using argument_type = typename Promote_args<T1, T2>::type;
-   return detail::A0_impl<argument_type>(m_sq, scale_sq, T1(0));
+   return A0(m_sq, scale_sq, T1(0));
 }
 
 } // namespace loop_functions
