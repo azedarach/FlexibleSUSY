@@ -31,6 +31,17 @@
 using namespace flexiblesusy;
 using namespace loop_functions;
 
+BOOST_AUTO_TEST_CASE( test_complexification )
+{
+   BOOST_TEST((std::is_same<Complexification<int>::type, std::complex<int> >::value));
+   BOOST_TEST((std::is_same<Complexification<float>::type, std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Complexification<double>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Complexification<long double>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Complexification<std::complex<float> >::type, std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Complexification<std::complex<double> >::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Complexification<std::complex<long double> >::type, std::complex<long double> >::value));
+}
+
 BOOST_AUTO_TEST_CASE( test_int_as_double_promotion )
 {
    BOOST_TEST((std::is_same<Promote_args<int>::type, double>::value));
@@ -134,13 +145,119 @@ BOOST_AUTO_TEST_CASE( test_long_double_promotion )
    BOOST_TEST((std::is_same<Promote_args<long double, double, int>::type, long double>::value));
 }
 
-BOOST_AUTO_TEST_CASE( test_complexification )
+BOOST_AUTO_TEST_CASE( test_complex_float_promotion )
 {
-   BOOST_TEST((std::is_same<Complexification<int>::type, std::complex<int> >::value));
-   BOOST_TEST((std::is_same<Complexification<float>::type, std::complex<float> >::value));
-   BOOST_TEST((std::is_same<Complexification<double>::type, std::complex<double> >::value));
-   BOOST_TEST((std::is_same<Complexification<long double>::type, std::complex<long double> >::value));
-   BOOST_TEST((std::is_same<Complexification<std::complex<float> >::type, std::complex<float> >::value));
-   BOOST_TEST((std::is_same<Complexification<std::complex<double> >::type, std::complex<double> >::value));
-   BOOST_TEST((std::is_same<Complexification<std::complex<long double> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float> >::type, std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, std::complex<float> >::type,
+               std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, std::complex<float>, std::complex<float> >::type,
+               std::complex<float> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, float>::type, std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<float> >::type, std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, float, float>::type, std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<float>, float>::type, std::complex<float> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, float, std::complex<float> >::type, std::complex<float> >::value));
+}
+
+BOOST_AUTO_TEST_CASE( test_int_as_double_complex_promotion )
+{
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, int>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<int, std::complex<float> >::type, std::complex<double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<int, std::complex<float>, float>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<float>, int>::type, std::complex<double> >::value));
+}
+
+BOOST_AUTO_TEST_CASE( test_complex_double_promotion )
+{
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double> >::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, std::complex<double> >::type,
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, std::complex<double>, std::complex<double> >::type,
+               std::complex<double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, std::complex<float> >::type,
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, std::complex<double> >::type,
+               std::complex<double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, int>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<int, std::complex<double> >::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, float>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<double> >::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, double>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<double, std::complex<double> >::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, double>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<double, std::complex<float> >::type, std::complex<double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<double, std::complex<float>, std::complex<float> >::type,
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, double, std::complex<float> >::type,
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, std::complex<float>, double>::type,
+               std::complex<double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, float, int>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, int, float>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<double>, int>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, int, std::complex<double> >::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<int, std::complex<double>, float>::type, std::complex<double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<int, float, std::complex<double> >::type, std::complex<double> >::value));
+}
+
+BOOST_AUTO_TEST_CASE( test_complex_long_double_promotion )
+{
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, std::complex<long double> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, std::complex<long double>,
+               std::complex<long double> >::type, std::complex<long double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, std::complex<float> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, std::complex<long double> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, std::complex<double> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, std::complex<long double> >::type,
+               std::complex<long double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, int>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<int, std::complex<long double> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, float>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<long double> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, double>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<double, std::complex<long double> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, long double>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<long double, std::complex<float> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, long double>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<long double, std::complex<double> >::type, std::complex<long double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<long double, std::complex<float>, std::complex<float> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, long double, std::complex<float> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<float>, std::complex<float>, long double>::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<long double, std::complex<double>, std::complex<double> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, long double, std::complex<double> >::type,
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<double>, std::complex<double>, long double>::type,
+               std::complex<long double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, float, int>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, int, float>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<long double>, int>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, int, std::complex<long double> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<int, std::complex<long double>, float>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<int, float, std::complex<long double> >::type, std::complex<long double> >::value));
+
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, float, double>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<std::complex<long double>, double, float>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, std::complex<long double>, double>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<float, double, std::complex<long double> >::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<double, std::complex<long double>, float>::type, std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<Promote_args<double, float, std::complex<long double> >::type, std::complex<long double> >::value));
 }

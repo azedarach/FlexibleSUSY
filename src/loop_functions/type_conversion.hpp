@@ -28,55 +28,6 @@ namespace loop_functions {
 
 namespace detail {
 
-template <template <typename, typename> class Promotion_policy, typename... Args>
-struct Promote_args_helper;
-
-template <template <typename, typename> class Promotion_policy, typename T>
-struct Promote_args_helper<Promotion_policy, T> {
-   using type = typename Promotion_policy<T, T>::type;
-};
-
-template <template <typename, typename> class Promotion_policy,
-          typename First, typename Second, typename... Rest>
-struct Promote_args_helper<Promotion_policy, First, Second, Rest...> {
-   using type =
-      typename Promotion_policy<
-      First,
-      typename Promote_args_helper<Promotion_policy, Second, Rest...>::type>::type;
-};
-
-} // namespace detail
-
-// @todo handle references, cv-qualifiers etc.
-// @todo handle real -> complex promotion
-template <typename T1, typename T2>
-struct Default_promotion_rule {
-   using type = typename std::common_type<T1, T2>::type;
-};
-
-template <>
-struct Default_promotion_rule<int, int> {
-   using type = double;
-};
-
-template <typename T>
-struct Default_promotion_rule<int, T> {
-   using type = typename Default_promotion_rule<double, T>::type;
-};
-
-template <typename T>
-struct Default_promotion_rule<T, int> {
-   using type = typename Default_promotion_rule<T, double>::type;
-};
-
-template <typename... Types>
-struct Promote_args {
-   using type =
-      typename detail::Promote_args_helper<Default_promotion_rule, Types...>::type;
-};
-
-namespace detail {
-
 template <typename T, class Enable = void>
 struct Is_complex_helper;
 
@@ -103,6 +54,64 @@ struct Complexification {
    using type =
       typename std::conditional<Is_complex<T>::value,
                                 T, std::complex<T> >::type;
+};
+
+namespace detail {
+
+template <template <typename, typename> class Promotion_policy, typename... Args>
+struct Promote_args_helper;
+
+template <template <typename, typename> class Promotion_policy, typename T>
+struct Promote_args_helper<Promotion_policy, T> {
+   using type = typename Promotion_policy<T, T>::type;
+};
+
+template <template <typename, typename> class Promotion_policy,
+          typename First, typename Second, typename... Rest>
+struct Promote_args_helper<Promotion_policy, First, Second, Rest...> {
+   using type =
+      typename Promotion_policy<
+      First,
+      typename Promote_args_helper<Promotion_policy, Second, Rest...>::type>::type;
+};
+
+} // namespace detail
+
+// @todo handle references, cv-qualifiers etc.
+// @todo handle real -> complex promotion
+template <typename T1, typename T2>
+struct Default_promotion_rule {
+   using type = typename std::conditional<
+      Is_complex<T1>::value && !Is_complex<T2>::value,
+      typename std::common_type<T1, typename Complexification<T2>::type>::type,
+      typename std::conditional<
+         !Is_complex<T1>::value && Is_complex<T2>::value,
+         typename std::common_type<typename Complexification<T1>::type, T2>::type,
+         typename std::common_type<T1, T2>::type>::type>::type;
+};
+
+template <>
+struct Default_promotion_rule<int, int> {
+   using type = double;
+};
+
+template <typename T>
+struct Default_promotion_rule<int, T> {
+   using type =
+      typename std::conditional<Is_complex<T>::value,
+                                typename Default_promotion_rule<Complexification<double>::type, T>::type,
+                                typename Default_promotion_rule<double, T>::type>::type;
+};
+
+template <typename T>
+struct Default_promotion_rule<T, int> {
+   using type = typename Default_promotion_rule<int, T>::type;
+};
+
+template <typename... Types>
+struct Promote_args {
+   using type =
+      typename detail::Promote_args_helper<Default_promotion_rule, Types...>::type;
 };
 
 // helper function
