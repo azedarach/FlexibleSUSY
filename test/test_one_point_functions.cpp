@@ -311,6 +311,67 @@ BOOST_AUTO_TEST_CASE( test_A0_return_type_complex_args )
                std::complex<long double> >::value));
 }
 
+BOOST_AUTO_TEST_CASE( test_A0_return_type_mixed_args )
+{
+   int i;
+   float f;
+   double d;
+   long double ld;
+
+   std::complex<float> cf;
+   std::complex<double> cd;
+   std::complex<long double> cld;
+
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(i, cf)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(i, cd)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(i, cld)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(f, cf)),
+               std::complex<float> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(f, cd)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(f, cld)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(d, cf)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(d, cd)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(d, cld)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(ld, cf)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(ld, cd)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(ld, cld)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cf, i)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cf, f)),
+               std::complex<float> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cf, d)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cf, ld)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cd, i)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cd, f)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cd, d)),
+               std::complex<double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cd, ld)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cld, i)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cld, f)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cld, d)),
+               std::complex<long double> >::value));
+   BOOST_TEST((std::is_same<decltype(loop_functions::A0(cld, ld)),
+               std::complex<long double> >::value));
+}
+
 BOOST_AUTO_TEST_CASE( test_A0_zero_complex_mass_limit_real_scale )
 {
    const std::size_t n_points = 100;
