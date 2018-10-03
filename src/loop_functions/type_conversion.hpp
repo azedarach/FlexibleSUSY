@@ -74,9 +74,34 @@ struct Promote_args {
       typename detail::Promote_args_helper<Default_promotion_rule, Types...>::type;
 };
 
+namespace detail {
+
+template <typename T, class Enable = void>
+struct Is_complex_helper;
+
+template <typename T>
+struct Is_complex_helper<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
+   : std::false_type {};
+
+template <>
+struct Is_complex_helper<std::complex<float> > : std::true_type {};
+
+template <>
+struct Is_complex_helper<std::complex<double> > : std::true_type {};
+
+template <>
+struct Is_complex_helper<std::complex<long double> > : std::true_type {};
+
+} // namespace detail
+
+template <typename T>
+struct Is_complex : detail::Is_complex_helper<T> {};
+
 template <typename T>
 struct Complexification {
-   using type = std::complex<T>;
+   using type =
+      typename std::conditional<Is_complex<T>::value,
+                                T, std::complex<T> >::type;
 };
 
 // helper function

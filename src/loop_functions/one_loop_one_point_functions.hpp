@@ -19,7 +19,6 @@
 #ifndef LOOP_FUNCTIONS_ONE_LOOP_ONE_POINT_FUNCTIONS_H
 #define LOOP_FUNCTIONS_ONE_LOOP_ONE_POINT_FUNCTIONS_H
 
-#include "evaluation_policies.hpp"
 #include "numerics2.hpp"
 #include "type_conversion.hpp"
 
@@ -45,38 +44,31 @@ namespace detail {
 //    return m_sq * (divergence + MassSq(1) - log(m_sq / scale_sq));
 // }
 
-template <typename T1, typename T2, typename T3, class Evaluation_policy>
-Complex_promotion<T1,T2,T3>::type
-A0_impl(T1 m_sq, T2 scale_sq, T3 divergence, const Evaluation_policy& policy)
+template <typename T>
+typename Complexification<T>::type
+A0_impl(T m_sq, T scale_sq, T divergence)
 {
+   using result_type = typename Complexification<T>::type;
    using std::log;
-   const auto value = m_sq * (divergence + result_type(1) - log(m_sq / scale_sq));
-   return value;
+   return m_sq * (divergence + result_type(1) - log(m_sq / scale_sq));
 }
 
 } // namespace detail
-
-template <typename T1, typename T2, typename T3, class Evaluation_policy>
-typename Complex_promotion<T1, T2, T3>::type
-A0(T1 m_sq, T2 scale_sq, T3 divergence, const Evaluation_policy& policy)
-{
-   return detail::A0_impl(m_sq, scale_sq, divergence, policy);
-}
 
 template <typename T1, typename T2, typename T3>
 typename Complex_promotion<T1, T2, T3>::type
 A0(T1 m_sq, T2 scale_sq, T3 divergence)
 {
-   return detail::A0_impl(m_sq, scale_sq, divergence,
-                          Default_evaluation_policy());
+   using argument_type = typename Promote_args<T1, T2, T3>::type;
+   return detail::A0_impl<argument_type>(m_sq, scale_sq, divergence);
 }
 
 template <typename T1, typename T2>
 typename Complex_promotion<T1,T2>::type
 A0(T1 m_sq, T2 scale_sq)
 {
-   return detail::A0_impl(m_sq, scale_sq, T1(0),
-                          Default_evaluation_policy());
+   using argument_type = typename Promote_args<T1, T2>::type;
+   return detail::A0_impl<argument_type>(m_sq, scale_sq, T1(0));
 }
 
 } // namespace loop_functions
