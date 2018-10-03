@@ -55,6 +55,7 @@ A0_impl(T m_sq, T scale_sq, T divergence)
 } // namespace detail
 
 // @todo make zero limit threshold configurable
+// @todo use separate routine for internal argument promotion
 template <typename T1, typename T2, typename T3>
 typename Promote_and_complexify<T1, T2, T3>::type
 A0(T1 m_sq, T2 scale_sq, T3 divergence)
