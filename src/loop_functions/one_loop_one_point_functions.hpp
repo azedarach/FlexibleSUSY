@@ -25,8 +25,6 @@
 #include <cmath>
 #include <complex>
 
-#include <iostream>
-
 namespace flexiblesusy {
 
 namespace loop_functions {
