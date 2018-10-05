@@ -109,6 +109,27 @@ std::complex<T> fast_log(const std::complex<T>& z) noexcept
    return std::complex<T>(std::log(std::abs(z)), std::arg(z));
 }
 
+// @todo check possible loss of precision
+template <class T>
+std::complex<T> complex_log1p(const std::complex<T>& z) noexcept
+{
+   using std::abs;
+
+   const auto r = abs(z);
+
+   if (is_zero(r)) {
+      return z;
+   } else if (r > 0.5) {
+      return fast_log(std::complex<T>(1, 0) + z);
+   }
+
+   const auto rz = std::real(z);
+   const auto iz = std::imag(z);
+
+   return std::complex<T>(0.5 * std::log1p(rz * rz + 2 * rz + iz * iz),
+                          std::atan2(iz, 1 + rz));
+}
+
 } // namespace flexiblesusy
 
 #endif

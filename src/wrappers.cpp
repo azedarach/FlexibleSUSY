@@ -138,6 +138,11 @@ double Log(double a) noexcept
    return std::log(a);
 }
 
+double Log1p(double a) noexcept
+{
+   return std::log1p(a);
+}
+
 std::complex<double> ComplexLog(double a) noexcept
 {
    return fast_log(std::complex<double>(a,0.));
@@ -146,6 +151,16 @@ std::complex<double> ComplexLog(double a) noexcept
 std::complex<double> ComplexLog(const std::complex<double>& z) noexcept
 {
    return fast_log(z);
+}
+
+std::complex<double> ComplexLog1p(double a) noexcept
+{
+   return complex_log1p(std::complex<double>(a, 0.));
+}
+
+std::complex<double> ComplexLog1p(const std::complex<double>& z) noexcept
+{
+   return complex_log1p(z);
 }
 
 double FiniteLog(double a) noexcept

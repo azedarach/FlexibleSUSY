@@ -245,6 +245,8 @@ typename Eigen::MatrixBase<Derived>::PlainObject Diag(const Eigen::MatrixBase<De
 
 std::complex<double> ComplexLog(double a) noexcept;
 std::complex<double> ComplexLog(const std::complex<double>& z) noexcept;
+std::complex<double> ComplexLog1p(double a) noexcept;
+std::complex<double> ComplexLog1p(const std::complex<double>& z) noexcept;
 double FiniteLog(double a) noexcept;
 
 /**
@@ -341,6 +343,7 @@ double PrintWARNING(Ts&&... vs)
 ///////////////////////// end of logger commands /////////////////////////
 
 double Log(double a) noexcept;
+double Log1p(double a) noexcept;
 
 double MaxRelDiff(double, double);
 double MaxRelDiff(const std::complex<double>&, const std::complex<double>&);
