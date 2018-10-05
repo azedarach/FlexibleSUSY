@@ -73,19 +73,71 @@ template <typename T>
 typename std::enable_if<Is_complex<T>::value, typename Complexification<T>::type>::type
 B0_momentum_terms_one_zero_mass(T p_sq, T m_sq)
 {
-}
+   using complex_type = typename Complexification<T>::type;
+   using std::abs;
 
-template <typename T>
-typename std::enable_if<!Is_complex<T>::value, typename Complexification<T>::type>::type
-B0_momentum_terms_one_zero_mass(T p_sq, T m_sq)
-{
-   if (is_zero(p_sq)) {
+   if (is_zero(abs(p_sq))) {
       return 1;
    }
 
    const auto diff = m_sq - p_sq;
    const auto s1 = p_sq / m_sq;
    const auto s2 = diff / m_sq;
+
+   complex_type s;
+   if (abs(s1) < 0.125) {
+      s = ComplexLog1p(-s1);
+   } else if (Re(s2) > 0) {
+      s = ComplexLog(s2);
+   } else {
+      s = ComplexLog(-s) - complex_type(0, Pi);
+   }
+
+   s *= -diff / p_sq;
+
+   return 2 - s;
+}
+
+template <typename T>
+typename std::enable_if<!Is_complex<T>::value, typename Complexification<T>::type>::type
+B0_momentum_terms_one_zero_mass(T p_sq, T m_sq)
+{
+   using complex_type = typename Complexification<T>::type;
+   using std::abs;
+   using std::log;
+
+   const auto diff = m_sq - p_sq;
+   if (is_zero(p_sq)) {
+      return 1;
+   } else if (is_zero(diff)) {
+      return 2;
+   }
+
+   const auto s1 = p_sq / m_sq;
+   T s;
+   if (abs(s1) < 0.125) {
+      s = Log1p(-s1);
+   } else {
+      s = log(abs(diff / m_sq));
+   }
+
+   s *= -diff / p_sq;
+
+   return 2 - s + (p_sq > m_sq ? complex_type(0, -diff * Pi / p_sq) :
+                   complex_type(0, 0));
+}
+
+template <typename T>
+typename std::enable_if<Is_complex<T>::value, typename Complexification<T>::type>::type
+B0_momentum_terms_equal_masses(T p_sq, T m_sq)
+{
+   using std::abs;
+
+   if (abs(p_sq) < abs(m_sq)) {
+      return B0_momentum_terms_equal_masses_series(p_sq, m_sq);
+   }
+
+   
 }
 
 // @note assumes at least one argument is non-zero
