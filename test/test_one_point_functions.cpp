@@ -487,7 +487,7 @@ BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_time )
 
 #ifdef ENABLE_LOOPTOOLS
 
-BOOST_AUTO_TEST_CASE( test_looptools_A0_pos_real_args_value)
+BOOST_AUTO_TEST_CASE( test_looptools_A0_pos_real_args_value )
 {
    const double tol = 1.e-14;
    BOOST_CHECK_LT(std::abs(loop_functions::A0(2, 1) -
