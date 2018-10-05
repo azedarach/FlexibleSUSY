@@ -420,6 +420,19 @@ BOOST_AUTO_TEST_CASE( test_A0_zero_complex_mass_limit_real_scale )
    }
 }
 
+BOOST_AUTO_TEST_CASE( test_A0_negative_real_mass_value )
+{
+   const double tol = 1.e-15;
+
+   BOOST_CHECK_CLOSE_FRACTION(Re(loop_functions::A0(-1, 1)), -1., tol);
+   BOOST_CHECK_CLOSE_FRACTION(Im(loop_functions::A0(-1, 1)), Pi, tol);
+
+   BOOST_CHECK_CLOSE_FRACTION(Re(loop_functions::A0(-10, 1)),
+                              -10. * (1 - std::log(10.)), tol);
+   BOOST_CHECK_CLOSE_FRACTION(Im(loop_functions::A0(-10, 1)),
+                              10. * Pi, tol);
+}
+
 BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_value )
 {
    const double tol = 1.e-14;
@@ -469,7 +482,7 @@ BOOST_AUTO_TEST_CASE( test_softsusy_ReA0_pos_real_args_time )
                       "Softsusy     : " << ss_time << "s\n"
                       "FlexibleSUSY : " << fs_time << "s\n");
 
-   BOOST_CHECK_GT(ss_time, fs_time);
+   BOOST_CHECK_LT(fs_time / ss_time, 1.2);
 }
 
 #ifdef ENABLE_LOOPTOOLS

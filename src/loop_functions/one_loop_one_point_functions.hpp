@@ -32,22 +32,28 @@ namespace loop_functions {
 namespace detail {
 
 template <typename T>
-typename std::enable_if<Is_complex<T>::value, typename Complexification<T>::type>::type
-A0_impl(T m_sq, T scale_sq, T divergence)
-{
-   using result_type = typename Complexification<T>::type;
-
-   return m_sq * (divergence + result_type(1) - fast_log(m_sq / scale_sq));
-}
-
-template <typename T>
 typename std::enable_if<!Is_complex<T>::value, typename Complexification<T>::type>::type
 A0_impl(T m_sq, T scale_sq, T divergence)
 {
    using result_type = typename Complexification<T>::type;
    using std::log;
 
-   return m_sq * (divergence + result_type(1) - log(m_sq / scale_sq));
+   if (m_sq > 0 && scale_sq > 0) {
+      return m_sq * (divergence + result_type(1) - log(m_sq / scale_sq));
+   }
+
+   const auto log_arg = result_type(m_sq / scale_sq);
+
+   return m_sq * (divergence + result_type(1) - fast_log(log_arg));
+}
+
+template <typename T>
+typename std::enable_if<Is_complex<T>::value, typename Complexification<T>::type>::type
+A0_impl(T m_sq, T scale_sq, T divergence)
+{
+   using result_type = typename Complexification<T>::type;
+
+   return m_sq * (divergence + result_type(1) - fast_log(m_sq / scale_sq));
 }
 
 } // namespace detail
